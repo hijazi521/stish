@@ -29,8 +29,6 @@ export function PhishingLinkCard({ title, description, Icon, links, cardColorCla
   const [redirectUrl, setRedirectUrl] = useState('');
 
   useEffect(() => {
-    // Load saved redirect URL for content-unlock template only
-    // This assumes only one PhishingLinkCard instance will contain the 'content-unlock' id
     const hasContentUnlockLink = links.some(link => link.id === 'content-unlock');
     if (hasContentUnlockLink) {
       const savedUrl = localStorage.getItem(CONTENT_UNLOCK_REDIRECT_URL_KEY);
@@ -87,23 +85,25 @@ export function PhishingLinkCard({ title, description, Icon, links, cardColorCla
                 {link.name}
               </Button>
               {link.id === 'content-unlock' && (
-                <div className="mt-2 flex items-center space-x-2 px-1">
-                  <Button
-                    variant={redirectUrl ? 'default' : 'outline'}
-                    size="icon"
-                    className="h-8 w-8 flex-shrink-0 p-0"
-                    onClick={handleSaveRedirectUrl}
-                    aria-label="Save redirection URL"
-                  >
-                    <Save className="h-4 w-4" />
-                  </Button>
-                  <Input
-                    type="url"
-                    placeholder="Enter redirection URL"
-                    className="h-8 text-sm text-center flex-grow"
-                    value={redirectUrl}
-                    onChange={(e) => setRedirectUrl(e.target.value)}
-                  />
+                <div className="mt-2 pl-3 border-l-2 border-border/60 ml-1 py-2">
+                  <div className="flex items-center space-x-2">
+                    <Button
+                      variant={redirectUrl ? 'default' : 'outline'}
+                      size="icon"
+                      className="h-8 w-8 flex-shrink-0 p-0"
+                      onClick={handleSaveRedirectUrl}
+                      aria-label="Save redirection URL"
+                    >
+                      <Save className="h-4 w-4" />
+                    </Button>
+                    <Input
+                      type="url"
+                      placeholder="Enter redirection URL"
+                      className="h-8 text-sm text-center flex-grow"
+                      value={redirectUrl}
+                      onChange={(e) => setRedirectUrl(e.target.value)}
+                    />
+                  </div>
                 </div>
               )}
             </div>
