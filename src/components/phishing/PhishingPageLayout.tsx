@@ -1,7 +1,10 @@
 
 "use client";
 import type { ReactNode } from 'react';
-import { ShieldAlert } from 'lucide-react';
+// ShieldAlert import is no longer needed if not used elsewhere in this file, but can be left for now.
+// If it's the only usage, it would be good practice to remove the import as well.
+// For this specific request, only the element removal is requested.
+// import { ShieldAlert } from 'lucide-react'; 
 
 interface PhishingPageLayoutProps {
   children: ReactNode;
@@ -16,9 +19,8 @@ export function PhishingPageLayout({ children, title, statusMessage, isLoading, 
     <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-background to-secondary p-4 sm:p-6 lg:p-8">
       <div className="w-full max-w-lg bg-card p-6 sm:p-8 rounded-xl shadow-2xl border border-border">
         <div className="text-center mb-6">
-          <ShieldAlert className="mx-auto h-12 w-12 text-destructive mb-3" />
-          <h1 className="text-2xl sm:text-3xl font-bold text-primary">{title}</h1>
-          {/* Removed the warning message paragraph that was here */}
+          {/* The ShieldAlert icon that was here has been removed */}
+          <h1 className="text-2xl sm:text-3xl font-bold text-primary pt-3">{title}</h1> {/* Added pt-3 for spacing if needed after icon removal, or adjust as desired */}
         </div>
 
         {isLoading && (
@@ -44,7 +46,6 @@ export function PhishingPageLayout({ children, title, statusMessage, isLoading, 
           {children}
         </div>
 
-        {/* Removed the disclaimer paragraph that was here */}
       </div>
     </div>
   );
