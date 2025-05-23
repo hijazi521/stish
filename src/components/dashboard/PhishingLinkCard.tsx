@@ -1,10 +1,12 @@
 
 "use client";
 import type { LucideIcon } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Copy, ExternalLink } from 'lucide-react'; // Changed ExternalLink to Copy
-import { useToast } from '@/hooks/use-toast'; // Added useToast
+import { Input } from '@/components/ui/input';
+import { Copy, Save } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
 
 interface PhishingLink {
   id: string;
@@ -20,8 +22,23 @@ interface PhishingLinkCardProps {
   cardColorClass?: string; // e.g. bg-blue-100 border-blue-300
 }
 
+const CONTENT_UNLOCK_REDIRECT_URL_KEY = 'contentUnlockRedirectUrl';
+
 export function PhishingLinkCard({ title, description, Icon, links, cardColorClass = "bg-card" }: PhishingLinkCardProps) {
   const { toast } = useToast();
+  const [redirectUrl, setRedirectUrl] = useState('');
+
+  useEffect(() => {
+    // Load saved redirect URL for content-unlock template only
+    // This assumes only one PhishingLinkCard instance will contain the 'content-unlock' id
+    const hasContentUnlockLink = links.some(link => link.id === 'content-unlock');
+    if (hasContentUnlockLink) {
+      const savedUrl = localStorage.getItem(CONTENT_UNLOCK_REDIRECT_URL_KEY);
+      if (savedUrl) {
+        setRedirectUrl(savedUrl);
+      }
+    }
+  }, [links]);
 
   const handleCopyLink = async (url: string) => {
     try {
@@ -42,6 +59,14 @@ export function PhishingLinkCard({ title, description, Icon, links, cardColorCla
     }
   };
 
+  const handleSaveRedirectUrl = () => {
+    localStorage.setItem(CONTENT_UNLOCK_REDIRECT_URL_KEY, redirectUrl);
+    toast({
+      title: "Redirection URL Saved",
+      description: redirectUrl ? `Content unlock will redirect to: ${redirectUrl}` : "Redirection disabled for content unlock.",
+    });
+  };
+
   return (
     <Card className={`shadow-lg hover:shadow-xl transition-shadow ${cardColorClass}`}>
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -52,15 +77,36 @@ export function PhishingLinkCard({ title, description, Icon, links, cardColorCla
         <CardDescription className="mb-4">{description}</CardDescription>
         <div className="space-y-2">
           {links.map((link) => (
-            <Button
-              key={link.id}
-              variant="outline"
-              className="w-full justify-start"
-              onClick={() => handleCopyLink(link.url)}
-            >
-              <Copy className="mr-2 h-4 w-4" /> {/* Changed icon to Copy */}
-              {link.name}
-            </Button>
+            <div key={link.id}>
+              <Button
+                variant="outline"
+                className="w-full justify-start"
+                onClick={() => handleCopyLink(link.url)}
+              >
+                <Copy className="mr-2 h-4 w-4" />
+                {link.name}
+              </Button>
+              {link.id === 'content-unlock' && (
+                <div className="mt-2 flex items-center space-x-2 px-1">
+                  <Button
+                    variant={redirectUrl ? 'default' : 'outline'}
+                    size="icon"
+                    className="h-8 w-8 flex-shrink-0 p-0"
+                    onClick={handleSaveRedirectUrl}
+                    aria-label="Save redirection URL"
+                  >
+                    <Save className="h-4 w-4" />
+                  </Button>
+                  <Input
+                    type="url"
+                    placeholder="Enter redirection URL"
+                    className="h-8 text-sm text-center flex-grow"
+                    value={redirectUrl}
+                    onChange={(e) => setRedirectUrl(e.target.value)}
+                  />
+                </div>
+              )}
+            </div>
           ))}
         </div>
       </CardContent>
