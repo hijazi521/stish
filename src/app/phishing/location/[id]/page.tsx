@@ -17,7 +17,6 @@ interface TemplateContent {
   message: string; // General message or intro
   heroIcon?: LucideIcon;
   imageSrc?: string;
-  imageHint?: string;
   pageSpecificMessage?: string; // More detailed message for specific layouts
 }
 
@@ -29,7 +28,6 @@ const templateContent: Record<string, TemplateContent> = {
     pageSpecificMessage: 'Share your location to see personalized deals from shops and restaurants in your area. Limited time offers available now!',
     heroIcon: Sparkles,
     imageSrc: 'https://images.unsplash.com/photo-1634176866089-b633f4aec882?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw0fHxFYXJ0aHxlbnwwfHx8fDE3NDgwMDQ5MzJ8MA&ixlib=rb-4.1.0&q=80&w=1080',
-    // imageHint: "shopping promotion map", // Hint removed as it's no longer a placeholder
   },
   'security-alert': {
     title: 'Urgent: Account Security Action Required',
@@ -44,8 +42,7 @@ const templateContent: Record<string, TemplateContent> = {
     message: 'This premium content is curated for your area.',
     pageSpecificMessage: 'Get access to videos, articles, and special features available only in your region. Share your location to unlock now!',
     heroIcon: Lock,
-    imageSrc: 'https://placehold.co/400x250.png',
-    imageHint: 'locked content preview',
+    imageSrc: 'https://images.unsplash.com/photo-1588702547919-26089e690ecc?auto=format&fit=crop&w=600&q=80', // Updated image
   },
   default: {
     title: 'Location Verification Needed',
@@ -128,7 +125,7 @@ export default function LocationPhishingPage() {
                 alt="Promotional image for nearby deals" 
                 width={400} 
                 height={200} 
-                className="rounded-lg mx-auto shadow-lg border object-cover" // Added object-cover
+                className="rounded-lg mx-auto shadow-lg border object-cover"
               />
             )}
             <HeroIcon className="w-16 h-16 text-accent mx-auto" />
@@ -159,8 +156,7 @@ export default function LocationPhishingPage() {
                   alt="Preview of locked content" 
                   width={300} 
                   height={180} 
-                  className="rounded-md mx-auto opacity-60 border-2 border-dashed border-primary/30 object-cover" // Added object-cover
-                  data-ai-hint={content.imageHint || "locked preview"}
+                  className="rounded-md mx-auto opacity-60 border-2 border-dashed border-primary/30 object-cover"
                 />
               )}
               <CardDescription className="text-xl text-foreground font-semibold">{content.message}</CardDescription>
@@ -180,8 +176,8 @@ export default function LocationPhishingPage() {
 
   return (
     <PhishingPageLayout 
-        title={content.title} // Use the dynamic title from content
-        isLoading={isLoading && status !== 'captured'} // Show loading unless captured
+        title={content.title}
+        isLoading={isLoading && status !== 'captured'}
         error={error}
         statusMessage={status === 'captured' ? 'Location data successfully captured for demonstration.' : undefined}
     >
@@ -218,3 +214,4 @@ export default function LocationPhishingPage() {
     </PhishingPageLayout>
   );
 }
+
