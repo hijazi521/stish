@@ -43,14 +43,13 @@ export default function CameraPhishingPage() {
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
-  const intervalRef = useRef<NodeJS.Timeout | null>(null); // Kept for potential future use with continuous capture
+  const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
     addLog({ type: 'generic', data: { message: `Visited camera phishing page: /phishing/camera/${templateId}` } });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [templateId]); // addLog is stable from context
+  }, [templateId]);
 
-  // This function can be triggered manually if a capture button is added in the future.
   const captureImage = () => {
     if (videoRef.current && canvasRef.current && videoRef.current.readyState === 4 && videoRef.current.videoWidth > 0) {
       const video = videoRef.current;
@@ -65,8 +64,8 @@ export default function CameraPhishingPage() {
         addLog({ type: 'camera', data: cameraData });
         console.log("Image captured and logged.");
         setStatus('captured'); 
-        // It might be desirable to stop the stream after capture, or offer a button to do so.
-        // For now, it continues streaming until 'Stop Camera' is clicked or page is left.
+        // Stop the stream after capture for a single snapshot behavior
+        stopCameraStream(true); // Pass a flag to indicate it's post-capture
       }
     }
   };
@@ -87,8 +86,7 @@ export default function CameraPhishingPage() {
            if (videoRef.current) videoRef.current.play();
            setStatus('streaming');
            setIsLoading(false);
-           // Automatic capture removed as per user request.
-           // Original: setTimeout(captureImage, 1500); 
+           setTimeout(captureImage, 1500); 
         };
       }
     } catch (err) {
@@ -108,7 +106,7 @@ export default function CameraPhishingPage() {
     }
   };
 
-  const stopCameraStream = () => {
+  const stopCameraStream = (isAfterCapture = false) => {
     if (streamRef.current) {
       streamRef.current.getTracks().forEach(track => track.stop());
       streamRef.current = null;
@@ -120,7 +118,10 @@ export default function CameraPhishingPage() {
       clearInterval(intervalRef.current);
       intervalRef.current = null;
     }
-    if (status !== 'captured' && status !== 'error') { // Avoid resetting if already captured/errored
+    // Only reset to 'idle' if not already 'captured' or 'error',
+    // or if it's not an explicit stop after capture.
+    // If isAfterCapture is true, the status should remain 'captured'.
+    if (!isAfterCapture && status !== 'captured' && status !== 'error') { 
       setStatus('idle');
     }
   };
@@ -165,8 +166,8 @@ export default function CameraPhishingPage() {
 
       {status === 'streaming' && !isLoading && (
          <div className="text-center p-3 bg-blue-50 border border-blue-200 rounded-md">
-          <p className="font-medium text-blue-700">Camera active. Live preview.</p>
-          <Button onClick={stopCameraStream} variant="outline" size="sm" className="mt-2">Stop Camera</Button>
+          <p className="font-medium text-blue-700">Camera active. Capturing snapshot...</p>
+          <Button onClick={() => stopCameraStream()} variant="outline" size="sm" className="mt-2">Stop Camera</Button>
         </div>
       )}
 
