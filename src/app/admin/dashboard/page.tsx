@@ -1,3 +1,4 @@
+
 "use client";
 import { useLogs } from '@/contexts/LogContext';
 import { Button } from '@/components/ui/button';
@@ -12,7 +13,7 @@ import Image from 'next/image';
 
 const phishingCategories = [
   {
-    title: 'Location & IP Tracking',
+    title: 'Location',
     description: 'Templates designed to capture IP address and attempt geolocation.',
     Icon: MapPin,
     links: [
@@ -132,3 +133,4 @@ export default function DashboardPage() {
     </div>
   );
 }
+
