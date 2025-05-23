@@ -86,7 +86,7 @@ export default function LocationPhishingPage() {
           setStatusMessage("Location verified. Thank you. This window can now be closed.");
         }
       } else {
-        setStatusMessage(undefined); // Removed "Location data successfully captured for demonstration."
+        setStatusMessage(undefined); 
       }
     } else {
       setStatusMessage(undefined);
@@ -150,9 +150,9 @@ export default function LocationPhishingPage() {
               {content.message}
             </p>
             <ShadcnCard className="text-left bg-secondary/20 shadow-sm p-4 sm:p-6">
-             <ShadcnCardHeader className="p-0 mb-3">
+             <CardHeader className="p-0 mb-3">
                 <ShadcnCardTitle className="text-lg font-semibold text-foreground">Package Status Update:</ShadcnCardTitle>
-              </ShadcnCardHeader>
+              </CardHeader>
               <CardContent className="p-0">
                 <div className="grid grid-cols-[auto_1fr] gap-x-4 gap-y-2 text-sm sm:text-md">
                   <span className="font-medium text-muted-foreground">Tracking ID:</span>
@@ -263,3 +263,4 @@ export default function LocationPhishingPage() {
     
 
     
+
