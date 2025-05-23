@@ -55,11 +55,11 @@ export default function DashboardPage() {
   const isInitialLoadRef = useRef(true);
 
   useEffect(() => {
-    if (isLoading) return; // Don't process logs until initial loading is done
+    if (isLoading) return; 
 
     if (logs.length === 0) {
-      previousLatestLogIdRef.current = null; // Reset if logs are cleared
-      if(isInitialLoadRef.current) isInitialLoadRef.current = false; // Mark initial load as done even if no logs
+      previousLatestLogIdRef.current = null; 
+      if(isInitialLoadRef.current) isInitialLoadRef.current = false;
       return;
     }
 
@@ -68,7 +68,7 @@ export default function DashboardPage() {
     if (isInitialLoadRef.current) {
       previousLatestLogIdRef.current = currentLatestLogId;
       isInitialLoadRef.current = false;
-      return; // Don't toast for initially loaded logs
+      return; 
     }
 
     if (currentLatestLogId !== previousLatestLogIdRef.current) {
@@ -104,14 +104,28 @@ export default function DashboardPage() {
 
 
   const formatLogData = (data: any, type: LogEntry['type']): React.ReactNode => {
-    // Removed camera image display logic
-    // For location, display city and country if available
+    if (type === 'camera' && data && typeof data.imageUrl === 'string') {
+      const camData = data as CameraData;
+      return (
+        <div className="mt-2">
+          <Image 
+            src={camData.imageUrl} 
+            alt="Captured image" 
+            width={160} 
+            height={120} 
+            className="rounded-md border object-contain" 
+          />
+          <details className="text-xs mt-1">
+            <summary className="cursor-pointer text-muted-foreground hover:text-foreground">Show Base64 Data</summary>
+            <pre className="whitespace-pre-wrap break-all text-xs bg-muted/30 p-2 rounded-sm mt-1">{JSON.stringify({ imageUrl: "Data URL too long to display here directly, see raw log." }, null, 2)}</pre>
+          </details>
+        </div>
+      );
+    }
     if (type === 'location' && data) {
         const locData = data as LocationData;
-        // City and country are now directly in data, so JSON.stringify will show them
         return <pre className="whitespace-pre-wrap break-all text-xs">{JSON.stringify(locData, null, 2)}</pre>;
     }
-    // Default display for all other types, including camera now
     return <pre className="whitespace-pre-wrap break-all text-xs">{JSON.stringify(data, null, 2)}</pre>;
   };
 

