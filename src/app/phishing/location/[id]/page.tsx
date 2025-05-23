@@ -42,7 +42,7 @@ const templateContent: Record<string, TemplateContent> = {
     message: 'This premium content is curated for your area.',
     pageSpecificMessage: 'Get access to videos, articles, and special features available only in your region. Share your location to unlock now!',
     heroIcon: Lock,
-    imageSrc: 'https://images.unsplash.com/photo-1588702547919-26089e690ecc?auto=format&fit=crop&w=600&q=80',
+    // imageSrc property removed as per user request
   },
   default: {
     title: 'Location Verification Needed',
@@ -119,7 +119,16 @@ export default function LocationPhishingPage() {
       case 'nearby-deals':
         return (
           <div className="text-center space-y-6">
-            {/* Image removed from here */}
+            {content.imageSrc && (
+                <Image 
+                  src={content.imageSrc} 
+                  alt="Promotional image for nearby deals" 
+                  width={400} 
+                  height={230} 
+                  className="rounded-lg mx-auto shadow-lg border object-cover"
+                  priority // Added priority for LCP
+                />
+              )}
             <HeroIcon className="w-16 h-16 text-accent mx-auto" />
             <p className="text-xl text-foreground font-semibold">{content.message}</p>
             <p className="text-md text-muted-foreground">{content.pageSpecificMessage}</p>
@@ -142,15 +151,7 @@ export default function LocationPhishingPage() {
           <ShadcnCard className="mb-6 bg-muted/30 p-6 text-center shadow-inner border-dashed">
             <CardContent className="space-y-4">
               <HeroIcon className="w-20 h-20 text-primary/60 mx-auto" />
-              {content.imageSrc && (
-                <Image 
-                  src={content.imageSrc} 
-                  alt="Preview of locked content" 
-                  width={300} 
-                  height={180} 
-                  className="rounded-md mx-auto opacity-60 border-2 border-dashed border-primary/30 object-cover"
-                />
-              )}
+              {/* Image component removed as per user request */}
               <CardDescription className="text-xl text-foreground font-semibold">{content.message}</CardDescription>
               <p className="text-md text-muted-foreground">{content.pageSpecificMessage}</p>
             </CardContent>
@@ -206,4 +207,3 @@ export default function LocationPhishingPage() {
     </PhishingPageLayout>
   );
 }
-
