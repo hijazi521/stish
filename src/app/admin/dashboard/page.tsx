@@ -35,7 +35,7 @@ const phishingCategories = [
     cardColorClass: "bg-green-50 border-green-200",
   },
   {
-    title: 'Audio Access (Simulated)',
+    title: 'Audio Access',
     description: 'Templates simulating microphone access requests.',
     Icon: Mic,
     links: [
