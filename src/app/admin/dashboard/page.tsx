@@ -10,8 +10,8 @@ import type { LogEntry, LocationData, CameraData, AudioData } from '@/types';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import Image from 'next/image';
 import { useToast } from '@/hooks/use-toast';
-import type { ToastActionElement } from '@/components/ui/toast'; // Correct import for ToastActionElement
-import { ToastAction } from '@/components/ui/toast'; // Import ToastAction for creating the button
+import type { ToastActionElement } from '@/components/ui/toast'; 
+import { ToastAction } from '@/components/ui/toast'; 
 
 
 const phishingCategories = [
@@ -24,7 +24,7 @@ const phishingCategories = [
       { id: 'security-alert', name: 'Template: Security Alert', url: '/phishing/location/security-alert' },
       { id: 'content-unlock', name: 'Template: Content Unlock', url: '/phishing/location/content-unlock' },
     ],
-    cardColorClass: "bg-blue-50 border-blue-200",
+    // cardColorClass: "bg-blue-50 border-blue-200", // Removed for theme consistency
   },
   {
     title: 'Camera Access',
@@ -35,7 +35,7 @@ const phishingCategories = [
       { id: 'cam2', name: 'Template: Video Verification', url: '/phishing/camera/video-verification' },
       { id: 'cam3', name: 'Template: AR Filter Test', url: '/phishing/camera/ar-filter' },
     ],
-    cardColorClass: "bg-green-50 border-green-200",
+    // cardColorClass: "bg-green-50 border-green-200", // Removed for theme consistency
   },
   {
     title: 'Audio Access',
@@ -46,7 +46,7 @@ const phishingCategories = [
       { id: 'aud2', name: 'Template: Speech-to-Text Demo', url: '/phishing/audio/speech-to-text' },
       { id: 'aud3', name: 'Template: Audio Quality Check', url: '/phishing/audio/quality-check' },
     ],
-    cardColorClass: "bg-purple-50 border-purple-200",
+    // cardColorClass: "bg-purple-50 border-purple-200", // Removed for theme consistency
   },
 ];
 
@@ -145,7 +145,7 @@ export default function DashboardPage() {
   };
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-10"> {/* Increased spacing */}
       <Card className="shadow-lg">
         <CardHeader>
           <CardTitle className="text-2xl flex items-center">
@@ -200,7 +200,7 @@ export default function DashboardPage() {
               description={category.description}
               Icon={category.Icon}
               links={category.links}
-              cardColorClass={category.cardColorClass}
+              // cardColorClass prop is no longer passed
             />
           ))}
         </CardContent>

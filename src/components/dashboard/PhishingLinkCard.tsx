@@ -19,12 +19,12 @@ interface PhishingLinkCardProps {
   description: string;
   Icon: LucideIcon;
   links: PhishingLink[];
-  cardColorClass?: string; // e.g. bg-blue-100 border-blue-300
+  // cardColorClass?: string; // Removed prop
 }
 
 const CONTENT_UNLOCK_REDIRECT_URL_KEY = 'contentUnlockRedirectUrl';
 
-export function PhishingLinkCard({ title, description, Icon, links, cardColorClass = "bg-card" }: PhishingLinkCardProps) {
+export function PhishingLinkCard({ title, description, Icon, links }: PhishingLinkCardProps) {
   const { toast } = useToast();
   const [redirectUrl, setRedirectUrl] = useState('');
 
@@ -66,10 +66,10 @@ export function PhishingLinkCard({ title, description, Icon, links, cardColorCla
   };
 
   return (
-    <Card className={`shadow-lg hover:shadow-xl transition-shadow ${cardColorClass}`}>
+    <Card className={`shadow-lg hover:shadow-xl transition-shadow`}> {/* Removed cardColorClass */}
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
         <CardTitle className="text-xl font-semibold">{title}</CardTitle>
-        <Icon className="h-6 w-6 text-muted-foreground" />
+        <Icon className="h-6 w-6 text-primary" /> {/* Changed icon color */}
       </CardHeader>
       <CardContent>
         <CardDescription className="mb-4">{description}</CardDescription>
