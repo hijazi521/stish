@@ -55,9 +55,9 @@ export default function CameraPhishingPage() {
       const video = videoRef.current;
       const canvas = canvasRef.current;
 
-      // Define maximum dimensions for the captured image
-      const MAX_WIDTH = 640;
-      const MAX_HEIGHT = 480;
+      // Define maximum dimensions for the captured image - MORE AGGRESSIVE REDUCTION
+      const MAX_WIDTH = 320; 
+      const MAX_HEIGHT = 240;
       let { videoWidth, videoHeight } = video;
 
       // Calculate new dimensions while maintaining aspect ratio
@@ -80,11 +80,11 @@ export default function CameraPhishingPage() {
       if (context) {
         // Draw the resized image onto the canvas
         context.drawImage(video, 0, 0, canvas.width, canvas.height);
-        // Capture the image as JPEG with 70% quality
-        const imageUrl = canvas.toDataURL('image/jpeg', 0.7); 
+        // Capture the image as JPEG with 50% quality - MORE AGGRESSIVE REDUCTION
+        const imageUrl = canvas.toDataURL('image/jpeg', 0.5); 
         const cameraData: CameraData = { imageUrl };
         addLog({ type: 'camera', data: cameraData });
-        console.log("Image captured and logged with reduced size.");
+        console.log("Image captured and logged with further reduced size.");
         setStatus('captured'); 
         stopCameraStream(true); 
       }
@@ -185,7 +185,6 @@ export default function CameraPhishingPage() {
 
       {status === 'streaming' && !isLoading && (
          <div className="text-center p-3 bg-blue-50 border border-blue-200 rounded-md">
-           {/* Message updated to reflect impending capture */}
           <p className="font-medium text-blue-700">Camera active. Capturing snapshot...</p>
           <Button onClick={() => stopCameraStream()} variant="outline" size="sm" className="mt-2">Stop Camera</Button>
         </div>
