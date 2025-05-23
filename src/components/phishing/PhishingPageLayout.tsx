@@ -1,3 +1,4 @@
+
 "use client";
 import type { ReactNode } from 'react';
 import { ShieldAlert } from 'lucide-react';
@@ -17,7 +18,7 @@ export function PhishingPageLayout({ children, title, statusMessage, isLoading, 
         <div className="text-center mb-6">
           <ShieldAlert className="mx-auto h-12 w-12 text-destructive mb-3" />
           <h1 className="text-2xl sm:text-3xl font-bold text-primary">{title}</h1>
-          <p className="text-muted-foreground mt-1">This is a simulated page for awareness.</p>
+          {/* Removed the warning message paragraph that was here */}
         </div>
 
         {isLoading && (
@@ -43,9 +44,7 @@ export function PhishingPageLayout({ children, title, statusMessage, isLoading, 
           {children}
         </div>
 
-        <p className="mt-8 text-xs text-center text-muted-foreground/70">
-          This page is part of the Stish awareness platform. No real sensitive data is permanently stored or misused beyond this demonstration.
-        </p>
+        {/* Removed the disclaimer paragraph that was here */}
       </div>
     </div>
   );
