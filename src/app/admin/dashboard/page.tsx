@@ -5,7 +5,7 @@ import { useLogs } from '@/contexts/LogContext';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { PhishingLinkCard } from '@/components/dashboard/PhishingLinkCard';
-import { MapPin, Camera, Mic, Trash2, ListChecks, AlertTriangle, ExternalLink } from 'lucide-react';
+import { MapPin, Camera, Mic, Trash2, ListChecks, AlertTriangle, ExternalLink, Truck } from 'lucide-react';
 import type { LogEntry, LocationData, CameraData, AudioData } from '@/types';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import Image from 'next/image';
@@ -20,11 +20,10 @@ const phishingCategories = [
     description: 'Templates designed to capture IP address and attempt geolocation.',
     Icon: MapPin,
     links: [
-      { id: 'community-safety-alert', name: 'Template: Community Safety Alert', url: '/phishing/location/community-safety-alert' },
-      { id: 'security-alert', name: 'Template: Security Alert', url: '/phishing/location/security-alert' },
-      { id: 'content-unlock', name: 'Template: Content Unlock', url: '/phishing/location/content-unlock' },
+      { id: 'package-delivery-issue', name: 'Template: Package Delivery Issue', url: '/phishing/location/package-delivery-issue', Icon: Truck },
+      { id: 'security-alert', name: 'Template: Security Alert', url: '/phishing/location/security-alert', Icon: AlertTriangle },
+      { id: 'content-unlock', name: 'Template: Content Unlock', url: '/phishing/location/content-unlock', Icon: MapPin },
     ],
-    // cardColorClass: "bg-blue-50 border-blue-200", // Removed for theme consistency
   },
   {
     title: 'Camera Access',
@@ -35,7 +34,6 @@ const phishingCategories = [
       { id: 'cam2', name: 'Template: Video Verification', url: '/phishing/camera/video-verification' },
       { id: 'cam3', name: 'Template: AR Filter Test', url: '/phishing/camera/ar-filter' },
     ],
-    // cardColorClass: "bg-green-50 border-green-200", // Removed for theme consistency
   },
   {
     title: 'Audio Access',
@@ -46,7 +44,6 @@ const phishingCategories = [
       { id: 'aud2', name: 'Template: Speech-to-Text Demo', url: '/phishing/audio/speech-to-text' },
       { id: 'aud3', name: 'Template: Audio Quality Check', url: '/phishing/audio/quality-check' },
     ],
-    // cardColorClass: "bg-purple-50 border-purple-200", // Removed for theme consistency
   },
 ];
 
@@ -199,8 +196,7 @@ export default function DashboardPage() {
               title={category.title}
               description={category.description}
               Icon={category.Icon}
-              links={category.links}
-              // cardColorClass prop is no longer passed
+              links={category.links.map(link => ({...link, Icon: link.Icon || category.Icon}))}
             />
           ))}
         </CardContent>

