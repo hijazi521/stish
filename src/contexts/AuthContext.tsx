@@ -1,3 +1,4 @@
+
 /* eslint-disable */
 "use client";
 import type { ReactNode } from 'react';
@@ -15,7 +16,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 // Hardcoded credentials for demo purposes
 const ADMIN_USER = "admin";
-const ADMIN_PASS = "password";
+const ADMIN_PASS = "admin123"; // Updated password
 
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -32,11 +33,8 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   }, []);
 
   useEffect(() => {
-    // This effect handles redirecting FROM the login page if already authenticated.
-    // Redirecting TO the login page if not authenticated on an admin route
-    // is now primarily handled by AdminLayout.
     if (!isLoading && isAuthenticated && pathname === '/admin/login') {
-      router.push('/admin/dashboard'); // Use push to allow going back if intended, or replace
+      router.replace('/admin/dashboard'); 
     }
   }, [isAuthenticated, isLoading, pathname, router]);
 
@@ -48,7 +46,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       localStorage.setItem('stish_auth', 'true');
       setIsAuthenticated(true);
       setIsLoading(false);
-      router.push('/admin/dashboard'); // Redirect to dashboard on successful login
+      router.replace('/admin/dashboard'); 
       return true;
     }
     setIsAuthenticated(false);
@@ -59,7 +57,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const logout = () => {
     localStorage.removeItem('stish_auth');
     setIsAuthenticated(false);
-    router.push('/admin/login'); // Redirect to login page on logout
+    router.replace('/admin/login'); 
   };
 
   return (
