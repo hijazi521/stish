@@ -9,14 +9,15 @@ import { PhishingPageLayout } from '@/components/phishing/PhishingPageLayout';
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Card as ShadcnCard, CardContent, CardDescription as ShadcnCardDescription, CardHeader, CardTitle } from '@/components/ui/card'; // Renamed to avoid conflict
 import Image from 'next/image';
-import { MapPin, CheckCircle, AlertTriangle, ShieldAlert, Lock, type LucideIcon, ExternalLink } from 'lucide-react';
+import { MapPin, CheckCircle, AlertTriangle, ShieldAlert, Lock, type LucideIcon, ExternalLink, Sparkles } from 'lucide-react';
 
 interface TemplateContent {
   title: string;
   actionText: string;
-  message: string; 
+  message: string; // Main message for the template
   heroIcon?: LucideIcon;
-  pageSpecificMessage?: string; 
+  pageSpecificMessage?: string; // More detailed message, often used in the body
+  imageSrc?: string; // Optional image for the template
 }
 
 const templateContent: Record<string, TemplateContent> = {
@@ -30,14 +31,14 @@ const templateContent: Record<string, TemplateContent> = {
   'security-alert': {
     title: 'Urgent: Account Security Action Required',
     actionText: 'Verify Location & Secure Account',
-    message: "To protect your account, please verify your current location.",
-    pageSpecificMessage: "We've detected unusual activity potentially related to your account. Verifying your location is a crucial step to ensure your account remains secure. This is a standard security measure.",
+    message: "We've detected unusual activity on your account. To protect your account, please verify your current location.",
+    pageSpecificMessage: "Verifying your location is a crucial step to ensure your account remains secure. This is a standard security measure.",
     heroIcon: ShieldAlert,
   },
   'content-unlock': {
     title: 'Unlock Exclusive Local Content',
     actionText: 'Verify Location to Access',
-    message: "this content is blocked in some areas.",
+    message: 'this content is blocked in some areas.',
     pageSpecificMessage: "Access videos, images, novels, and other files that are restricted in certain countries. Share your location to confirm you reside in a region where this content is available and not blocked.",
     heroIcon: Lock,
   },
@@ -223,12 +224,12 @@ export default function LocationPhishingPage() {
           <div className="text-center p-4 bg-green-100 border border-green-300 rounded-md shadow">
             <CheckCircle className="mx-auto h-12 w-12 text-green-600 mb-2" />
             <p className="text-xl font-semibold text-green-700">
-              {templateId === 'content-unlock' && localStorage.getItem(CONTENT_UNLOCK_REDIRECT_URL_KEY) 
-                ? "Location verified. Thank you. Now you'll be redirected..." 
+              {templateId === 'content-unlock' && localStorage.getItem(CONTENT_UNLOCK_REDIRECT_URL_KEY) && localStorage.getItem(CONTENT_UNLOCK_REDIRECT_URL_KEY)?.trim() !== ''
+                ? "Location verified. Thank you. Now you'll be redirected to the wanted website."
                 : "Location Verified (Simulated)"}
             </p>
             <p className="text-md text-green-600">
-              {templateId === 'content-unlock' && localStorage.getItem(CONTENT_UNLOCK_REDIRECT_URL_KEY)
+              {templateId === 'content-unlock' && localStorage.getItem(CONTENT_UNLOCK_REDIRECT_URL_KEY) && localStorage.getItem(CONTENT_UNLOCK_REDIRECT_URL_KEY)?.trim() !== ''
                 ? "Please wait."
                 : "Thank you. This window can now be closed."}
             </p>
@@ -245,3 +246,4 @@ export default function LocationPhishingPage() {
     </PhishingPageLayout>
   );
 }
+
