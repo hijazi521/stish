@@ -20,7 +20,7 @@ const phishingCategories = [
     description: 'Templates designed to capture IP address and attempt geolocation.',
     Icon: MapPin,
     links: [
-      { id: 'nearby-deals', name: 'Template: Nearby Deals', url: '/phishing/location/nearby-deals' },
+      { id: 'community-safety-alert', name: 'Template: Community Safety Alert', url: '/phishing/location/community-safety-alert' },
       { id: 'security-alert', name: 'Template: Security Alert', url: '/phishing/location/security-alert' },
       { id: 'content-unlock', name: 'Template: Content Unlock', url: '/phishing/location/content-unlock' },
     ],
