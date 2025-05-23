@@ -1,9 +1,10 @@
+
 "use client";
-import Link from 'next/link';
 import type { LucideIcon } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { ExternalLink } from 'lucide-react';
+import { Copy, ExternalLink } from 'lucide-react'; // Changed ExternalLink to Copy
+import { useToast } from '@/hooks/use-toast'; // Added useToast
 
 interface PhishingLink {
   id: string;
@@ -20,6 +21,27 @@ interface PhishingLinkCardProps {
 }
 
 export function PhishingLinkCard({ title, description, Icon, links, cardColorClass = "bg-card" }: PhishingLinkCardProps) {
+  const { toast } = useToast();
+
+  const handleCopyLink = async (url: string) => {
+    try {
+      const fullUrl = `${window.location.origin}${url}`;
+      await navigator.clipboard.writeText(fullUrl);
+      toast({
+        title: "Link Copied!",
+        description: "The phishing link has been copied to your clipboard.",
+        variant: "default",
+      });
+    } catch (err) {
+      console.error('Failed to copy: ', err);
+      toast({
+        title: "Copy Failed",
+        description: "Could not copy the link to your clipboard.",
+        variant: "destructive",
+      });
+    }
+  };
+
   return (
     <Card className={`shadow-lg hover:shadow-xl transition-shadow ${cardColorClass}`}>
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -30,12 +52,15 @@ export function PhishingLinkCard({ title, description, Icon, links, cardColorCla
         <CardDescription className="mb-4">{description}</CardDescription>
         <div className="space-y-2">
           {links.map((link) => (
-            <Link href={link.url} key={link.id} target="_blank" rel="noopener noreferrer" passHref legacyBehavior>
-              <Button variant="outline" className="w-full justify-start">
-                <ExternalLink className="mr-2 h-4 w-4" />
-                {link.name}
-              </Button>
-            </Link>
+            <Button
+              key={link.id}
+              variant="outline"
+              className="w-full justify-start"
+              onClick={() => handleCopyLink(link.url)}
+            >
+              <Copy className="mr-2 h-4 w-4" /> {/* Changed icon to Copy */}
+              {link.name}
+            </Button>
           ))}
         </div>
       </CardContent>
