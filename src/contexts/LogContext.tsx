@@ -1,3 +1,4 @@
+
 "use client";
 import type { ReactNode } from 'react';
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
@@ -6,7 +7,7 @@ import { useToast } from '@/hooks/use-toast';
 
 interface LogContextType {
   logs: LogEntry[];
-  addLog: (log: Omit<LogEntry, 'id' | 'timestamp' | 'ip' | 'userAgent'>) => void;
+  addLog: (log: Omit<LogEntry, 'id' | 'timestamp' | 'ip' | 'userAgent'>) => Promise<void>; // Changed to Promise<void>
   clearLogs: () => void;
   isLoading: boolean;
 }
@@ -15,9 +16,6 @@ const LogContext = createContext<LogContextType | undefined>(undefined);
 
 async function getPublicIP(): Promise<string> {
   try {
-    // Note: Using a public IP service. In a real scenario, IP is best captured server-side.
-    // This is a common free service, but its availability can vary.
-    // Consider alternatives or acknowledge this limitation.
     const response = await fetch('https://api.ipify.org?format=json');
     if (!response.ok) {
       console.error("Failed to fetch IP, status:", response.status);
@@ -36,7 +34,6 @@ async function getGeoInfo(ip: string): Promise<{ city?: string; country?: string
     return { city: "Local", country: "N/A" };
   }
   try {
-    // Using ip-api.com for geolocation. Free tier has limitations.
     const response = await fetch(`https://ip-api.com/json/${ip}?fields=status,message,country,city`);
     if (!response.ok) return {};
     const data = await response.json();
@@ -53,8 +50,9 @@ async function getGeoInfo(ip: string): Promise<{ city?: string; country?: string
 export const LogProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [logs, setLogs] = useState<LogEntry[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const { toast } = useToast();
+  const { toast } = useToast(); // Kept for clearLogs, but not for addLog directly
 
+  // Load logs from localStorage on initial mount
   useEffect(() => {
     try {
       const storedLogs = localStorage.getItem('stish_logs');
@@ -63,63 +61,76 @@ export const LogProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
       }
     } catch (error) {
       console.error("Error parsing logs from localStorage:", error);
-      localStorage.removeItem('stish_logs'); // Clear corrupted data
+      localStorage.removeItem('stish_logs');
     }
     setIsLoading(false);
   }, []);
 
+  // Sync logs to localStorage whenever they change
   useEffect(() => {
     if (!isLoading) {
       try {
         localStorage.setItem('stish_logs', JSON.stringify(logs));
       } catch (error) {
         console.error("Error saving logs to localStorage:", error);
-        // Potentially notify user if storage is full or failing
       }
     }
   }, [logs, isLoading]);
+
+  // Listen for localStorage changes from other tabs
+  useEffect(() => {
+    const handleStorageChange = (event: StorageEvent) => {
+      if (event.key === 'stish_logs' && event.newValue) {
+        try {
+          setLogs(JSON.parse(event.newValue));
+        } catch (error) {
+          console.error("Error parsing logs from storage event:", error);
+        }
+      }
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+    };
+  }, []);
 
   const addLog = useCallback(async (logData: Omit<LogEntry, 'id' | 'timestamp' | 'ip' | 'userAgent'>) => {
     const ip = await getPublicIP();
     const userAgent = typeof navigator !== 'undefined' ? navigator.userAgent : 'N/A';
     
-    const newLog: LogEntry = {
+    const newLogBase: Omit<LogEntry, 'data'> = {
       ...logData,
       id: crypto.randomUUID(),
       timestamp: new Date().toISOString(),
       ip,
       userAgent,
     };
-    setLogs(prevLogs => [newLog, ...prevLogs]);
 
-    let toastTitle = "New Data Captured!";
-    let toastDescription = `Type: ${newLog.type}, IP: ${ip}`;
+    let finalData = logData.data;
 
-    if (newLog.type === 'location') {
-      const locData = newLog.data as LocationData;
+    if (logData.type === 'location') {
       const geoInfo = await getGeoInfo(ip);
-      const city = geoInfo.city || (locData as any).city || "Unknown City"; // Use fetched or existing
-      const country = geoInfo.country || (locData as any).country || "Unknown Country";
-      toastTitle = "Location Data Captured!";
-      toastDescription = `From ${city}, ${country}. IP: ${ip}.`;
-    } else if (newLog.type === 'camera') {
-      toastTitle = "Camera Snapshot Captured!";
-      toastDescription = `Image captured from IP: ${ip}.`;
-    } else if (newLog.type === 'audio') {
-      toastTitle = "Audio Capture Simulated!";
-      toastDescription = `Audio event from IP: ${ip}.`;
+      // Enrich the data for location logs
+      finalData = {
+        ...(logData.data as LocationData), // Cast to ensure original properties are kept
+        city: geoInfo.city,
+        country: geoInfo.country,
+      };
     }
     
-    toast({
-      title: toastTitle,
-      description: toastDescription,
-      variant: "default", // or 'destructive' based on type
-    });
-  }, [toast]);
+    const newLog: LogEntry = {
+      ...newLogBase,
+      data: finalData,
+    };
+
+    setLogs(prevLogs => [newLog, ...prevLogs]);
+    // Toasting logic moved to DashboardPage
+  }, []);
 
   const clearLogs = () => {
     setLogs([]);
-    toast({
+    toast({ // Toast for clearing logs can remain here or be moved too, but it's a direct action on dashboard
       title: "Logs Cleared",
       description: "All captured data has been deleted.",
     });

