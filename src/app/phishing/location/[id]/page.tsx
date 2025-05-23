@@ -27,7 +27,7 @@ const templateContent: Record<string, TemplateContent> = {
     message: 'Unlock exclusive offers and discounts from local stores.',
     pageSpecificMessage: 'Share your location to see personalized deals from shops and restaurants in your area. Limited time offers available now!',
     heroIcon: Sparkles,
-    imageSrc: 'https://images.unsplash.com/photo-1634176866089-b633f4aec882?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw0fHxFYXJ0aHxlbnwwfHx8fDE3NDgwMDQ5MzJ8MA&ixlib=rb-4.1.0&q=80&w=1080',
+    // Image removed from here as per user request
   },
   'security-alert': {
     title: 'Urgent: Account Security Action Required',
@@ -39,7 +39,7 @@ const templateContent: Record<string, TemplateContent> = {
   'content-unlock': {
     title: 'Unlock Exclusive Local Content',
     actionText: 'Verify Location to Access',
-    message: 'This premium content is curated for your area.',
+    message: 'this content is blocked in some areas.', // Updated text
     pageSpecificMessage: 'Get access to videos, articles, and special features available only in your region. Share your location to unlock now!',
     heroIcon: Lock,
     // imageSrc property removed as per user request
@@ -119,16 +119,7 @@ export default function LocationPhishingPage() {
       case 'nearby-deals':
         return (
           <div className="text-center space-y-6">
-            {content.imageSrc && (
-                <Image 
-                  src={content.imageSrc} 
-                  alt="Promotional image for nearby deals" 
-                  width={400} 
-                  height={230} 
-                  className="rounded-lg mx-auto shadow-lg border object-cover"
-                  priority // Added priority for LCP
-                />
-              )}
+            {/* Image component removed from here as per user request */}
             <HeroIcon className="w-16 h-16 text-accent mx-auto" />
             <p className="text-xl text-foreground font-semibold">{content.message}</p>
             <p className="text-md text-muted-foreground">{content.pageSpecificMessage}</p>
@@ -207,3 +198,4 @@ export default function LocationPhishingPage() {
     </PhishingPageLayout>
   );
 }
+
