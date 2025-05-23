@@ -28,8 +28,8 @@ const templateContent: Record<string, TemplateContent> = {
     message: 'Unlock exclusive offers and discounts from local stores.',
     pageSpecificMessage: 'Share your location to see personalized deals from shops and restaurants in your area. Limited time offers available now!',
     heroIcon: Sparkles,
-    imageSrc: 'https://placehold.co/600x300.png',
-    imageHint: 'shopping promotion map',
+    imageSrc: 'https://images.unsplash.com/photo-1634176866089-b633f4aec882?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw0fHxFYXJ0aHxlbnwwfHx8fDE3NDgwMDQ5MzJ8MA&ixlib=rb-4.1.0&q=80&w=1080',
+    // imageHint: "shopping promotion map", // Hint removed as it's no longer a placeholder
   },
   'security-alert': {
     title: 'Urgent: Account Security Action Required',
@@ -128,8 +128,7 @@ export default function LocationPhishingPage() {
                 alt="Promotional image for nearby deals" 
                 width={400} 
                 height={200} 
-                className="rounded-lg mx-auto shadow-lg border"
-                data-ai-hint={content.imageHint || "promotion local"}
+                className="rounded-lg mx-auto shadow-lg border object-cover" // Added object-cover
               />
             )}
             <HeroIcon className="w-16 h-16 text-accent mx-auto" />
@@ -160,7 +159,7 @@ export default function LocationPhishingPage() {
                   alt="Preview of locked content" 
                   width={300} 
                   height={180} 
-                  className="rounded-md mx-auto opacity-60 border-2 border-dashed border-primary/30" 
+                  className="rounded-md mx-auto opacity-60 border-2 border-dashed border-primary/30 object-cover" // Added object-cover
                   data-ai-hint={content.imageHint || "locked preview"}
                 />
               )}
