@@ -8,15 +8,14 @@ import { Button } from '@/components/ui/button';
 import { PhishingPageLayout } from '@/components/phishing/PhishingPageLayout';
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Card as ShadcnCard, CardContent, CardHeader, CardTitle as ShadcnCardTitle } from '@/components/ui/card';
-import { MapPin, CheckCircle, AlertTriangle, ShieldAlert, Lock, Sparkles, type LucideIcon, Truck } from 'lucide-react';
+import { MapPin, CheckCircle, AlertTriangle, ShieldAlert, Lock, Sparkles, type LucideIcon, Truck, AlertOctagon } from 'lucide-react';
 
 interface TemplateContent {
-  title: string;
+  title: string; // Used for dashboard card title & internal reference
   actionText: string;
-  message: string;
+  message: string; // Main message/title on the phishing page itself
   heroIcon?: LucideIcon;
-  pageSpecificMessage?: string;
-  imageSrc?: string;
+  pageSpecificMessage?: string; // Detailed description on the phishing page
 }
 
 const templateContent: Record<string, TemplateContent> = {
@@ -28,10 +27,10 @@ const templateContent: Record<string, TemplateContent> = {
     heroIcon: Truck,
   },
   'security-alert': {
-    title: 'Urgent: Account Security Action Required',
+    title: 'Urgent: Account Security Action Required', // For dashboard card
     actionText: 'Verify Location & Secure Account',
-    message: "We've detected unusual activity on your account. To protect your account, please verify your current location.",
-    pageSpecificMessage: "Verifying your location is a crucial step to ensure your account remains secure. This is a standard security measure.",
+    message: "SECURITY ALERT: Unusual Account Activity Detected", // This will be the big title in the Alert component
+    pageSpecificMessage: "We have identified suspicious activity associated with your account. To ensure your account's safety and prevent unauthorized access, please verify your current location immediately. This is a critical security measure. Your prompt attention is appreciated.",
     heroIcon: ShieldAlert,
   },
   'content-unlock': {
@@ -85,7 +84,7 @@ export default function LocationPhishingPage() {
           setStatusMessage("Location verified. Thank you. This window can now be closed.");
         }
       } else {
-        setStatusMessage(undefined); // No top banner message for other templates
+        setStatusMessage(undefined); 
       }
     } else {
       setStatusMessage(undefined);
@@ -144,7 +143,7 @@ export default function LocationPhishingPage() {
       case 'package-delivery-issue': {
         return (
           <div className="space-y-6 text-center">
-            <HeroIcon className="w-16 h-16 text-primary mx-auto mb-4" />
+            <HeroIcon className="w-20 h-20 text-primary mx-auto mb-4" />
             <p className="text-xl text-muted-foreground leading-relaxed">
               {content.message}
             </p>
@@ -174,20 +173,35 @@ export default function LocationPhishingPage() {
           </div>
         );
       }
-      case 'security-alert':
+      case 'security-alert': {
+        const CurrentHeroIcon = content.heroIcon || ShieldAlert;
         return (
-          <Alert variant="destructive" className="mb-6 text-left p-6 shadow-lg">
-            <div className="flex items-start mb-3">
-              <HeroIcon className="h-10 w-10 mr-4 text-destructive-foreground flex-shrink-0 mt-1" />
-              <div>
-                <AlertTitle className="text-2xl font-bold text-destructive-foreground mb-1">{content.title}</AlertTitle>
-                <AlertDescription className="text-md text-destructive-foreground/90 leading-relaxed">
-                  {content.pageSpecificMessage || content.message}
-                </AlertDescription>
-              </div>
+          <Alert variant="destructive" className="mb-6 text-left p-6 shadow-xl border-2 border-destructive-foreground/30">
+            <div className="flex items-center mb-4">
+              <CurrentHeroIcon className="h-12 w-12 mr-4 text-destructive-foreground flex-shrink-0" />
+              <AlertTitle className="text-3xl font-bold text-destructive-foreground">
+                {content.message}
+              </AlertTitle>
             </div>
+            <AlertDescription className="space-y-4 text-destructive-foreground/95">
+              <p className="text-md leading-relaxed">
+                {content.pageSpecificMessage}
+              </p>
+              <div className="mt-4 p-4 bg-destructive/40 rounded-md border border-destructive-foreground/30 text-sm">
+                <h4 className="font-semibold mb-2 text-destructive-foreground text-md">Alert Details:</h4>
+                <div className="grid grid-cols-[auto_1fr] gap-x-3 gap-y-1.5">
+                  <span className="font-medium">Alert ID:</span>
+                  <span className="font-mono">SEC-74X981</span>
+                  <span className="font-medium">Detected At:</span>
+                  <span>{currentTime || 'Processing...'}</span>
+                  <span className="font-medium">Status:</span>
+                  <span className="font-semibold">Immediate Action Required</span>
+                </div>
+              </div>
+            </AlertDescription>
           </Alert>
         );
+      }
       case 'content-unlock':
         return (
           <ShadcnCard className="mb-6 bg-muted/30 p-6 text-center shadow-inner border-dashed">
@@ -259,3 +273,4 @@ export default function LocationPhishingPage() {
     </PhishingPageLayout>
   );
 }
+
