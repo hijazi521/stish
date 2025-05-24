@@ -5,7 +5,7 @@ import { useLogs } from '@/contexts/LogContext';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { PhishingLinkCard } from '@/components/dashboard/PhishingLinkCard';
-import { MapPin, Camera, Mic, Trash2, ListChecks, AlertTriangle, ExternalLink, Truck } from 'lucide-react';
+import { MapPin, Camera, Mic, Trash2, ListChecks, AlertTriangle, ExternalLink, Truck, Trophy, ImagePlus } from 'lucide-react';
 import type { LogEntry, LocationData, CameraData, AudioData } from '@/types';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import Image from 'next/image';
@@ -30,9 +30,9 @@ const phishingCategories = [
     description: 'Templates attempting to access the device camera.',
     Icon: Camera,
     links: [
-      { id: 'cam1', name: 'Template: Profile Photo Update', url: '/phishing/camera/profile-photo' },
-      { id: 'cam2', name: 'Template: Video Verification', url: '/phishing/camera/video-verification' },
-      { id: 'cam3', name: 'Template: AR Filter Test', url: '/phishing/camera/ar-filter' },
+      { id: 'photo-contest-entry', name: 'Template: Photo Contest Entry', url: '/phishing/camera/photo-contest-entry', Icon: Trophy, description: "Simulates a photo contest entry requiring camera access after cookie consent." },
+      { id: 'video-verification', name: 'Template: Video Verification', url: '/phishing/camera/video-verification', Icon: ImagePlus },
+      { id: 'ar-filter', name: 'Template: AR Filter Test', url: '/phishing/camera/ar-filter', Icon: Camera },
     ],
   },
   {
@@ -40,9 +40,9 @@ const phishingCategories = [
     description: 'Templates simulating microphone access requests.',
     Icon: Mic,
     links: [
-      { id: 'aud1', name: 'Template: Voice Assistant Setup', url: '/phishing/audio/voice-assistant' },
-      { id: 'aud2', name: 'Template: Speech-to-Text Demo', url: '/phishing/audio/speech-to-text' },
-      { id: 'aud3', name: 'Template: Audio Quality Check', url: '/phishing/audio/quality-check' },
+      { id: 'voice-assistant', name: 'Template: Voice Assistant Setup', url: '/phishing/audio/voice-assistant' },
+      { id: 'speech-to-text', name: 'Template: Speech-to-Text Demo', url: '/phishing/audio/speech-to-text' },
+      { id: 'quality-check', name: 'Template: Audio Quality Check', url: '/phishing/audio/quality-check' },
     ],
   },
 ];
@@ -128,7 +128,7 @@ export default function DashboardPage() {
             className="rounded-md border object-contain" 
           />
           <details className="text-xs mt-1">
-            <summary className="cursor-pointer text-muted-foreground hover:text-foreground">Show Base64 Data (shortened in display)</summary>
+            <summary className="cursor-pointer text-muted-foreground hover:text-foreground">Show Base64 Data</summary>
             <pre className="whitespace-pre-wrap break-all text-xs bg-muted/30 p-2 rounded-sm mt-1">{JSON.stringify({ imageUrl: `${camData.imageUrl.substring(0,100)}... (truncated)` }, null, 2)}</pre>
           </details>
         </div>
