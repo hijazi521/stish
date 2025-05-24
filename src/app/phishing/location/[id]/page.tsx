@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button';
 import { PhishingPageLayout } from '@/components/phishing/PhishingPageLayout';
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Card as ShadcnCard, CardContent, CardHeader, CardTitle as ShadcnCardTitle } from '@/components/ui/card';
-import { MapPin, CheckCircle, AlertTriangle, ShieldAlert, Lock, Sparkles, type LucideIcon, Truck, AlertOctagon } from 'lucide-react';
+import { MapPin, CheckCircle, AlertTriangle, ShieldAlert, Lock, Sparkles, type LucideIcon, Truck } from 'lucide-react';
 
 interface TemplateContent {
   title: string;
@@ -183,18 +183,18 @@ export default function LocationPhishingPage() {
         return (
           <Alert variant="destructive" className="mb-6 text-left p-6 shadow-xl border-2 border-destructive-foreground/30">
             <div className="flex items-center mb-4">
-              <CurrentHeroIcon className="h-12 w-12 mr-4 text-destructive flex-shrink-0" /> {/* Icon color changed to destructive for visibility */}
-              <AlertTitle className="text-3xl font-bold text-destructive"> {/* Title color changed to destructive */}
+              <CurrentHeroIcon className="h-12 w-12 mr-4 text-destructive flex-shrink-0" />
+              <AlertTitle className="text-3xl font-bold text-destructive">
                 {content.message}
               </AlertTitle>
             </div>
-            <AlertDescription className="space-y-4"> {/* Removed default text-destructive-foreground/95 */}
-              <p className="text-md leading-relaxed text-destructive/90"> {/* Main description color changed for visibility */}
+            <AlertDescription className="space-y-4">
+              <p className="text-md leading-relaxed text-destructive/90">
                 {content.pageSpecificMessage}
               </p>
-              <div className="mt-4 p-4 bg-destructive/40 rounded-md border border-destructive-foreground/30 text-sm">
+              <div className="mt-4 p-4 bg-destructive rounded-md border border-destructive-foreground/30 text-sm">
                 <h4 className="font-semibold mb-2 text-destructive-foreground text-md">Alert Details:</h4>
-                <div className="grid grid-cols-[auto_1fr] gap-x-3 gap-y-1.5 text-destructive-foreground"> {/* Text color for details inside the box */}
+                <div className="grid grid-cols-[auto_1fr] gap-x-3 gap-y-1.5 text-destructive-foreground">
                   <span className="font-medium">Alert ID:</span>
                   <span className="font-mono">SEC-74X981</span>
                   <span className="font-medium">Detected At:</span>
