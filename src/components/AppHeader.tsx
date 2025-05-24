@@ -1,8 +1,9 @@
+
 "use client";
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
-import { LogIn, LogOut, ShieldCheck } from 'lucide-react'; // ShieldCheck for Stish logo concept
+import { LogIn, LogOut, ShieldCheck } from 'lucide-react'; 
 
 export function AppHeader() {
   const { isAuthenticated, logout, isLoading } = useAuth();
@@ -11,7 +12,8 @@ export function AppHeader() {
     <header className="bg-primary text-primary-foreground shadow-md">
       <div className="container mx-auto flex h-16 items-center justify-between px-4 sm:px-6 lg:px-8">
         <Link href={isAuthenticated ? "/admin/dashboard" : "/admin/login"} className="flex items-center gap-2 text-xl font-semibold">
-          <ShieldCheck className="h-7 w-7 text-accent" />
+          {/* Changed text-accent to text-primary-foreground for better contrast */}
+          <ShieldCheck className="h-7 w-7 text-primary-foreground" /> 
           <span>Stish</span>
         </Link>
         {isAuthenticated && !isLoading && (
