@@ -76,7 +76,7 @@ export default function LoginPage() {
           </form>
         </CardContent>
         <CardFooter className="text-center text-sm text-muted-foreground">
-          <p>For demonstration purposes only.</p>
+          {/* The text "For demonstration purposes only." has been removed from here. */}
         </CardFooter>
       </Card>
     </main>
