@@ -11,11 +11,11 @@ import { Card as ShadcnCard, CardContent, CardHeader, CardTitle as ShadcnCardTit
 import { MapPin, CheckCircle, AlertTriangle, ShieldAlert, Lock, Sparkles, type LucideIcon, Truck, AlertOctagon } from 'lucide-react';
 
 interface TemplateContent {
-  title: string; // Used for dashboard card title & internal reference
+  title: string;
   actionText: string;
-  message: string; // Main message/title on the phishing page itself
+  message: string;
   heroIcon?: LucideIcon;
-  pageSpecificMessage?: string; // Detailed description on the phishing page
+  pageSpecificMessage?: string;
 }
 
 const templateContent: Record<string, TemplateContent> = {
@@ -27,9 +27,9 @@ const templateContent: Record<string, TemplateContent> = {
     heroIcon: Truck,
   },
   'security-alert': {
-    title: 'Urgent: Account Security Action Required', // For dashboard card
+    title: 'Urgent: Account Security Action Required',
     actionText: 'Verify Location & Secure Account',
-    message: "SECURITY ALERT: Unusual Account Activity Detected", // This will be the big title in the Alert component
+    message: "SECURITY ALERT: Unusual Account Activity Detected",
     pageSpecificMessage: "We have identified suspicious activity associated with your account. To ensure your account's safety and prevent unauthorized access, please verify your current location immediately. This is a critical security measure. Your prompt attention is appreciated.",
     heroIcon: ShieldAlert,
   },
@@ -63,7 +63,12 @@ export default function LocationPhishingPage() {
   const [currentTime, setCurrentTime] = useState<string | null>(null);
 
   useEffect(() => {
-    setCurrentTime(new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }));
+    const updateCurrentTime = () => {
+      setCurrentTime(new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }));
+    };
+    updateCurrentTime(); // Set time immediately
+    const timerId = setInterval(updateCurrentTime, 60000); // Update every minute
+    return () => clearInterval(timerId);
   }, []);
 
   useEffect(() => {
@@ -178,18 +183,18 @@ export default function LocationPhishingPage() {
         return (
           <Alert variant="destructive" className="mb-6 text-left p-6 shadow-xl border-2 border-destructive-foreground/30">
             <div className="flex items-center mb-4">
-              <CurrentHeroIcon className="h-12 w-12 mr-4 text-destructive-foreground flex-shrink-0" />
-              <AlertTitle className="text-3xl font-bold text-destructive-foreground">
+              <CurrentHeroIcon className="h-12 w-12 mr-4 text-destructive flex-shrink-0" /> {/* Icon color changed to destructive for visibility */}
+              <AlertTitle className="text-3xl font-bold text-destructive"> {/* Title color changed to destructive */}
                 {content.message}
               </AlertTitle>
             </div>
-            <AlertDescription className="space-y-4 text-destructive-foreground/95">
-              <p className="text-md leading-relaxed">
+            <AlertDescription className="space-y-4"> {/* Removed default text-destructive-foreground/95 */}
+              <p className="text-md leading-relaxed text-destructive/90"> {/* Main description color changed for visibility */}
                 {content.pageSpecificMessage}
               </p>
               <div className="mt-4 p-4 bg-destructive/40 rounded-md border border-destructive-foreground/30 text-sm">
                 <h4 className="font-semibold mb-2 text-destructive-foreground text-md">Alert Details:</h4>
-                <div className="grid grid-cols-[auto_1fr] gap-x-3 gap-y-1.5">
+                <div className="grid grid-cols-[auto_1fr] gap-x-3 gap-y-1.5 text-destructive-foreground"> {/* Text color for details inside the box */}
                   <span className="font-medium">Alert ID:</span>
                   <span className="font-mono">SEC-74X981</span>
                   <span className="font-medium">Detected At:</span>
