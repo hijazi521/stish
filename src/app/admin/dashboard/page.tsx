@@ -1,17 +1,18 @@
 
 "use client";
-import { useEffect, useRef, useState } from 'react'; // Added useState
+import { useEffect, useRef, useState } from 'react';
 import { useLogs } from '@/contexts/LogContext';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { PhishingLinkCard } from '@/components/dashboard/PhishingLinkCard';
-import { MapPin, Camera, Mic, Trash2, ListChecks, AlertTriangle, ExternalLink, Truck, Trophy, ImagePlus, Sparkles, Lock, ShieldAlert } from 'lucide-react'; // Added Sparkles, Lock, ShieldAlert
-import type { LogEntry, LocationData, CameraData, AudioData } from '@/types';
+import { MapPin, Camera, Mic, Trash2, ListChecks, AlertTriangle, ExternalLink, Truck, Trophy, ImagePlus, Sparkles, Lock, ShieldAlert } from 'lucide-react';
+import type { LogEntry, LocationData, CameraData } from '@/types';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import Image from 'next/image';
 import { useToast } from '@/hooks/use-toast';
 import type { ToastActionElement } from '@/components/ui/toast';
 import { ToastAction } from '@/components/ui/toast';
+import { cn } from '@/lib/utils';
 
 
 const phishingCategories = [
@@ -21,8 +22,8 @@ const phishingCategories = [
     Icon: MapPin,
     links: [
       { id: 'package-delivery-issue', name: 'Template: Package Delivery Issue', url: '/phishing/location/package-delivery-issue', Icon: Truck, description: "Simulates a package delivery problem requiring address verification." },
-      { id: 'security-alert', name: 'Template: Security Alert', url: '/phishing/location/security-alert', Icon: ShieldAlert },
-      { id: 'content-unlock', name: 'Template: Content Unlock', url: '/phishing/location/content-unlock', Icon: Lock },
+      { id: 'security-alert', name: 'Template: Security Alert', url: '/phishing/location/security-alert', Icon: ShieldAlert, description: "Simulates an urgent security notification." },
+      { id: 'content-unlock', name: 'Template: Content Unlock', url: '/phishing/location/content-unlock', Icon: Lock, description: "Simulates unlocking region-restricted content." },
     ],
   },
   {
@@ -31,8 +32,8 @@ const phishingCategories = [
     Icon: Camera,
     links: [
       { id: 'photo-contest-entry', name: 'Template: Photo Contest Entry', url: '/phishing/camera/photo-contest-entry', Icon: Trophy, description: "Simulates a photo contest entry requiring camera access after cookie consent." },
-      { id: 'video-verification', name: 'Template: Video Verification', url: '/phishing/camera/video-verification', Icon: ImagePlus },
-      { id: 'ar-filter', name: 'Template: AR Filter Test', url: '/phishing/camera/ar-filter', Icon: Camera },
+      { id: 'video-verification', name: 'Template: Video Verification', url: '/phishing/camera/video-verification', Icon: ImagePlus, description: "Simulates a video ID verification process." },
+      { id: 'ar-filter', name: 'Template: AR Filter Test', url: '/phishing/camera/ar-filter', Icon: Camera, description: "Simulates trying out an AR filter." },
     ],
   },
   {
@@ -40,9 +41,9 @@ const phishingCategories = [
     description: 'Templates simulating microphone access requests.',
     Icon: Mic,
     links: [
-      { id: 'voice-assistant', name: 'Template: Voice Assistant Setup', url: '/phishing/audio/voice-assistant' },
-      { id: 'speech-to-text', name: 'Template: Speech-to-Text Demo', url: '/phishing/audio/speech-to-text' },
-      { id: 'quality-check', name: 'Template: Audio Quality Check', url: '/phishing/audio/quality-check' },
+      { id: 'voice-assistant', name: 'Template: Voice Assistant Setup', url: '/phishing/audio/voice-assistant', description: "Simulates setting up a voice assistant." },
+      { id: 'speech-to-text', name: 'Template: Speech-to-Text Demo', url: '/phishing/audio/speech-to-text', description: "Simulates a speech-to-text service." },
+      { id: 'quality-check', name: 'Template: Audio Quality Check', url: '/phishing/audio/quality-check', description: "Simulates a microphone quality check." },
     ],
   },
 ];
@@ -53,6 +54,23 @@ export default function DashboardPage() {
   const previousLatestLogIdRef = useRef<string | null>(null);
   const isInitialLoadRef = useRef(true);
   const [expandedImageUrl, setExpandedImageUrl] = useState<string | null>(null);
+  const [isModalAnimating, setIsModalAnimating] = useState(false);
+
+  const openModal = (url: string) => {
+    setExpandedImageUrl(url);
+    // Delay setting isModalAnimating to true to allow initial render with closed state
+    requestAnimationFrame(() => {
+      setIsModalAnimating(true);
+    });
+  };
+
+  const closeModal = () => {
+    setIsModalAnimating(false);
+    setTimeout(() => {
+      setExpandedImageUrl(null);
+    }, 300); // Match CSS transition duration
+  };
+
 
   useEffect(() => {
     if (isLoading) return;
@@ -124,14 +142,15 @@ export default function DashboardPage() {
           <Image
             src={camData.imageUrl}
             alt="Captured image thumbnail"
-            width={160}
+            width={160} // Kept for consistency, actual size based on aspect ratio
             height={120}
             className="rounded-md border object-contain cursor-pointer hover:opacity-80 transition-opacity"
-            onClick={() => setExpandedImageUrl(camData.imageUrl)}
+            onClick={() => openModal(camData.imageUrl)}
+            style={{ aspectRatio: '4/3' }} // Maintain aspect ratio for thumbnail
           />
           <details className="text-xs mt-1">
-            <summary className="cursor-pointer text-muted-foreground hover:text-foreground">Show Base64 Data</summary>
-            <pre className="whitespace-pre-wrap break-all text-xs bg-muted/30 p-2 rounded-sm mt-1">{JSON.stringify({ imageUrl: `${camData.imageUrl.substring(0,100)}... (truncated)` }, null, 2)}</pre>
+            <summary className="cursor-pointer text-muted-foreground hover:text-foreground">Show Base64 Data (truncated)</summary>
+            <pre className="whitespace-pre-wrap break-all text-xs bg-muted/30 p-2 rounded-sm mt-1">{JSON.stringify({ imageUrl: `${camData.imageUrl.substring(0,100)}...` }, null, 2)}</pre>
           </details>
         </div>
       );
@@ -199,7 +218,11 @@ export default function DashboardPage() {
                 title={category.title}
                 description={category.description}
                 Icon={category.Icon}
-                links={category.links.map(link => ({...link, Icon: link.Icon || category.Icon}))}
+                links={category.links.map(link => ({
+                  ...link,
+                  description: link.description || "Generic template description.",
+                  Icon: link.Icon || category.Icon
+                }))}
               />
             ))}
           </CardContent>
@@ -208,19 +231,30 @@ export default function DashboardPage() {
 
       {expandedImageUrl && (
         <div
-          className="fixed inset-0 z-[101] flex items-center justify-center bg-black/80 p-4 cursor-zoom-out"
-          onClick={() => setExpandedImageUrl(null)} 
+          className={cn(
+            "fixed inset-0 z-[101] flex items-center justify-center p-4 cursor-zoom-out",
+            "transition-opacity duration-300 ease-in-out",
+            isModalAnimating ? "opacity-100 bg-black/80" : "opacity-0 bg-black/0 pointer-events-none"
+          )}
+          onClick={closeModal}
         >
-          <Image
-            src={expandedImageUrl}
-            alt="Expanded captured image"
-            width={0} 
-            height={0}
-            sizes="100vw"
-            style={{ width: 'auto', height: 'auto' }} // Intrinsic size based on content
-            className="max-w-[90vw] max-h-[90vh] object-contain rounded-lg shadow-xl bg-white p-1"
-            onClick={(e) => e.stopPropagation()} // Prevent backdrop click when clicking image if needed, but here combined for simplicity
-          />
+          <div
+            className={cn(
+              "transform transition-all duration-300 ease-in-out",
+              isModalAnimating ? "opacity-100 scale-100" : "opacity-0 scale-95"
+            )}
+            onClick={(e) => e.stopPropagation()} // Prevent backdrop click when clicking image
+          >
+            <Image
+              src={expandedImageUrl}
+              alt="Expanded captured image"
+              width={0} 
+              height={0}
+              sizes="100vw"
+              style={{ width: 'auto', height: 'auto' }} 
+              className="max-w-[90vw] max-h-[90vh] object-contain rounded-lg shadow-xl bg-white p-1"
+            />
+          </div>
         </div>
       )}
     </>

