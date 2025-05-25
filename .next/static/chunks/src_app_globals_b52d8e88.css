@@ -680,6 +680,10 @@ main {
   display: grid;
 }
 
+.inline-grid {
+  display: inline-grid;
+}
+
 .hidden {
   display: none;
 }
@@ -1375,6 +1379,10 @@ main {
   background-color: hsl(var(--background) / .9);
 }
 
+.bg-black\/0 {
+  background-color: #0000;
+}
+
 .bg-black\/30 {
   background-color: #0000004d;
 }
@@ -1475,10 +1483,6 @@ main {
 .bg-white {
   --tw-bg-opacity: 1;
   background-color: rgb(255 255 255 / var(--tw-bg-opacity, 1));
-}
-
-.bg-black\/0 {
-  background-color: #0000;
 }
 
 .bg-gradient-to-br {
@@ -1863,6 +1867,10 @@ main {
   opacity: 0;
 }
 
+.opacity-100 {
+  opacity: 1;
+}
+
 .opacity-50 {
   opacity: .5;
 }
@@ -1877,10 +1885,6 @@ main {
 
 .opacity-90 {
   opacity: .9;
-}
-
-.opacity-100 {
-  opacity: 1;
 }
 
 .shadow {

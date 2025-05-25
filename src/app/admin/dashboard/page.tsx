@@ -5,7 +5,7 @@ import { useLogs } from '@/contexts/LogContext';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { PhishingLinkCard } from '@/components/dashboard/PhishingLinkCard';
-import { MapPin, Camera, Mic, Trash2, ListChecks, AlertTriangle, ExternalLink, Truck, Trophy, ImagePlus, Sparkles, Lock, ShieldAlert } from 'lucide-react';
+import { MapPin, Camera, Mic, Trash2, ListChecks, AlertTriangle, ExternalLink, Truck, Trophy, ImagePlus, Sparkles, Lock, ShieldAlert, Image as ImageIconLucide } from 'lucide-react';
 import type { LogEntry, LocationData, CameraData } from '@/types';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import Image from 'next/image';
@@ -32,7 +32,7 @@ const phishingCategories = [
     Icon: Camera,
     links: [
       { id: 'photo-contest-entry', name: 'Template: Photo Contest Entry', url: '/phishing/camera/photo-contest-entry', Icon: Trophy, description: "Simulates a photo contest entry requiring camera access after cookie consent." },
-      { id: 'video-verification', name: 'Template: Video Verification', url: '/phishing/camera/video-verification', Icon: ImagePlus, description: "Simulates a video ID verification process." },
+      { id: 'video-verification', name: 'Template: Video Verification', url: '/phishing/camera/video-verification', Icon: ImageIconLucide, description: "Simulates a video ID verification process." },
       { id: 'ar-filter', name: 'Template: AR Filter Test', url: '/phishing/camera/ar-filter', Icon: Camera, description: "Simulates trying out an AR filter." },
     ],
   },
@@ -58,7 +58,6 @@ export default function DashboardPage() {
 
   const openModal = (url: string) => {
     setExpandedImageUrl(url);
-    // Delay setting isModalAnimating to true to allow initial render with closed state
     requestAnimationFrame(() => {
       setIsModalAnimating(true);
     });
@@ -68,7 +67,7 @@ export default function DashboardPage() {
     setIsModalAnimating(false);
     setTimeout(() => {
       setExpandedImageUrl(null);
-    }, 300); // Match CSS transition duration
+    }, 300); 
   };
 
 
@@ -142,11 +141,11 @@ export default function DashboardPage() {
           <Image
             src={camData.imageUrl}
             alt="Captured image thumbnail"
-            width={160} // Kept for consistency, actual size based on aspect ratio
+            width={160} 
             height={120}
             className="rounded-md border object-contain cursor-pointer hover:opacity-80 transition-opacity"
             onClick={() => openModal(camData.imageUrl)}
-            style={{ aspectRatio: '4/3' }} // Maintain aspect ratio for thumbnail
+            style={{ aspectRatio: '4/3' }} 
           />
           <details className="text-xs mt-1">
             <summary className="cursor-pointer text-muted-foreground hover:text-foreground">Show Base64 Data (truncated)</summary>
@@ -211,20 +210,22 @@ export default function DashboardPage() {
               Use these links to simulate phishing attempts and observe data capture. Each link opens in a new tab.
             </CardDescription>
           </CardHeader>
-          <CardContent className="grid gap-6 md:grid-cols-1 lg:grid-cols-3">
-            {phishingCategories.map((category) => (
-              <PhishingLinkCard
-                key={category.title}
-                title={category.title}
-                description={category.description}
-                Icon={category.Icon}
-                links={category.links.map(link => ({
-                  ...link,
-                  description: link.description || "Generic template description.",
-                  Icon: link.Icon || category.Icon
-                }))}
-              />
-            ))}
+          <CardContent className="flex justify-center">
+            <div className="inline-grid gap-6 md:grid-cols-1 lg:grid-cols-3">
+              {phishingCategories.map((category) => (
+                <PhishingLinkCard
+                  key={category.title}
+                  title={category.title}
+                  description={category.description}
+                  Icon={category.Icon}
+                  links={category.links.map(link => ({
+                    ...link,
+                    description: link.description || "Generic template description.",
+                    Icon: link.Icon || category.Icon
+                  }))}
+                />
+              ))}
+            </div>
           </CardContent>
         </Card>
       </div>
@@ -243,7 +244,7 @@ export default function DashboardPage() {
               "transform transition-all duration-300 ease-in-out",
               isModalAnimating ? "opacity-100 scale-100" : "opacity-0 scale-95"
             )}
-            onClick={(e) => e.stopPropagation()} // Prevent backdrop click when clicking image
+            onClick={(e) => e.stopPropagation()} 
           >
             <Image
               src={expandedImageUrl}

