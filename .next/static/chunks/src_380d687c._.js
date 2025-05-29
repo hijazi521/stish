@@ -567,10 +567,12 @@ const LogProvider = ({ children })=>{
     _s();
     const [logs, setLogs] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])([]);
     const [isLoading, setIsLoading] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(true);
-    const { toast } = (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$hooks$2f$use$2d$toast$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useToast"])(); // Kept for clearLogs, but not for addLog directly
-    // Load logs from localStorage on initial mount
+    const { toast } = (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$hooks$2f$use$2d$toast$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useToast"])();
     (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useEffect"])({
         "LogProvider.useEffect": ()=>{
+            if ("TURBOPACK compile-time falsy", 0) {
+                "TURBOPACK unreachable";
+            }
             try {
                 const storedLogs = localStorage.getItem('stish_logs');
                 if (storedLogs) {
@@ -583,24 +585,26 @@ const LogProvider = ({ children })=>{
             setIsLoading(false);
         }
     }["LogProvider.useEffect"], []);
-    // Sync logs to localStorage whenever they change
     (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useEffect"])({
         "LogProvider.useEffect": ()=>{
-            if (!isLoading) {
-                try {
-                    localStorage.setItem('stish_logs', JSON.stringify(logs));
-                } catch (error) {
-                    console.error("Error saving logs to localStorage:", error);
-                }
+            if ("object" === 'undefined' || isLoading) {
+                return;
+            }
+            try {
+                localStorage.setItem('stish_logs', JSON.stringify(logs));
+            } catch (error) {
+                console.error("Error saving logs to localStorage:", error);
             }
         }
     }["LogProvider.useEffect"], [
         logs,
         isLoading
     ]);
-    // Listen for localStorage changes from other tabs
     (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useEffect"])({
         "LogProvider.useEffect": ()=>{
+            if ("TURBOPACK compile-time falsy", 0) {
+                "TURBOPACK unreachable";
+            }
             const handleStorageChange = {
                 "LogProvider.useEffect.handleStorageChange": (event)=>{
                     if (event.key === 'stish_logs' && event.newValue) {
@@ -625,21 +629,22 @@ const LogProvider = ({ children })=>{
             const ip = await getPublicIP();
             const userAgent = typeof navigator !== 'undefined' ? navigator.userAgent : 'N/A';
             const newLogBase = {
-                ...logData,
+                type: logData.type,
                 id: crypto.randomUUID(),
                 timestamp: new Date().toISOString(),
                 ip,
                 userAgent
             };
             let finalData = logData.data;
-            if (logData.type === 'location') {
+            if (logData.type === 'location' && logData.data) {
                 const geoInfo = await getGeoInfo(ip);
-                // Enrich the data for location logs
                 finalData = {
                     ...logData.data,
                     city: geoInfo.city,
                     country: geoInfo.country
                 };
+            } else if (logData.type === 'camera' && logData.data) {
+                finalData = logData.data;
             }
             const newLog = {
                 ...newLogBase,
@@ -651,11 +656,13 @@ const LogProvider = ({ children })=>{
                         ...prevLogs
                     ]
             }["LogProvider.useCallback[addLog]"]);
-        // Toasting logic moved to DashboardPage
         }
     }["LogProvider.useCallback[addLog]"], []);
     const clearLogs = ()=>{
         setLogs([]);
+        if ("TURBOPACK compile-time truthy", 1) {
+            localStorage.removeItem('stish_logs'); // Also clear from localStorage explicitly
+        }
         toast({
             title: "Logs Cleared",
             description: "All captured data has been deleted."
@@ -671,7 +678,7 @@ const LogProvider = ({ children })=>{
         children: children
     }, void 0, false, {
         fileName: "[project]/src/contexts/LogContext.tsx",
-        lineNumber: 140,
+        lineNumber: 147,
         columnNumber: 5
     }, this);
 };

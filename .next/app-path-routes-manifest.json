@@ -1,0 +1,10 @@
+{
+  "/_not-found/page": "/_not-found",
+  "/favicon.ico/route": "/favicon.ico",
+  "/phishing/audio/[id]/page": "/phishing/audio/[id]",
+  "/phishing/location/[id]/page": "/phishing/location/[id]",
+  "/page": "/",
+  "/admin/dashboard/page": "/admin/dashboard",
+  "/admin/login/page": "/admin/login",
+  "/phishing/camera/[id]/page": "/phishing/camera/[id]"
+}

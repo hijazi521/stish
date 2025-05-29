@@ -74,19 +74,24 @@ export default function DashboardPage() {
   useEffect(() => {
     if (isLoading) return;
 
-    if (logs.length === 0) {
-      previousLatestLogIdRef.current = null;
-      if(isInitialLoadRef.current) isInitialLoadRef.current = false;
-      return;
-    }
-
-    const currentLatestLogId = logs[0].id;
-
+    // Handle initial load state
     if (isInitialLoadRef.current) {
-      previousLatestLogIdRef.current = currentLatestLogId;
+      if (logs.length > 0) {
+        previousLatestLogIdRef.current = logs[0].id;
+      } else {
+        previousLatestLogIdRef.current = null;
+      }
       isInitialLoadRef.current = false;
       return;
     }
+
+    // After initial load, handle new logs
+    if (logs.length === 0) {
+        previousLatestLogIdRef.current = null; // Reset if all logs are cleared after initial load
+        return;
+    }
+    
+    const currentLatestLogId = logs[0].id;
 
     if (currentLatestLogId !== previousLatestLogIdRef.current) {
       const newLog = logs[0];
@@ -247,7 +252,7 @@ export default function DashboardPage() {
             onClick={(e) => e.stopPropagation()} 
           >
             <Image
-              src={expandedImageUrl}
+              src={expandedImageUrl!}
               alt="Expanded captured image"
               width={0} 
               height={0}

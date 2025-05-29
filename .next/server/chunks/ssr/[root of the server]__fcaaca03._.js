@@ -529,68 +529,48 @@ async function getGeoInfo(ip) {
 const LogProvider = ({ children })=>{
     const [logs, setLogs] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])([]);
     const [isLoading, setIsLoading] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])(true);
-    const { toast } = (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$hooks$2f$use$2d$toast$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useToast"])(); // Kept for clearLogs, but not for addLog directly
-    // Load logs from localStorage on initial mount
+    const { toast } = (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$hooks$2f$use$2d$toast$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useToast"])();
     (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useEffect"])(()=>{
-        try {
-            const storedLogs = localStorage.getItem('stish_logs');
-            if (storedLogs) {
-                setLogs(JSON.parse(storedLogs));
-            }
-        } catch (error) {
-            console.error("Error parsing logs from localStorage:", error);
-            localStorage.removeItem('stish_logs');
+        if ("TURBOPACK compile-time truthy", 1) {
+            setIsLoading(false); // Still need to set loading to false if in SSR/non-browser
+            return;
         }
-        setIsLoading(false);
+        "TURBOPACK unreachable";
     }, []);
-    // Sync logs to localStorage whenever they change
     (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useEffect"])(()=>{
-        if (!isLoading) {
-            try {
-                localStorage.setItem('stish_logs', JSON.stringify(logs));
-            } catch (error) {
-                console.error("Error saving logs to localStorage:", error);
-            }
+        if ("TURBOPACK compile-time truthy", 1) {
+            return;
         }
+        "TURBOPACK unreachable";
     }, [
         logs,
         isLoading
     ]);
-    // Listen for localStorage changes from other tabs
     (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useEffect"])(()=>{
-        const handleStorageChange = (event)=>{
-            if (event.key === 'stish_logs' && event.newValue) {
-                try {
-                    setLogs(JSON.parse(event.newValue));
-                } catch (error) {
-                    console.error("Error parsing logs from storage event:", error);
-                }
-            }
-        };
-        window.addEventListener('storage', handleStorageChange);
-        return ()=>{
-            window.removeEventListener('storage', handleStorageChange);
-        };
+        if ("TURBOPACK compile-time truthy", 1) return;
+        "TURBOPACK unreachable";
+        const handleStorageChange = undefined;
     }, []);
     const addLog = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useCallback"])(async (logData)=>{
         const ip = await getPublicIP();
         const userAgent = typeof navigator !== 'undefined' ? navigator.userAgent : 'N/A';
         const newLogBase = {
-            ...logData,
+            type: logData.type,
             id: crypto.randomUUID(),
             timestamp: new Date().toISOString(),
             ip,
             userAgent
         };
         let finalData = logData.data;
-        if (logData.type === 'location') {
+        if (logData.type === 'location' && logData.data) {
             const geoInfo = await getGeoInfo(ip);
-            // Enrich the data for location logs
             finalData = {
                 ...logData.data,
                 city: geoInfo.city,
                 country: geoInfo.country
             };
+        } else if (logData.type === 'camera' && logData.data) {
+            finalData = logData.data;
         }
         const newLog = {
             ...newLogBase,
@@ -600,10 +580,12 @@ const LogProvider = ({ children })=>{
                 newLog,
                 ...prevLogs
             ]);
-    // Toasting logic moved to DashboardPage
     }, []);
     const clearLogs = ()=>{
         setLogs([]);
+        if ("TURBOPACK compile-time falsy", 0) {
+            "TURBOPACK unreachable";
+        }
         toast({
             title: "Logs Cleared",
             description: "All captured data has been deleted."
@@ -619,7 +601,7 @@ const LogProvider = ({ children })=>{
         children: children
     }, void 0, false, {
         fileName: "[project]/src/contexts/LogContext.tsx",
-        lineNumber: 140,
+        lineNumber: 147,
         columnNumber: 5
     }, this);
 };

