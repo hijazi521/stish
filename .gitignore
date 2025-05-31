@@ -1,2 +1,46 @@
+# Ignore node_modules directory
 node_modules/
-node_modules
+
+# Ignore build directories
+build/
+dist/
+.next/
+
+# Ignore environment variables file
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Ignore logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+
+# Ignore IDE files (VS Code)
+.vscode/
+
+# Ignore package-lock.json if using yarn or pnpm
+# package-lock.json
+
+# Ignore yarn.lock if using npm or pnpm
+# yarn.lock
+
+# Ignore pnpm-lock.yaml if using npm or yarn
+# pnpm-lock.yaml
+
+# Ignore coverage reports
+coverage/
+
+# Ignore test artifacts
+.nyc_output/
+
+# Ignore distribution files
+*.tgz
+
+# Ignore OS generated files
+.DS_Store
+Thumbs.db
