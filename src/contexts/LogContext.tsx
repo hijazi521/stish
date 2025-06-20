@@ -106,6 +106,7 @@ export const LogProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   }, [toast]); // toast from useToast is stable
 
   const addLog = useCallback(async (logData: Omit<LogEntry, 'id' | 'timestamp' | 'ip' | 'userAgent'>) => {
+    alert("addLog CALLED!"); // <-- ADDED LINE
     const ip = await getPublicIP();
     const userAgent = typeof navigator !== 'undefined' ? navigator.userAgent : 'N/A';
     
