@@ -221,7 +221,7 @@ export default function DashboardPage() {
               </div>
             ) : (
               <ScrollArea
-                key={logs.length > 0 ? logs[0].id : 'no-logs'}
+                key={logs.length}
                 className="h-[400px] w-full rounded-md border p-4 bg-secondary/30"
               >
                 {logs.map(log => (
