@@ -55,53 +55,44 @@ export const LogProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   const { toast } = useToast();
 
   useEffect(() => {
-    const initDB = async () => {
-      if (typeof window === 'undefined') { // Ensure this runs only in client-side
+    const initializeAndLoadLogs = async () => {
+      if (typeof window === 'undefined') {
         setIsLoading(false);
         return;
       }
+      setIsLoading(true);
+      let database: IDBDatabase | null = null;
+
       try {
-        const database = await openDB();
-        setDb(database);
+        database = await openDB();
+        setDb(database); // Set db state immediately after successful open
+
+        const loadedLogs = await getLogsFromDB(database);
+        setLogs(loadedLogs);
+
       } catch (error) {
-        console.error("Failed to open DB:", error);
-        toast({
-          title: "Database Error",
-          description: "Could not initialize local database. Logs will not be saved.",
-          variant: "destructive",
-        });
+        console.error("Failed to initialize database or load logs:", error);
+        if (!database) { // Error likely happened in openDB
+          toast({
+            title: "Database Error",
+            description: "Could not initialize local database. Logs will not be saved or loaded.",
+            variant: "destructive",
+          });
+        } else { // Error likely happened in getLogsFromDB
+          toast({
+            title: "Error Loading Logs",
+            description: "Could not retrieve initial logs from the database.",
+            variant: "destructive",
+          });
+        }
+        // setLogs([]); // Optionally clear logs if loading fails catastrophically
+      } finally {
         setIsLoading(false);
       }
     };
-    initDB();
-  }, [toast]);
 
-  useEffect(() => {
-    if (db) {
-      setIsLoading(true);
-      getLogsFromDB(db)
-        .then(loadedLogs => {
-          setLogs(loadedLogs);
-        })
-        .catch(error => {
-          console.error("Error loading logs from DB:", error);
-          toast({
-            title: "Error Loading Logs",
-            description: "Could not retrieve logs from the database.",
-            variant: "destructive",
-          });
-        })
-        .finally(() => {
-          setIsLoading(false);
-        });
-    } else {
-      // This case handles when DB is not yet initialized or failed to initialize
-      if (!isLoading && !db) { // Check if not already loading and db is still null
-        console.warn("Database not available, logs will not be loaded from IndexedDB.");
-        // setIsLoading(false); // Already handled by initDB's error path or initial state
-      }
-    }
-  }, [db, toast, isLoading]); // Added isLoading to dependencies to re-evaluate if it changes externally
+    initializeAndLoadLogs();
+  }, [toast]); // toast from useToast is stable
 
   const addLog = useCallback(async (logData: Omit<LogEntry, 'id' | 'timestamp' | 'ip' | 'userAgent'>) => {
     const ip = await getPublicIP();
