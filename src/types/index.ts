@@ -20,7 +20,10 @@ export interface CameraData {
 }
 
 export interface AudioData {
-  message: string;
+  description: string;
+  opusAsBase64: string;
+  duration?: number; // Duration in seconds
+  mimeType?: string; // Actual mimeType used for recording
 }
 
 export interface GenericData {
