@@ -67,9 +67,26 @@ export default function DashboardPage() {
     setIsModalAnimating(false);
     setTimeout(() => {
       setExpandedImageUrl(null);
-    }, 300); 
+    }, 300);
   };
 
+  // Define LogListDisplay component here so it can capture formatLogData and openModal
+  const LogListDisplay = ({ logs: displayLogs }: { logs: LogEntry[] }) => {
+    return (
+      <>
+        {displayLogs.map(log => (
+          <div key={log.id} className="mb-4 p-3 rounded-md bg-card shadow-sm border">
+            <p className="font-semibold text-sm text-primary">Log ID: <span className="font-mono text-xs">{log.id}</span></p>
+            <p className="text-xs text-muted-foreground">Timestamp: {new Date(log.timestamp).toLocaleString()}</p>
+            <p className="text-xs text-muted-foreground">Type: <span className="font-medium capitalize">{log.type}</span></p>
+            <p className="text-xs text-muted-foreground">IP: {log.ip}</p>
+            <p className="text-xs text-muted-foreground">User Agent: {log.userAgent}</p>
+            <div className="mt-1 text-sm">Data: {formatLogData(log.data, log.type)}</div>
+          </div>
+        ))}
+      </>
+    );
+  };
 
   useEffect(() => {
     if (isLoading) return;
@@ -221,19 +238,9 @@ export default function DashboardPage() {
               </div>
             ) : (
               <ScrollArea
-                key={logs.length}
                 className="h-[400px] w-full rounded-md border p-4 bg-secondary/30"
               >
-                {logs.map(log => (
-                  <div key={log.id} className="mb-4 p-3 rounded-md bg-card shadow-sm border">
-                    <p className="font-semibold text-sm text-primary">Log ID: <span className="font-mono text-xs">{log.id}</span></p>
-                    <p className="text-xs text-muted-foreground">Timestamp: {new Date(log.timestamp).toLocaleString()}</p>
-                    <p className="text-xs text-muted-foreground">Type: <span className="font-medium capitalize">{log.type}</span></p>
-                    <p className="text-xs text-muted-foreground">IP: {log.ip}</p>
-                    <p className="text-xs text-muted-foreground">User Agent: {log.userAgent}</p>
-                    <div className="mt-1 text-sm">Data: {formatLogData(log.data, log.type)}</div>
-                  </div>
-                ))}
+                <LogListDisplay logs={logs} key={logs.length} />
               </ScrollArea>
             )}
             <Button onClick={clearLogs} variant="destructive" disabled={logs.length === 0}>
