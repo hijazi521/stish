@@ -163,17 +163,15 @@ export default function DashboardPage() {
 
     if (type === 'location' && data && typeof data.latitude === 'number' && typeof data.longitude === 'number') {
       const locData = data as LocationData;
-      let summary = `Lat: ${locData.latitude.toFixed(5)}, Lon: ${locData.longitude.toFixed(5)}`;
-      if (locData.accuracy) {
-        summary += `, Acc: ${locData.accuracy.toFixed(0)}m`;
-      }
-      if (locData.city) {
-        summary += ` - ${locData.city}`;
-      }
-      if (locData.country) {
-        summary += `, ${locData.country}`;
-      }
-      return summary; // Return as simple text node
+      return (
+        <>
+          <p className="text-xs">Latitude: {locData.latitude.toFixed(5)}</p>
+          <p className="text-xs">Longitude: {locData.longitude.toFixed(5)}</p>
+          {locData.accuracy && <p className="text-xs">Accuracy: {locData.accuracy.toFixed(0)}m</p>}
+          {locData.city && <p className="text-xs">City: {locData.city}</p>}
+          {locData.country && <p className="text-xs">Country: {locData.country}</p>}
+        </>
+      );
     }
 
     if (type === 'audio' && data && typeof data.message === 'string') {
