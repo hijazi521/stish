@@ -135,35 +135,29 @@ export const LogProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
       data: finalData,
     };
 
-    let currentDbInstance: IDBDatabase;
-    try {
-      currentDbInstance = db || await dbReadyPromiseRef.current;
-      if (!db && currentDbInstance) {
-        setDb(currentDbInstance); // Keep db state in sync if promise was awaited
-      }
-    } catch (error) {
-      console.error("Database initialization failed or still pending for addLog:", error);
-      toast({
-        title: "Logging Error",
-        description: "Database is not available. Log could not be saved.",
-        variant: "destructive",
-      });
-      return;
-    }
+    // Optimistic update
+    setLogs(prevLogs => [newLog, ...prevLogs]);
 
-    try {
-      await addLogToDB(currentDbInstance, newLog);
-      const updatedLogs = await getLogsFromDB(currentDbInstance);
-      setLogs(updatedLogs);
-    } catch (error) {
-      console.error("Failed to add log to DB:", error);
-      toast({
-        title: "Logging Error",
-        description: "Failed to save log to database.",
-        variant: "destructive",
-      });
-    }
-  }, [db, toast]); // db dependency is still useful here for re-running if db state changes externally, though promise makes it robust
+    // Asynchronous background save
+    (async () => {
+      try {
+        const dbInstance = db || await dbReadyPromiseRef.current;
+        if (!db && dbInstance) {
+          setDb(dbInstance); // Keep db state in sync if promise was awaited
+        }
+        await addLogToDB(dbInstance, newLog);
+      } catch (error) {
+        console.error("Failed to save log to IndexedDB in background:", error);
+        // Optional: Consider a toast notification for the user if background save fails
+        // toast({
+        //   title: "Background Save Error",
+        //   description: "A log was added to the view but failed to save persistently.",
+        //   variant: "warning", // Or "destructive" if critical
+        // });
+      }
+    })();
+
+  }, [db, setDb]); // Updated dependencies: setDb is included as db might be set in the async block. toast is removed as it's not directly used here unless error handling for async save is added.
 
   const clearLogs = async () => {
     let currentDbInstance: IDBDatabase;
