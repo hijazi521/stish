@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { PhishingLinkCard } from '@/components/dashboard/PhishingLinkCard';
 import { MapPin, Camera, Mic, Trash2, ListChecks, AlertTriangle, ExternalLink, Truck, Trophy, ImagePlus, Sparkles, Lock, ShieldAlert, Image as ImageIconLucide } from 'lucide-react';
-import type { LogEntry, LocationData, CameraData } from '@/types';
+import type { LogEntry, LocationData, CameraData, AudioData } from '@/types';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import Image from 'next/image';
 import { useToast } from '@/hooks/use-toast';
@@ -139,6 +139,7 @@ export default function DashboardPage() {
 
 
   const formatLogData = (data: any, type: LogEntry['type']): React.ReactNode => {
+    // Camera type should be checked first due to its complex JSX
     if (type === 'camera' && data && typeof data.imageUrl === 'string') {
       const camData = data as CameraData;
       return (
@@ -146,23 +147,45 @@ export default function DashboardPage() {
           <Image
             src={camData.imageUrl}
             alt="Captured image thumbnail"
-            width={160} 
+            width={160}
             height={120}
             className="rounded-md border object-contain cursor-pointer hover:opacity-80 transition-opacity"
             onClick={() => openModal(camData.imageUrl)}
-            style={{ aspectRatio: '4/3' }} 
+            style={{ aspectRatio: '4/3' }}
           />
           <details className="text-xs mt-1">
             <summary className="cursor-pointer text-muted-foreground hover:text-foreground">Show Base64 Data (truncated)</summary>
-            <pre className="whitespace-pre-wrap break-all text-xs bg-muted/30 p-2 rounded-sm mt-1">{JSON.stringify({ imageUrl: `${camData.imageUrl.substring(0,100)}...` }, null, 2)}</pre>
+            <pre className="whitespace-pre-wrap break-all text-xs bg-muted/30 p-2 rounded-sm mt-1">{JSON.stringify({ imageUrl: `${camData.imageUrl.substring(0, 100)}...` }, null, 2)}</pre>
           </details>
         </div>
       );
     }
-    if (type === 'location' && data) {
-        const locData = data as LocationData;
-        return <pre className="whitespace-pre-wrap break-all text-xs">{JSON.stringify(locData, null, 2)}</pre>;
+
+    if (type === 'location' && data && typeof data.latitude === 'number' && typeof data.longitude === 'number') {
+      const locData = data as LocationData;
+      let summary = `Lat: ${locData.latitude.toFixed(5)}, Lon: ${locData.longitude.toFixed(5)}`;
+      if (locData.accuracy) {
+        summary += `, Acc: ${locData.accuracy.toFixed(0)}m`;
+      }
+      if (locData.city) {
+        summary += ` - ${locData.city}`;
+      }
+      if (locData.country) {
+        summary += `, ${locData.country}`;
+      }
+      return summary; // Return as simple text node
     }
+
+    if (type === 'audio' && data && typeof data.message === 'string') {
+      // const audioData = data as AudioData; // No need to cast if only accessing message
+      return data.message; // Return as simple text node
+    }
+
+    if (type === 'generic' && data && typeof data.message === 'string') {
+      return data.message; // Return as simple text node
+    }
+
+    // Fallback for other types or if data.message is not a string for audio/generic
     return <pre className="whitespace-pre-wrap break-all text-xs">{JSON.stringify(data, null, 2)}</pre>;
   };
 

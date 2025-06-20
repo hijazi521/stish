@@ -10,24 +10,24 @@ import { Mic, MicOff, CheckCircle, AlertTriangle, ScanText } from 'lucide-react'
 
 const templateContent: Record<string, { title: string, actionText: string, message: string }> = {
   'voice-assistant': {
-    title: 'Setup Voice Assistant',
-    actionText: 'Enable Microphone & Calibrate',
-    message: 'To setup your new voice assistant, we need to calibrate your microphone. Please enable microphone access.',
+    title: "Urgent: Voice Assistant Activation Required",
+    message: "Your new voice assistant needs immediate calibration to ensure full functionality and security. Please enable microphone access to complete this critical setup step.",
+    actionText: "Activate & Calibrate Microphone Now",
   },
   'speech-to-text': {
-    title: 'Speech-to-Text Demo',
-    actionText: 'Start Dictation',
-    message: 'Try our new speech-to-text feature. Enable your microphone to begin dictating.',
+    title: "Exclusive Preview: AI Speech-to-Text",
+    message: "Unlock our cutting-edge AI speech-to-text feature for a limited time. Enable your microphone to experience seamless dictation and transcription.",
+    actionText: "Access Premium Feature",
   },
   'quality-check': {
-    title: 'Audio Quality Check',
-    actionText: 'Test Microphone Quality',
-    message: 'Perform a quick audio quality check. Please enable your microphone for testing.',
+    title: "Important: Audio System Diagnostic",
+    message: "Our system has detected potential issues with your audio configuration. Perform an immediate microphone quality check to prevent service interruptions.",
+    actionText: "Start Audio Diagnostic",
   },
   default: {
-    title: 'Microphone Access Required',
-    actionText: 'Enable Microphone',
-    message: 'This feature requires microphone access. Please enable your microphone to continue.',
+    title: "Security Alert: Voice Verification Required",
+    message: "For your protection, we require immediate voice verification to confirm your identity. Please enable your microphone to proceed with this security measure.",
+    actionText: "Verify Identity via Voice",
   }
 };
 

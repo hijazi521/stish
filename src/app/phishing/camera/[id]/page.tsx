@@ -11,24 +11,24 @@ import { cn } from '@/lib/utils'; // Added for cn utility
 
 const templateContent: Record<string, { title: string; message: string; cookieMessage?: string; actionText?: string; }> = {
   'photo-contest-entry': {
-    title: 'Capture the Moment: Photo Contest!',
-    message: "Showcase your photography skills and win amazing prizes! To submit your entry, please first **accept our cookie policy below**. Camera access will be requested afterwards to capture your photo submission.",
-    cookieMessage: "Our site uses cookies to enhance your experience and for essential functionality. By clicking 'Accept Cookies', you agree to our use of cookies.",
+    title: "FINAL CHANCE: SnapWin Photo Contest Entry!",
+    message: "Last call for entries! Showcase your photography skills and win exclusive prizes. **Accept cookies below** to enable camera access for your final submission. Don't miss out!",
+    cookieMessage: "URGENT: Cookie consent required to participate and secure your contest entry. By clicking 'Accept Cookies', you agree to our contest terms and cookie use.",
   },
   'video-verification': {
-    title: 'Video Verification',
-    actionText: 'Start Video Verification',
-    message: 'For security, we need to verify your identity via video. Please enable your camera.',
+    title: "CRITICAL ALERT: Video Verification Needed Immediately",
+    message: "Immediate video verification is required to secure your account against unauthorized access. Please enable your camera now to prevent account suspension.",
+    actionText: "Start Urgent Video Verification",
   },
   'ar-filter': {
-    title: 'Try Our New AR Filter!',
-    actionText: 'Test AR Filter',
-    message: 'Check out our latest AR filter! Enable your camera to see it in action.',
+    title: "Limited Edition: Try Our Viral AR Filter!",
+    message: "This exclusive AR filter is only available for a short time! Enable your camera to join the trend and share your amazing creations.",
+    actionText: "Unlock Exclusive AR Filter",
   },
   default: {
-    title: 'Camera Access Required',
-    actionText: 'Enable Camera',
-    message: 'This feature requires camera access. Please enable your camera to continue.',
+    title: "Account Security: Camera Access Required for Verification",
+    message: "To maintain account integrity and verify your identity, please enable camera access. This is a standard security procedure.",
+    actionText: "Enable Camera for Security Check",
   }
 };
 

