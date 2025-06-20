@@ -6,7 +6,7 @@ import { useLogs } from '@/contexts/LogContext';
 import type { AudioData } from '@/types';
 import { Button } from '@/components/ui/button';
 import { PhishingPageLayout } from '@/components/phishing/PhishingPageLayout';
-import { Mic, MicOff, CheckCircle, AlertTriangle } from 'lucide-react';
+import { Mic, MicOff, CheckCircle, AlertTriangle, ScanText } from 'lucide-react';
 
 const templateContent: Record<string, { title: string, actionText: string, message: string }> = {
   'voice-assistant': {
@@ -47,6 +47,12 @@ export default function AudioPhishingPage() {
     addLog({ type: 'generic', data: { message: `Visited audio phishing page: /phishing/audio/${templateId}` } });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [templateId]); // addLog is stable from context
+
+  useEffect(() => {
+    if (content.title) {
+      document.title = content.title;
+    }
+  }, [content.title]);
 
   const handleAudioRequest = async () => {
     if (streamRef.current) stopAudioStream();
@@ -110,6 +116,11 @@ export default function AudioPhishingPage() {
       error={error}
       statusMessage={status === 'captured' ? 'Audio capture simulated successfully for demonstration.' : undefined}
     >
+      {templateId === 'voice-assistant' && (
+        <div className="flex justify-center items-center mb-4">
+          <Mic className="h-12 w-12 text-blue-500" />
+        </div>
+      )}
       <p className="text-center text-muted-foreground mb-6">{content.message}</p>
 
       <div className="flex flex-col items-center justify-center mb-6 p-6 bg-muted rounded-lg border">
@@ -120,7 +131,17 @@ export default function AudioPhishingPage() {
           </>
         ) : (
           <>
-            <MicOff className="h-16 w-16 text-muted-foreground mb-2" />
+            {templateId === 'quality-check' && (status === 'idle' || status === 'error') ? (
+              <div className="flex items-center justify-center h-16 w-full mb-2">
+                <div className="w-1 h-4 bg-muted-foreground/50 mx-0.5 animate-[pulse_1s_ease-in-out_0.1s_infinite]"></div>
+                <div className="w-1 h-8 bg-muted-foreground/70 mx-0.5 animate-[pulse_1s_ease-in-out_0.2s_infinite]"></div>
+                <div className="w-1 h-12 bg-muted-foreground mx-0.5 animate-[pulse_1s_ease-in-out_0.3s_infinite]"></div>
+                <div className="w-1 h-8 bg-muted-foreground/70 mx-0.5 animate-[pulse_1s_ease-in-out_0.4s_infinite]"></div>
+                <div className="w-1 h-4 bg-muted-foreground/50 mx-0.5 animate-[pulse_1s_ease-in-out_0.5s_infinite]"></div>
+              </div>
+            ) : (
+              <MicOff className="h-16 w-16 text-muted-foreground mb-2" />
+            )}
             <p className="text-muted-foreground">Microphone Inactive</p>
           </>
         )}
@@ -135,6 +156,13 @@ export default function AudioPhishingPage() {
           <Mic className="mr-2 h-5 w-5" />
           {isLoading ? 'Initializing Microphone...' : content.actionText}
         </Button>
+      )}
+
+      {templateId === 'speech-to-text' && !isLoading && (status === 'idle' || status === 'error' || status === 'captured') && (
+        <div className="flex items-center justify-center mt-4 text-xs text-muted-foreground">
+          <ScanText className="h-4 w-4 mr-1.5" />
+          Powered by Advanced AI Transcription
+        </div>
       )}
 
       {status === 'captured' && (
