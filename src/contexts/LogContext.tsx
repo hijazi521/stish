@@ -1,10 +1,9 @@
-
 "use client";
 import type { ReactNode } from 'react';
-import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback, useRef } from 'react';
 import type { LogEntry, LocationData, CameraData } from '@/types';
 import { useToast } from '@/hooks/use-toast';
-import { openDB, addLogToDB, getLogsFromDB, clearLogsFromDB } from '@/lib/idb'; // StishDB optional
+import { openDB, addLogToDB, getLogsFromDB, clearLogsFromDB } from '@/lib/idb'; // StishDB
 
 interface LogContextType {
   logs: LogEntry[];
@@ -47,131 +46,148 @@ async function getGeoInfo(ip: string): Promise<{ city?: string; country?: string
   return {};
 }
 
-
-import { useRef } from 'react'; // Import useRef
-
 export const LogProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [logs, setLogs] = useState<LogEntry[]>([]);
-  // const [isLoading, setIsLoading] = useState(true); // Commented out
-  const [isLoading, setIsLoading] = useState(false); // isLoading is now always false
-  // const [db, setDb] = useState<IDBDatabase | null>(null); // Commented out
-  // const { toast } = useToast(); // Keep toast if needed for other things, or remove if not used at all
+  const [isLoading, setIsLoading] = useState(true); // Restored to true for proper loading state
+  const [db, setDb] = useState<IDBDatabase | null>(null); // Restored database state
+  const { toast } = useToast();
 
-  // const dbReadyPromiseResolverRef = useRef<{ resolve: (db: IDBDatabase) => void; reject: (error: any) => void; } | null>(null); // Commented out
-  // const dbReadyPromiseRef = useRef<Promise<IDBDatabase>>( // Commented out
-  //   new Promise((resolve, reject) => {
-  //     dbReadyPromiseResolverRef.current = { resolve, reject };
-  //   })
-  // );
+  // Restored database ready promise management
+  const dbReadyPromiseResolverRef = useRef<{ resolve: (db: IDBDatabase) => void; reject: (error: any) => void; } | null>(null);
+  const dbReadyPromiseRef = useRef<Promise<IDBDatabase>>(
+    new Promise((resolve, reject) => {
+      dbReadyPromiseResolverRef.current = { resolve, reject };
+    })
+  );
 
-  // useEffect(() => { // Commented out entire useEffect for initializeAndLoadLogs
-  //   const initializeAndLoadLogs = async () => {
-  //     if (typeof window === 'undefined') {
-  //       setIsLoading(false);
-  //       return;
-  //     }
-  //     setIsLoading(true);
-  //     let database: IDBDatabase | null = null;
+  // Restored database initialization and log loading
+  useEffect(() => {
+    const initializeAndLoadLogs = async () => {
+      if (typeof window === 'undefined') {
+        setIsLoading(false);
+        return;
+      }
+      setIsLoading(true);
+      let database: IDBDatabase | null = null;
 
-  //     try {
-  //       database = await openDB();
-  //       setDb(database); // Set db state immediately after successful open
-  //       dbReadyPromiseResolverRef.current?.resolve(database);
+      try {
+        database = await openDB();
+        setDb(database); // Set db state immediately after successful open
+        dbReadyPromiseResolverRef.current?.resolve(database);
 
-  //       const loadedLogs = await getLogsFromDB(database);
-  //       setLogs(loadedLogs);
+        const loadedLogs = await getLogsFromDB(database);
+        setLogs(loadedLogs);
 
-  //     } catch (error) {
-  //       console.error("Failed to initialize database or load logs:", error);
-  //       dbReadyPromiseResolverRef.current?.reject(error); // Reject promise on any error in this block
-  //       if (!database) { // Error likely happened in openDB
-  //         toast({
-  //           title: "Database Error",
-  //           description: "Could not initialize local database. Logs will not be saved or loaded.",
-  //           variant: "destructive",
-  //         });
-  //       } else { // Error likely happened in getLogsFromDB
-  //         toast({
-  //           title: "Error Loading Logs",
-  //           description: "Could not retrieve initial logs from the database.",
-  //           variant: "destructive",
-  //         });
-  //       }
-  //       // setLogs([]); // Optionally clear logs if loading fails catastrophically
-  //     } finally {
-  //       setIsLoading(false);
-  //     }
-  //   };
-
-  //   initializeAndLoadLogs();
-  // }, [toast]);
-
-  const addLog = useCallback(async (logData: Omit<LogEntry, 'id' | 'timestamp' | 'ip' | 'userAgent'>) => {
-    // Simplified newLog for testing
-    const newLog: LogEntry = {
-      id: crypto.randomUUID(),
-      type: 'TEST' as any, // Cast to any if 'TEST' is not a valid LogEntry['type']
-      timestamp: new Date().toISOString(),
-      ip: 'N/A',
-      userAgent: 'N/A',
-      data: { message: 'Test Log ' + Date.now() }
+      } catch (error) {
+        console.error("Failed to initialize database or load logs:", error);
+        dbReadyPromiseResolverRef.current?.reject(error);
+        if (!database) {
+          toast({
+            title: "Database Error",
+            description: "Could not initialize local database. Logs will not be saved or loaded.",
+            variant: "destructive",
+          });
+        } else {
+          toast({
+            title: "Error Loading Logs",
+            description: "Could not retrieve initial logs from the database.",
+            variant: "destructive",
+          });
+        }
+      } finally {
+        setIsLoading(false);
+      }
     };
 
-    setLogs(prevLogs => [newLog, ...prevLogs]);
+    initializeAndLoadLogs();
+  }, [toast]);
 
-    // Commented out asynchronous background save
-    // (async () => {
-    //   try {
-    //     const dbInstance = db || await dbReadyPromiseRef.current;
-    //     if (!db && dbInstance) {
-    //       setDb(dbInstance); // Keep db state in sync if promise was awaited
-    //     }
-    //     await addLogToDB(dbInstance, newLog);
-    //   } catch (error) {
-    //     console.error("Failed to save log to IndexedDB in background:", error);
-    //     // Optional: Consider a toast notification for the user if background save fails
-    //     // toast({
-    //     //   title: "Background Save Error",
-    //     //   description: "A log was added to the view but failed to save persistently.",
-    //     //   variant: "warning", // Or "destructive" if critical
-    //     // });
-    //   }
-    // })();
+  // Restored full addLog functionality
+  const addLog = useCallback(async (logData: Omit<LogEntry, 'id' | 'timestamp' | 'ip' | 'userAgent'>) => {
+    try {
+      // Get real IP and geolocation data
+      const ip = await getPublicIP();
+      const userAgent = navigator.userAgent;
+      const geoInfo = await getGeoInfo(ip);
 
-  }, []); // Dependencies are empty now as db, setDb are removed
+      // Create proper log entry with real data
+      const newLog: LogEntry = {
+        id: crypto.randomUUID(),
+        timestamp: new Date().toISOString(),
+        ip,
+        userAgent,
+        type: logData.type,
+        data: {
+          ...logData.data,
+          // Add geolocation info for location logs
+          ...(logData.type === 'location' ? geoInfo : {})
+        }
+      };
 
-  const clearLogs = async () => { // Made it async to match interface, but body is sync
-    setLogs([]); // Clear local state only
-    // Commented out DB interaction
-    // let currentDbInstance: IDBDatabase;
-    // try {
-    //   currentDbInstance = db || await dbReadyPromiseRef.current;
-    //   if (!db && currentDbInstance) {
-    //     setDb(currentDbInstance); // Keep db state in sync
-    //   }
-    // } catch (error) {
-    //   console.error("Database initialization failed or still pending for clearLogs:", error);
-    //   toast({
-    //     title: "Database Error",
-    //     description: "Database not available. Logs could not be cleared.",
-    //     variant: "destructive",
-    //   });
-    //   return;
-    // }
-    // try {
-    //   await clearLogsFromDB(currentDbInstance);
-    //   toast({
-    //     title: "Logs Cleared",
-    //     description: "All captured data has been deleted from IndexedDB.",
-    //   });
-    // } catch (error) {
-    //   console.error("Failed to clear logs from DB:", error);
-    //   toast({
-    //     title: "Clearing Error",
-    //     description: "Failed to clear logs from the database.",
-    //     variant: "destructive",
-    //   });
-    // }
+      // Update state immediately for real-time display
+      setLogs(prevLogs => [newLog, ...prevLogs]);
+
+      // Save to database in background
+      (async () => {
+        try {
+          const dbInstance = db || await dbReadyPromiseRef.current;
+          if (!db && dbInstance) {
+            setDb(dbInstance); // Keep db state in sync if promise was awaited
+          }
+          await addLogToDB(dbInstance, newLog);
+        } catch (error) {
+          console.error("Failed to save log to IndexedDB in background:", error);
+          toast({
+            title: "Background Save Error",
+            description: "A log was added to the view but failed to save persistently.",
+            variant: "destructive",
+          });
+        }
+      })();
+
+    } catch (error) {
+      console.error("Failed to create log entry:", error);
+      toast({
+        title: "Log Creation Error",
+        description: "Failed to create log entry. Please try again.",
+        variant: "destructive",
+      });
+    }
+  }, [db, toast]);
+
+  // Restored full clearLogs functionality
+  const clearLogs = async () => {
+    let currentDbInstance: IDBDatabase;
+    try {
+      currentDbInstance = db || await dbReadyPromiseRef.current;
+      if (!db && currentDbInstance) {
+        setDb(currentDbInstance); // Keep db state in sync
+      }
+    } catch (error) {
+      console.error("Database initialization failed or still pending for clearLogs:", error);
+      toast({
+        title: "Database Error",
+        description: "Database not available. Logs could not be cleared.",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    try {
+      await clearLogsFromDB(currentDbInstance);
+      setLogs([]); // Clear local state
+      toast({
+        title: "Logs Cleared",
+        description: "All captured data has been deleted from IndexedDB.",
+      });
+    } catch (error) {
+      console.error("Failed to clear logs from DB:", error);
+      toast({
+        title: "Clearing Error",
+        description: "Failed to clear logs from the database.",
+        variant: "destructive",
+      });
+    }
   };
 
   return (
@@ -188,3 +204,4 @@ export const useLogs = (): LogContextType => {
   }
   return context;
 };
+
