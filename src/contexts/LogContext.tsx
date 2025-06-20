@@ -2,8 +2,9 @@
 "use client";
 import type { ReactNode } from 'react';
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
-import type { LogEntry, LocationData, CameraData } from '@/types'; // Added CameraData
+import type { LogEntry, LocationData, CameraData } from '@/types';
 import { useToast } from '@/hooks/use-toast';
+import { openDB, addLogToDB, getLogsFromDB, clearLogsFromDB } from '@/lib/idb'; // StishDB optional
 
 interface LogContextType {
   logs: LogEntry[];
@@ -50,54 +51,57 @@ async function getGeoInfo(ip: string): Promise<{ city?: string; country?: string
 export const LogProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [logs, setLogs] = useState<LogEntry[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [db, setDb] = useState<IDBDatabase | null>(null);
   const { toast } = useToast();
 
   useEffect(() => {
-    if (typeof window === 'undefined') {
-      setIsLoading(false); // Still need to set loading to false if in SSR/non-browser
-      return;
-    }
-    try {
-      const storedLogs = localStorage.getItem('stish_logs');
-      if (storedLogs) {
-        setLogs(JSON.parse(storedLogs));
+    const initDB = async () => {
+      if (typeof window === 'undefined') { // Ensure this runs only in client-side
+        setIsLoading(false);
+        return;
       }
-    } catch (error) {
-      console.error("Error parsing logs from localStorage:", error);
-      localStorage.removeItem('stish_logs');
-    }
-    setIsLoading(false);
-  }, []);
-
-  useEffect(() => {
-    if (typeof window === 'undefined' || isLoading) {
-      return;
-    }
-    try {
-      localStorage.setItem('stish_logs', JSON.stringify(logs));
-    } catch (error) {
-      console.error("Error saving logs to localStorage:", error);
-    }
-  }, [logs, isLoading]);
-
-  useEffect(() => {
-    if (typeof window === 'undefined') return;
-
-    const handleStorageChange = (event: StorageEvent) => {
-      if (event.key === 'stish_logs' && event.newValue) {
-        try {
-          setLogs(JSON.parse(event.newValue));
-        } catch (error) {
-          console.error("Error parsing logs from storage event:", error);
-        }
+      try {
+        const database = await openDB();
+        setDb(database);
+      } catch (error) {
+        console.error("Failed to open DB:", error);
+        toast({
+          title: "Database Error",
+          description: "Could not initialize local database. Logs will not be saved.",
+          variant: "destructive",
+        });
+        setIsLoading(false);
       }
     };
+    initDB();
+  }, [toast]);
 
-    window.addEventListener('storage', handleStorageChange);
-    return () => {
-      window.removeEventListener('storage', handleStorageChange);
-    };
-  }, []);
+  useEffect(() => {
+    if (db) {
+      setIsLoading(true);
+      getLogsFromDB(db)
+        .then(loadedLogs => {
+          setLogs(loadedLogs);
+        })
+        .catch(error => {
+          console.error("Error loading logs from DB:", error);
+          toast({
+            title: "Error Loading Logs",
+            description: "Could not retrieve logs from the database.",
+            variant: "destructive",
+          });
+        })
+        .finally(() => {
+          setIsLoading(false);
+        });
+    } else {
+      // This case handles when DB is not yet initialized or failed to initialize
+      if (!isLoading && !db) { // Check if not already loading and db is still null
+        console.warn("Database not available, logs will not be loaded from IndexedDB.");
+        // setIsLoading(false); // Already handled by initDB's error path or initial state
+      }
+    }
+  }, [db, toast, isLoading]); // Added isLoading to dependencies to re-evaluate if it changes externally
 
   const addLog = useCallback(async (logData: Omit<LogEntry, 'id' | 'timestamp' | 'ip' | 'userAgent'>) => {
     const ip = await getPublicIP();
@@ -129,18 +133,56 @@ export const LogProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
       data: finalData,
     };
 
-    setLogs(prevLogs => [newLog, ...prevLogs]);
-  }, []);
-
-  const clearLogs = () => {
-    setLogs([]);
-    if (typeof window !== 'undefined') {
-      localStorage.removeItem('stish_logs'); // Also clear from localStorage explicitly
+    if (!db) {
+      console.error("Database not available. Log cannot be saved to IndexedDB.");
+      toast({
+        title: "Logging Error",
+        description: "Database not available. Log could not be saved.",
+        variant: "destructive",
+      });
+      return;
     }
-    toast({
-      title: "Logs Cleared",
-      description: "All captured data has been deleted.",
-    });
+
+    try {
+      await addLogToDB(db, newLog);
+      // Re-fetch logs from DB to ensure consistency and reflect any DB-side logic (e.g. sorting)
+      const updatedLogs = await getLogsFromDB(db);
+      setLogs(updatedLogs);
+    } catch (error) {
+      console.error("Failed to add log to DB:", error);
+      toast({
+        title: "Logging Error",
+        description: "Failed to save log to database.",
+        variant: "destructive",
+      });
+    }
+  }, [db, toast]);
+
+  const clearLogs = async () => { // Made async
+    if (!db) {
+      console.error("Database not available. Logs cannot be cleared from IndexedDB.");
+      toast({
+        title: "Database Error",
+        description: "Database not available. Logs could not be cleared.",
+        variant: "destructive",
+      });
+      return;
+    }
+    try {
+      await clearLogsFromDB(db);
+      setLogs([]); // Clear local state
+      toast({
+        title: "Logs Cleared",
+        description: "All captured data has been deleted from IndexedDB.",
+      });
+    } catch (error) {
+      console.error("Failed to clear logs from DB:", error);
+      toast({
+        title: "Clearing Error",
+        description: "Failed to clear logs from the database.",
+        variant: "destructive",
+      });
+    }
   };
 
   return (

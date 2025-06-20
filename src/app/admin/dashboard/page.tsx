@@ -174,9 +174,23 @@ export default function DashboardPage() {
       );
     }
 
-    if (type === 'audio' && data && typeof data.message === 'string') {
-      // const audioData = data as AudioData; // No need to cast if only accessing message
-      return data.message; // Return as simple text node
+    // Audio type handling
+    if (type === 'audio' && data && typeof data.opusAsBase64 === 'string' && typeof data.mimeType === 'string') {
+      // The opusAsBase64 string already includes the "data:audio/ogg; codecs=opus;base64," part or similar.
+      // So, we can use it directly in src.
+      const audioSrc = data.opusAsBase64;
+      return (
+        <>
+          {data.description && <p className="text-sm mb-1">{data.description}</p>}
+          <audio controls src={audioSrc} className="w-full max-w-xs">
+            Your browser does not support the audio element.
+          </audio>
+          {typeof data.duration === 'number' && <p className="text-xs text-muted-foreground mt-1">Duration: {data.duration.toFixed(1)}s</p>}
+        </>
+      );
+    } else if (type === 'audio' && data && typeof data.description === 'string') {
+      // Fallback for audio logs that might not have playable data but have a description
+      return <p className="text-sm">Audio log: {data.description} (audio data not available for playback)</p>;
     }
 
     if (type === 'generic' && data && typeof data.message === 'string') {

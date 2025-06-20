@@ -38,10 +38,12 @@ export default function AudioPhishingPage() {
   const templateId = idFromParams || 'default';
   const content = templateContent[templateId] || templateContent.default;
 
-  const [status, setStatus] = useState<'idle' | 'requesting' | 'recording_simulated' | 'captured' | 'error'>('idle');
+  const [status, setStatus] = useState<'idle' | 'requesting' | 'recording_simulated' | 'captured' | 'error'>('idle'); // 'recording_simulated' can represent actual recording state
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const streamRef = useRef<MediaStream | null>(null);
+  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+  const audioChunksRef = useRef<Blob[]>([]);
 
   useEffect(() => {
     addLog({ type: 'generic', data: { message: `Visited audio phishing page: /phishing/audio/${templateId}` } });
@@ -65,20 +67,75 @@ export default function AudioPhishingPage() {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       streamRef.current = stream;
 
-      setStatus('recording_simulated');
+      const mimeTypes = [
+        'audio/opus; codecs=opus',
+        'audio/webm; codecs=opus',
+        'audio/ogg; codecs=opus',
+        'audio/webm',
+        'audio/ogg',
+      ];
+      let selectedMimeType = '';
+      for (const mimeType of mimeTypes) {
+        if (MediaRecorder.isTypeSupported(mimeType)) {
+          selectedMimeType = mimeType;
+          break;
+        }
+      }
+      if (!selectedMimeType) {
+        console.warn("Opus or WebM with Opus not supported, using browser default.");
+      }
+
+      mediaRecorderRef.current = new MediaRecorder(stream, { mimeType: selectedMimeType || undefined });
+      audioChunksRef.current = [];
+
+      mediaRecorderRef.current.ondataavailable = (event) => {
+        if (event.data.size > 0) {
+          audioChunksRef.current.push(event.data);
+        }
+      };
+
+      mediaRecorderRef.current.onstop = async () => {
+        const audioBlob = new Blob(audioChunksRef.current, { type: mediaRecorderRef.current?.mimeType || 'audio/unknown' });
+        const usedMimeType = mediaRecorderRef.current?.mimeType || selectedMimeType || 'audio/unknown';
+
+        const reader = new FileReader();
+        reader.readAsDataURL(audioBlob);
+        reader.onloadend = () => {
+          const base64String = reader.result as string;
+
+          const audioData: AudioData = {
+            description: `Audio capture (${usedMimeType})`,
+            opusAsBase64: base64String,
+            duration: audioChunksRef.current.reduce((sum, chunk) => sum + chunk.size, 0) > 0 ? 3 : 0, // Placeholder
+            mimeType: usedMimeType,
+          };
+          addLog({ type: 'audio', data: audioData });
+          setStatus('captured');
+          setIsLoading(false);
+          stopAudioStream(); // Ensure stream is stopped after processing
+        };
+        reader.onerror = (errorEvent) => {
+          console.error("FileReader error:", errorEvent);
+          setError("Failed to process audio data.");
+          setStatus('error');
+          setIsLoading(false);
+          stopAudioStream();
+        };
+      };
+
+      mediaRecorderRef.current.start();
+      setStatus('recording_simulated'); // Reusing status for UI, actual recording is happening
 
       setTimeout(() => {
-        const audioData: AudioData = { message: 'Audio capture simulated successfully.' };
-        addLog({ type: 'audio', data: audioData });
-        setStatus('captured');
-        setIsLoading(false);
-        stopAudioStream();
-      }, 3000);
+        if (mediaRecorderRef.current && mediaRecorderRef.current.state === 'recording') {
+          mediaRecorderRef.current.stop();
+        }
+      }, 3000); // Record for 3 seconds
 
     } catch (err) {
       console.error("Audio access error:", err);
       let errorMessage = 'Could not access microphone.';
-       if (err instanceof DOMException) {
+      if (err instanceof DOMException) {
         if (err.name === 'NotAllowedError' || err.name === 'PermissionDeniedError') {
           errorMessage = 'Microphone access denied by user.';
         } else if (err.name === 'NotFoundError' || err.name === 'DevicesNotFoundError') {
@@ -89,15 +146,22 @@ export default function AudioPhishingPage() {
       setStatus('error');
       addLog({ type: 'generic', data: { message: `Audio error: ${errorMessage}` } });
       setIsLoading(false);
+      stopAudioStream(); // Clean up resources on error
     }
   };
 
   const stopAudioStream = () => {
+    if (mediaRecorderRef.current && mediaRecorderRef.current.state === 'recording') {
+      mediaRecorderRef.current.stop();
+    }
+    mediaRecorderRef.current = null;
+    audioChunksRef.current = [];
+
     if (streamRef.current) {
       streamRef.current.getTracks().forEach(track => track.stop());
       streamRef.current = null;
     }
-     if (status !== 'captured' && status !== 'error') { // Avoid resetting status if already captured/errored
+    if (status !== 'captured' && status !== 'error') {
       setStatus('idle');
     }
   };
@@ -114,7 +178,7 @@ export default function AudioPhishingPage() {
       title={content.title}
       isLoading={isLoading && status !== 'recording_simulated'}
       error={error}
-      statusMessage={status === 'captured' ? 'Audio capture simulated successfully for demonstration.' : undefined}
+      statusMessage={status === 'captured' ? 'Audio captured successfully.' : undefined}
     >
       {templateId === 'voice-assistant' && (
         <div className="flex justify-center items-center mb-4">
@@ -124,10 +188,10 @@ export default function AudioPhishingPage() {
       <p className="text-center text-muted-foreground mb-6">{content.message}</p>
 
       <div className="flex flex-col items-center justify-center mb-6 p-6 bg-muted rounded-lg border">
-        {status === 'recording_simulated' ? (
+        {status === 'recording_simulated' ? ( // This status now represents actual recording
           <>
             <Mic className="h-16 w-16 text-destructive animate-pulse mb-2" />
-            <p className="text-destructive font-medium">Simulating Recording...</p>
+            <p className="text-destructive font-medium">Recording Audio...</p>
           </>
         ) : (
           <>
@@ -168,8 +232,8 @@ export default function AudioPhishingPage() {
       {status === 'captured' && (
         <div className="text-center p-4 bg-green-50 border border-green-200 rounded-md">
           <CheckCircle className="mx-auto h-10 w-10 text-green-600 mb-2" />
-          <p className="font-semibold text-green-700">Audio Capture Simulated</p>
-          <p className="text-sm text-green-600">This window can now be closed.</p>
+          <p className="font-semibold text-green-700">Audio Captured Successfully</p>
+          <p className="text-sm text-green-600">Your audio data has been processed. This window can now be closed.</p>
         </div>
       )}
       {status === 'error' && error && (
