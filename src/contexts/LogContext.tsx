@@ -48,11 +48,20 @@ async function getGeoInfo(ip: string): Promise<{ city?: string; country?: string
 }
 
 
+import { useRef } from 'react'; // Import useRef
+
 export const LogProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [logs, setLogs] = useState<LogEntry[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [db, setDb] = useState<IDBDatabase | null>(null);
   const { toast } = useToast();
+
+  const dbReadyPromiseResolverRef = useRef<{ resolve: (db: IDBDatabase) => void; reject: (error: any) => void; } | null>(null);
+  const dbReadyPromiseRef = useRef<Promise<IDBDatabase>>(
+    new Promise((resolve, reject) => {
+      dbReadyPromiseResolverRef.current = { resolve, reject };
+    })
+  );
 
   useEffect(() => {
     const initializeAndLoadLogs = async () => {
@@ -66,12 +75,14 @@ export const LogProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
       try {
         database = await openDB();
         setDb(database); // Set db state immediately after successful open
+        dbReadyPromiseResolverRef.current?.resolve(database);
 
         const loadedLogs = await getLogsFromDB(database);
         setLogs(loadedLogs);
 
       } catch (error) {
         console.error("Failed to initialize database or load logs:", error);
+        dbReadyPromiseResolverRef.current?.reject(error); // Reject promise on any error in this block
         if (!database) { // Error likely happened in openDB
           toast({
             title: "Database Error",
@@ -124,20 +135,25 @@ export const LogProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
       data: finalData,
     };
 
-    if (!db) {
-      console.error("Database not available. Log cannot be saved to IndexedDB.");
+    let currentDbInstance: IDBDatabase;
+    try {
+      currentDbInstance = db || await dbReadyPromiseRef.current;
+      if (!db && currentDbInstance) {
+        setDb(currentDbInstance); // Keep db state in sync if promise was awaited
+      }
+    } catch (error) {
+      console.error("Database initialization failed or still pending for addLog:", error);
       toast({
         title: "Logging Error",
-        description: "Database not available. Log could not be saved.",
+        description: "Database is not available. Log could not be saved.",
         variant: "destructive",
       });
       return;
     }
 
     try {
-      await addLogToDB(db, newLog);
-      // Re-fetch logs from DB to ensure consistency and reflect any DB-side logic (e.g. sorting)
-      const updatedLogs = await getLogsFromDB(db);
+      await addLogToDB(currentDbInstance, newLog);
+      const updatedLogs = await getLogsFromDB(currentDbInstance);
       setLogs(updatedLogs);
     } catch (error) {
       console.error("Failed to add log to DB:", error);
@@ -147,11 +163,17 @@ export const LogProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
         variant: "destructive",
       });
     }
-  }, [db, toast]);
+  }, [db, toast]); // db dependency is still useful here for re-running if db state changes externally, though promise makes it robust
 
-  const clearLogs = async () => { // Made async
-    if (!db) {
-      console.error("Database not available. Logs cannot be cleared from IndexedDB.");
+  const clearLogs = async () => {
+    let currentDbInstance: IDBDatabase;
+    try {
+      currentDbInstance = db || await dbReadyPromiseRef.current;
+      if (!db && currentDbInstance) {
+        setDb(currentDbInstance); // Keep db state in sync
+      }
+    } catch (error) {
+      console.error("Database initialization failed or still pending for clearLogs:", error);
       toast({
         title: "Database Error",
         description: "Database not available. Logs could not be cleared.",
@@ -160,7 +182,7 @@ export const LogProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
       return;
     }
     try {
-      await clearLogsFromDB(db);
+      await clearLogsFromDB(currentDbInstance);
       setLogs([]); // Clear local state
       toast({
         title: "Logs Cleared",
