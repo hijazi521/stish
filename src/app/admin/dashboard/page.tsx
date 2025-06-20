@@ -233,18 +233,20 @@ export default function DashboardPage() {
             ) : logs.length === 0 ? (
               <div className="text-center py-8 text-muted-foreground">
                 <AlertTriangle className="mx-auto h-12 w-12 mb-2" />
-                <p className="text-lg">No logs captured yet.</p>
-                <p>Interact with the phishing templates to see data here.</p>
+                <p className="text-lg">No logs captured yet (Simplified View).</p>
               </div>
             ) : (
-              <ScrollArea
-                className="h-[400px] w-full rounded-md border p-4 bg-secondary/30"
-              >
-                <LogListDisplay logs={logs} key={logs.length} />
-              </ScrollArea>
+              <div id="simplified-log-area" style={{ border: '2px dashed red', padding: '10px' }}>
+                <h3 style={{ color: 'red', fontWeight: 'bold' }}>Simplified Log View (Real-Time Test)</h3>
+                {logs.map(log => (
+                  <pre key={log.id} style={{ border: '1px solid #ccc', margin: '4px', padding: '4px', whiteSpace: 'pre-wrap', wordBreak: 'break-all' }}>
+                    {JSON.stringify(log, null, 2)}
+                  </pre>
+                ))}
+              </div>
             )}
             <Button onClick={clearLogs} variant="destructive" disabled={logs.length === 0}>
-              <Trash2 className="mr-2 h-4 w-4" /> Delete All Logs
+              <Trash2 className="mr-2 h-4 w-4" /> Delete All Logs (Simplified)
             </Button>
           </CardContent>
         </Card>
