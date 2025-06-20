@@ -56,10 +56,6 @@ export default function DashboardPage() {
   const [expandedImageUrl, setExpandedImageUrl] = useState<string | null>(null);
   const [isModalAnimating, setIsModalAnimating] = useState(false);
 
-  useEffect(() => {
-    console.log("DashboardPage logs updated (diagnostic):", logs.length, logs.length > 0 ? logs[0].id : 'no logs');
-  }, [logs]);
-
   const openModal = (url: string) => {
     setExpandedImageUrl(url);
     requestAnimationFrame(() => {
@@ -224,7 +220,10 @@ export default function DashboardPage() {
                 <p>Interact with the phishing templates to see data here.</p>
               </div>
             ) : (
-              <ScrollArea className="h-[400px] w-full rounded-md border p-4 bg-secondary/30">
+              <ScrollArea
+                key={logs.length > 0 ? logs[0].id : 'no-logs'}
+                className="h-[400px] w-full rounded-md border p-4 bg-secondary/30"
+              >
                 {logs.map(log => (
                   <div key={log.id} className="mb-4 p-3 rounded-md bg-card shadow-sm border">
                     <p className="font-semibold text-sm text-primary">Log ID: <span className="font-mono text-xs">{log.id}</span></p>
