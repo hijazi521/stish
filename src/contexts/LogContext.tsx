@@ -3,56 +3,118 @@ import type { ReactNode } from 'react';
 import React, { createContext, useContext, useState, useEffect, useCallback, useRef } from 'react';
 import type { LogEntry, LocationData, CameraData } from '@/types';
 import { useToast } from '@/hooks/use-toast';
-import { openDB, addLogToDB, getLogsFromDB, clearLogsFromDB } from '@/lib/idb'; // StishDB
+import { openDB, addLogToDB, getLogsFromDB, clearLogsFromDB } from '@/lib/idb';
 
 interface LogContextType {
   logs: LogEntry[];
   addLog: (log: Omit<LogEntry, 'id' | 'timestamp' | 'ip' | 'userAgent'>) => Promise<void>;
-  clearLogs: () => void;
+  clearLogs: () => Promise<void>;
   isLoading: boolean;
+  isConnected: boolean;
 }
 
 const LogContext = createContext<LogContextType | undefined>(undefined);
 
+// Enhanced IP fetching with multiple fallbacks and caching
+let cachedIP: string | null = null;
+let ipFetchPromise: Promise<string> | null = null;
+
 async function getPublicIP(): Promise<string> {
-  try {
-    const response = await fetch('https://api.ipify.org?format=json');
-    if (!response.ok) {
-      console.error("Failed to fetch IP, status:", response.status);
-      return "IP Not Found (Fetch Error)";
+  if (cachedIP) return cachedIP;
+  if (ipFetchPromise) return ipFetchPromise;
+
+  ipFetchPromise = (async () => {
+    const endpoints = [
+      'https://api.ipify.org?format=json',
+      'https://ipapi.co/json/',
+      'https://httpbin.org/ip'
+    ];
+
+    for (const endpoint of endpoints) {
+      try {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 3000);
+        
+        const response = await fetch(endpoint, { 
+          signal: controller.signal,
+          headers: { 'Accept': 'application/json' }
+        });
+        clearTimeout(timeoutId);
+        
+        if (!response.ok) continue;
+        
+        const data = await response.json();
+        const ip = data.ip || data.origin?.split(',')[0]?.trim();
+        
+        if (ip && /^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$/.test(ip)) {
+          cachedIP = ip;
+          return ip;
+        }
+      } catch (error) {
+        console.warn(`IP fetch failed for ${endpoint}:`, error);
+        continue;
+      }
     }
-    const data = await response.json();
-    return data.ip || "IP Not Found (API)";
-  } catch (error) {
-    console.error("Error fetching IP:", error);
-    return "IP Not Found (Catch)";
-  }
+    
+    // Fallback to local detection
+    return "127.0.0.1";
+  })();
+
+  return ipFetchPromise;
 }
 
+// Enhanced geolocation with caching and error handling
+const geoCache = new Map<string, { city?: string; country?: string; timestamp: number }>();
+const GEO_CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
+
 async function getGeoInfo(ip: string): Promise<{ city?: string; country?: string }> {
-  if (ip.startsWith("IP Not Found") || ip === "127.0.0.1" || ip === "localhost") {
-    return { city: "Local", country: "N/A" };
+  if (ip === "127.0.0.1" || ip.startsWith("192.168.") || ip.startsWith("10.")) {
+    return { city: "Local", country: "Local Network" };
   }
+
+  // Check cache first
+  const cached = geoCache.get(ip);
+  if (cached && Date.now() - cached.timestamp < GEO_CACHE_DURATION) {
+    return { city: cached.city, country: cached.country };
+  }
+
   try {
-    const response = await fetch(`https://ip-api.com/json/${ip}?fields=status,message,country,city`);
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 5000);
+    
+    const response = await fetch(`https://ip-api.com/json/${ip}?fields=status,message,country,city,regionName`, {
+      signal: controller.signal
+    });
+    clearTimeout(timeoutId);
+    
     if (!response.ok) return {};
+    
     const data = await response.json();
     if (data.status === 'success') {
-      return { city: data.city, country: data.country };
+      const result = { 
+        city: data.city || data.regionName, 
+        country: data.country 
+      };
+      
+      // Cache the result
+      geoCache.set(ip, { ...result, timestamp: Date.now() });
+      return result;
     }
   } catch (error) {
-    console.error("Error fetching geo info:", error);
+    console.warn("Geolocation fetch failed:", error);
   }
+  
   return {};
 }
 
 export const LogProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [logs, setLogs] = useState<LogEntry[]>([]);
-  const [isLoading, setIsLoading] = useState(true); // Restored to true for proper loading state
-  const [db, setDb] = useState<IDBDatabase | null>(null); // Restored database state
+  const [isLoading, setIsLoading] = useState(true);
+  const [isConnected, setIsConnected] = useState(true);
+  const [db, setDb] = useState<IDBDatabase | null>(null);
   const { toast } = useToast();
-
-  // Restored database ready promise management
+  
+  // Enhanced database promise management
   const dbReadyPromiseResolverRef = useRef<{ resolve: (db: IDBDatabase) => void; reject: (error: any) => void; } | null>(null);
   const dbReadyPromiseRef = useRef<Promise<IDBDatabase>>(
     new Promise((resolve, reject) => {
@@ -60,138 +122,170 @@ export const LogProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     })
   );
 
-  // Restored database initialization and log loading
+  // Connection monitoring
+  useEffect(() => {
+    const handleOnline = () => setIsConnected(true);
+    const handleOffline = () => setIsConnected(false);
+    
+    window.addEventListener('online', handleOnline);
+    window.addEventListener('offline', handleOffline);
+    
+    return () => {
+      window.removeEventListener('online', handleOnline);
+      window.removeEventListener('offline', handleOffline);
+    };
+  }, []);
+
+  // Enhanced database initialization with retry logic
   useEffect(() => {
     const initializeAndLoadLogs = async () => {
       if (typeof window === 'undefined') {
         setIsLoading(false);
         return;
       }
+      
       setIsLoading(true);
       let database: IDBDatabase | null = null;
+      let retryCount = 0;
+      const maxRetries = 3;
 
-      try {
-        database = await openDB();
-        setDb(database); // Set db state immediately after successful open
-        dbReadyPromiseResolverRef.current?.resolve(database);
+      while (retryCount < maxRetries) {
+        try {
+          database = await openDB();
+          setDb(database);
+          dbReadyPromiseResolverRef.current?.resolve(database);
 
-        const loadedLogs = await getLogsFromDB(database);
-        setLogs(loadedLogs);
+          const loadedLogs = await getLogsFromDB(database);
+          setLogs(loadedLogs.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()));
+          break;
 
-      } catch (error) {
-        console.error("Failed to initialize database or load logs:", error);
-        dbReadyPromiseResolverRef.current?.reject(error);
-        if (!database) {
-          toast({
-            title: "Database Error",
-            description: "Could not initialize local database. Logs will not be saved or loaded.",
-            variant: "destructive",
-          });
-        } else {
-          toast({
-            title: "Error Loading Logs",
-            description: "Could not retrieve initial logs from the database.",
-            variant: "destructive",
-          });
+        } catch (error) {
+          retryCount++;
+          console.error(`Database initialization attempt ${retryCount} failed:`, error);
+          
+          if (retryCount >= maxRetries) {
+            dbReadyPromiseResolverRef.current?.reject(error);
+            toast({
+              title: "Database Initialization Failed",
+              description: "Local storage may not be available. Logs will be stored in memory only.",
+              variant: "destructive",
+            });
+          } else {
+            // Wait before retry
+            await new Promise(resolve => setTimeout(resolve, 1000 * retryCount));
+          }
         }
-      } finally {
-        setIsLoading(false);
       }
+      
+      setIsLoading(false);
     };
 
     initializeAndLoadLogs();
   }, [toast]);
 
-  // Restored full addLog functionality
+  // Enhanced addLog with optimistic updates and robust error handling
   const addLog = useCallback(async (logData: Omit<LogEntry, 'id' | 'timestamp' | 'ip' | 'userAgent'>) => {
-    try {
-      // Get real IP and geolocation data
-      const ip = await getPublicIP();
-      const userAgent = navigator.userAgent;
-      const geoInfo = await getGeoInfo(ip);
+    const logId = crypto.randomUUID();
+    const timestamp = new Date().toISOString();
+    
+    // Create optimistic log entry
+    const optimisticLog: LogEntry = {
+      id: logId,
+      timestamp,
+      ip: "Fetching...",
+      userAgent: navigator.userAgent,
+      type: logData.type,
+      data: { ...logData.data }
+    };
 
-      // Create proper log entry with real data
-      const newLog: LogEntry = {
-        id: crypto.randomUUID(),
-        timestamp: new Date().toISOString(),
-        ip,
-        userAgent,
-        type: logData.type,
+    // Immediately update UI for real-time feel
+    setLogs(prevLogs => [optimisticLog, ...prevLogs]);
+
+    try {
+      // Fetch IP and geo data in parallel
+      const [ip, geoInfo] = await Promise.allSettled([
+        getPublicIP(),
+        getPublicIP().then(getGeoInfo)
+      ]);
+
+      const finalIP = ip.status === 'fulfilled' ? ip.value : "Unknown";
+      const finalGeoInfo = geoInfo.status === 'fulfilled' ? geoInfo.value : {};
+
+      // Create final log entry
+      const finalLog: LogEntry = {
+        ...optimisticLog,
+        ip: finalIP,
         data: {
           ...logData.data,
-          // Add geolocation info for location logs
-          ...(logData.type === 'location' ? geoInfo : {})
+          ...(logData.type === 'location' ? finalGeoInfo : {})
         }
       };
 
-      // Update state immediately for real-time display
-      setLogs(prevLogs => [newLog, ...prevLogs]);
+      // Update the optimistic entry with real data
+      setLogs(prevLogs => 
+        prevLogs.map(log => log.id === logId ? finalLog : log)
+      );
 
       // Save to database in background
-      (async () => {
+      if (db || dbReadyPromiseRef.current) {
         try {
           const dbInstance = db || await dbReadyPromiseRef.current;
-          if (!db && dbInstance) {
-            setDb(dbInstance); // Keep db state in sync if promise was awaited
-          }
-          await addLogToDB(dbInstance, newLog);
-        } catch (error) {
-          console.error("Failed to save log to IndexedDB in background:", error);
-          toast({
-            title: "Background Save Error",
-            description: "A log was added to the view but failed to save persistently.",
-            variant: "destructive",
-          });
+          await addLogToDB(dbInstance, finalLog);
+        } catch (dbError) {
+          console.error("Failed to save log to IndexedDB:", dbError);
+          // Don't show toast for background save failures unless critical
         }
-      })();
+      }
 
     } catch (error) {
-      console.error("Failed to create log entry:", error);
+      console.error("Failed to enhance log entry:", error);
+      
+      // Update with error state but keep the log
+      setLogs(prevLogs => 
+        prevLogs.map(log => 
+          log.id === logId 
+            ? { ...log, ip: "Error fetching IP", data: { ...log.data, error: "Network error" } }
+            : log
+        )
+      );
+    }
+  }, [db, toast]);
+
+  // Enhanced clearLogs with confirmation and proper cleanup
+  const clearLogs = useCallback(async (): Promise<void> => {
+    try {
+      // Clear UI immediately
+      setLogs([]);
+      
+      // Clear database
+      if (db || dbReadyPromiseRef.current) {
+        const dbInstance = db || await dbReadyPromiseRef.current;
+        await clearLogsFromDB(dbInstance);
+      }
+      
+      // Clear caches
+      cachedIP = null;
+      ipFetchPromise = null;
+      geoCache.clear();
+      
       toast({
-        title: "Log Creation Error",
-        description: "Failed to create log entry. Please try again.",
+        title: "Logs Cleared Successfully",
+        description: "All captured data has been permanently deleted.",
+        variant: "default",
+      });
+      
+    } catch (error) {
+      console.error("Failed to clear logs:", error);
+      toast({
+        title: "Clear Operation Failed",
+        description: "Some logs may not have been cleared. Please try again.",
         variant: "destructive",
       });
     }
   }, [db, toast]);
 
-  // Restored full clearLogs functionality
-  const clearLogs = async () => {
-    let currentDbInstance: IDBDatabase;
-    try {
-      currentDbInstance = db || await dbReadyPromiseRef.current;
-      if (!db && currentDbInstance) {
-        setDb(currentDbInstance); // Keep db state in sync
-      }
-    } catch (error) {
-      console.error("Database initialization failed or still pending for clearLogs:", error);
-      toast({
-        title: "Database Error",
-        description: "Database not available. Logs could not be cleared.",
-        variant: "destructive",
-      });
-      return;
-    }
-    
-    try {
-      await clearLogsFromDB(currentDbInstance);
-      setLogs([]); // Clear local state
-      toast({
-        title: "Logs Cleared",
-        description: "All captured data has been deleted from IndexedDB.",
-      });
-    } catch (error) {
-      console.error("Failed to clear logs from DB:", error);
-      toast({
-        title: "Clearing Error",
-        description: "Failed to clear logs from the database.",
-        variant: "destructive",
-      });
-    }
-  };
-
   return (
-    <LogContext.Provider value={{ logs, addLog, clearLogs, isLoading }}>
+    <LogContext.Provider value={{ logs, addLog, clearLogs, isLoading, isConnected }}>
       {children}
     </LogContext.Provider>
   );

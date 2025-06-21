@@ -484,9 +484,7 @@ __turbopack_context__.s({
 });
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/dist/server/route-modules/app-page/vendored/ssr/react-jsx-dev-runtime.js [app-ssr] (ecmascript)");
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/dist/server/route-modules/app-page/vendored/ssr/react.js [app-ssr] (ecmascript)");
-var __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$hooks$2f$use$2d$toast$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/src/hooks/use-toast.ts [app-ssr] (ecmascript)");
 "use client";
-;
 ;
 ;
 const LogContext = /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["createContext"])(undefined);
@@ -528,68 +526,120 @@ async function getGeoInfo(ip) {
 }
 const LogProvider = ({ children })=>{
     const [logs, setLogs] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])([]);
-    const [isLoading, setIsLoading] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])(true);
-    const { toast } = (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$hooks$2f$use$2d$toast$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useToast"])();
-    (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useEffect"])(()=>{
-        if ("TURBOPACK compile-time truthy", 1) {
-            setIsLoading(false); // Still need to set loading to false if in SSR/non-browser
-            return;
-        }
-        "TURBOPACK unreachable";
-    }, []);
-    (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useEffect"])(()=>{
-        if ("TURBOPACK compile-time truthy", 1) {
-            return;
-        }
-        "TURBOPACK unreachable";
-    }, [
-        logs,
-        isLoading
-    ]);
-    (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useEffect"])(()=>{
-        if ("TURBOPACK compile-time truthy", 1) return;
-        "TURBOPACK unreachable";
-        const handleStorageChange = undefined;
-    }, []);
+    // const [isLoading, setIsLoading] = useState(true); // Commented out
+    const [isLoading, setIsLoading] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])(false); // isLoading is now always false
+    // const [db, setDb] = useState<IDBDatabase | null>(null); // Commented out
+    // const { toast } = useToast(); // Keep toast if needed for other things, or remove if not used at all
+    // const dbReadyPromiseResolverRef = useRef<{ resolve: (db: IDBDatabase) => void; reject: (error: any) => void; } | null>(null); // Commented out
+    // const dbReadyPromiseRef = useRef<Promise<IDBDatabase>>( // Commented out
+    //   new Promise((resolve, reject) => {
+    //     dbReadyPromiseResolverRef.current = { resolve, reject };
+    //   })
+    // );
+    // useEffect(() => { // Commented out entire useEffect for initializeAndLoadLogs
+    //   const initializeAndLoadLogs = async () => {
+    //     if (typeof window === 'undefined') {
+    //       setIsLoading(false);
+    //       return;
+    //     }
+    //     setIsLoading(true);
+    //     let database: IDBDatabase | null = null;
+    //     try {
+    //       database = await openDB();
+    //       setDb(database); // Set db state immediately after successful open
+    //       dbReadyPromiseResolverRef.current?.resolve(database);
+    //       const loadedLogs = await getLogsFromDB(database);
+    //       setLogs(loadedLogs);
+    //     } catch (error) {
+    //       console.error("Failed to initialize database or load logs:", error);
+    //       dbReadyPromiseResolverRef.current?.reject(error); // Reject promise on any error in this block
+    //       if (!database) { // Error likely happened in openDB
+    //         toast({
+    //           title: "Database Error",
+    //           description: "Could not initialize local database. Logs will not be saved or loaded.",
+    //           variant: "destructive",
+    //         });
+    //       } else { // Error likely happened in getLogsFromDB
+    //         toast({
+    //           title: "Error Loading Logs",
+    //           description: "Could not retrieve initial logs from the database.",
+    //           variant: "destructive",
+    //         });
+    //       }
+    //       // setLogs([]); // Optionally clear logs if loading fails catastrophically
+    //     } finally {
+    //       setIsLoading(false);
+    //     }
+    //   };
+    //   initializeAndLoadLogs();
+    // }, [toast]);
     const addLog = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useCallback"])(async (logData)=>{
-        const ip = await getPublicIP();
-        const userAgent = typeof navigator !== 'undefined' ? navigator.userAgent : 'N/A';
-        const newLogBase = {
-            type: logData.type,
-            id: crypto.randomUUID(),
-            timestamp: new Date().toISOString(),
-            ip,
-            userAgent
-        };
-        let finalData = logData.data;
-        if (logData.type === 'location' && logData.data) {
-            const geoInfo = await getGeoInfo(ip);
-            finalData = {
-                ...logData.data,
-                city: geoInfo.city,
-                country: geoInfo.country
-            };
-        } else if (logData.type === 'camera' && logData.data) {
-            finalData = logData.data;
-        }
+        // Simplified newLog for testing
         const newLog = {
-            ...newLogBase,
-            data: finalData
+            id: crypto.randomUUID(),
+            type: 'TEST',
+            timestamp: new Date().toISOString(),
+            ip: 'N/A',
+            userAgent: 'N/A',
+            data: {
+                message: 'Test Log ' + Date.now()
+            }
         };
         setLogs((prevLogs)=>[
                 newLog,
                 ...prevLogs
             ]);
-    }, []);
-    const clearLogs = ()=>{
-        setLogs([]);
-        if ("TURBOPACK compile-time falsy", 0) {
-            "TURBOPACK unreachable";
-        }
-        toast({
-            title: "Logs Cleared",
-            description: "All captured data has been deleted."
-        });
+    // Commented out asynchronous background save
+    // (async () => {
+    //   try {
+    //     const dbInstance = db || await dbReadyPromiseRef.current;
+    //     if (!db && dbInstance) {
+    //       setDb(dbInstance); // Keep db state in sync if promise was awaited
+    //     }
+    //     await addLogToDB(dbInstance, newLog);
+    //   } catch (error) {
+    //     console.error("Failed to save log to IndexedDB in background:", error);
+    //     // Optional: Consider a toast notification for the user if background save fails
+    //     // toast({
+    //     //   title: "Background Save Error",
+    //     //   description: "A log was added to the view but failed to save persistently.",
+    //     //   variant: "warning", // Or "destructive" if critical
+    //     // });
+    //   }
+    // })();
+    }, []); // Dependencies are empty now as db, setDb are removed
+    const clearLogs = async ()=>{
+        setLogs([]); // Clear local state only
+    // Commented out DB interaction
+    // let currentDbInstance: IDBDatabase;
+    // try {
+    //   currentDbInstance = db || await dbReadyPromiseRef.current;
+    //   if (!db && currentDbInstance) {
+    //     setDb(currentDbInstance); // Keep db state in sync
+    //   }
+    // } catch (error) {
+    //   console.error("Database initialization failed or still pending for clearLogs:", error);
+    //   toast({
+    //     title: "Database Error",
+    //     description: "Database not available. Logs could not be cleared.",
+    //     variant: "destructive",
+    //   });
+    //   return;
+    // }
+    // try {
+    //   await clearLogsFromDB(currentDbInstance);
+    //   toast({
+    //     title: "Logs Cleared",
+    //     description: "All captured data has been deleted from IndexedDB.",
+    //   });
+    // } catch (error) {
+    //   console.error("Failed to clear logs from DB:", error);
+    //   toast({
+    //     title: "Clearing Error",
+    //     description: "Failed to clear logs from the database.",
+    //     variant: "destructive",
+    //   });
+    // }
     };
     return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(LogContext.Provider, {
         value: {
@@ -601,7 +651,7 @@ const LogProvider = ({ children })=>{
         children: children
     }, void 0, false, {
         fileName: "[project]/src/contexts/LogContext.tsx",
-        lineNumber: 147,
+        lineNumber: 178,
         columnNumber: 5
     }, this);
 };

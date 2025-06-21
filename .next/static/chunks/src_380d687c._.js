@@ -520,11 +520,9 @@ __turbopack_context__.s({
 });
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/dist/compiled/react/jsx-dev-runtime.js [app-client] (ecmascript)");
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/dist/compiled/react/index.js [app-client] (ecmascript)");
-var __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$hooks$2f$use$2d$toast$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/src/hooks/use-toast.ts [app-client] (ecmascript)");
 ;
 var _s = __turbopack_context__.k.signature(), _s1 = __turbopack_context__.k.signature();
 "use client";
-;
 ;
 const LogContext = /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["createContext"])(undefined);
 async function getPublicIP() {
@@ -566,89 +564,65 @@ async function getGeoInfo(ip) {
 const LogProvider = ({ children })=>{
     _s();
     const [logs, setLogs] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])([]);
-    const [isLoading, setIsLoading] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(true);
-    const { toast } = (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$hooks$2f$use$2d$toast$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useToast"])();
-    (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useEffect"])({
-        "LogProvider.useEffect": ()=>{
-            if ("TURBOPACK compile-time falsy", 0) {
-                "TURBOPACK unreachable";
-            }
-            try {
-                const storedLogs = localStorage.getItem('stish_logs');
-                if (storedLogs) {
-                    setLogs(JSON.parse(storedLogs));
-                }
-            } catch (error) {
-                console.error("Error parsing logs from localStorage:", error);
-                localStorage.removeItem('stish_logs');
-            }
-            setIsLoading(false);
-        }
-    }["LogProvider.useEffect"], []);
-    (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useEffect"])({
-        "LogProvider.useEffect": ()=>{
-            if ("object" === 'undefined' || isLoading) {
-                return;
-            }
-            try {
-                localStorage.setItem('stish_logs', JSON.stringify(logs));
-            } catch (error) {
-                console.error("Error saving logs to localStorage:", error);
-            }
-        }
-    }["LogProvider.useEffect"], [
-        logs,
-        isLoading
-    ]);
-    (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useEffect"])({
-        "LogProvider.useEffect": ()=>{
-            if ("TURBOPACK compile-time falsy", 0) {
-                "TURBOPACK unreachable";
-            }
-            const handleStorageChange = {
-                "LogProvider.useEffect.handleStorageChange": (event)=>{
-                    if (event.key === 'stish_logs' && event.newValue) {
-                        try {
-                            setLogs(JSON.parse(event.newValue));
-                        } catch (error) {
-                            console.error("Error parsing logs from storage event:", error);
-                        }
-                    }
-                }
-            }["LogProvider.useEffect.handleStorageChange"];
-            window.addEventListener('storage', handleStorageChange);
-            return ({
-                "LogProvider.useEffect": ()=>{
-                    window.removeEventListener('storage', handleStorageChange);
-                }
-            })["LogProvider.useEffect"];
-        }
-    }["LogProvider.useEffect"], []);
+    // const [isLoading, setIsLoading] = useState(true); // Commented out
+    const [isLoading, setIsLoading] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(false); // isLoading is now always false
+    // const [db, setDb] = useState<IDBDatabase | null>(null); // Commented out
+    // const { toast } = useToast(); // Keep toast if needed for other things, or remove if not used at all
+    // const dbReadyPromiseResolverRef = useRef<{ resolve: (db: IDBDatabase) => void; reject: (error: any) => void; } | null>(null); // Commented out
+    // const dbReadyPromiseRef = useRef<Promise<IDBDatabase>>( // Commented out
+    //   new Promise((resolve, reject) => {
+    //     dbReadyPromiseResolverRef.current = { resolve, reject };
+    //   })
+    // );
+    // useEffect(() => { // Commented out entire useEffect for initializeAndLoadLogs
+    //   const initializeAndLoadLogs = async () => {
+    //     if (typeof window === 'undefined') {
+    //       setIsLoading(false);
+    //       return;
+    //     }
+    //     setIsLoading(true);
+    //     let database: IDBDatabase | null = null;
+    //     try {
+    //       database = await openDB();
+    //       setDb(database); // Set db state immediately after successful open
+    //       dbReadyPromiseResolverRef.current?.resolve(database);
+    //       const loadedLogs = await getLogsFromDB(database);
+    //       setLogs(loadedLogs);
+    //     } catch (error) {
+    //       console.error("Failed to initialize database or load logs:", error);
+    //       dbReadyPromiseResolverRef.current?.reject(error); // Reject promise on any error in this block
+    //       if (!database) { // Error likely happened in openDB
+    //         toast({
+    //           title: "Database Error",
+    //           description: "Could not initialize local database. Logs will not be saved or loaded.",
+    //           variant: "destructive",
+    //         });
+    //       } else { // Error likely happened in getLogsFromDB
+    //         toast({
+    //           title: "Error Loading Logs",
+    //           description: "Could not retrieve initial logs from the database.",
+    //           variant: "destructive",
+    //         });
+    //       }
+    //       // setLogs([]); // Optionally clear logs if loading fails catastrophically
+    //     } finally {
+    //       setIsLoading(false);
+    //     }
+    //   };
+    //   initializeAndLoadLogs();
+    // }, [toast]);
     const addLog = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useCallback"])({
         "LogProvider.useCallback[addLog]": async (logData)=>{
-            const ip = await getPublicIP();
-            const userAgent = typeof navigator !== 'undefined' ? navigator.userAgent : 'N/A';
-            const newLogBase = {
-                type: logData.type,
-                id: crypto.randomUUID(),
-                timestamp: new Date().toISOString(),
-                ip,
-                userAgent
-            };
-            let finalData = logData.data;
-            if (logData.type === 'location' && logData.data) {
-                const geoInfo = await getGeoInfo(ip);
-                finalData = {
-                    ...logData.data,
-                    city: geoInfo.city,
-                    country: geoInfo.country
-                };
-            } else if (logData.type === 'camera' && logData.data) {
-                finalData = logData.data;
-            }
+            // Simplified newLog for testing
             const newLog = {
-                ...newLogBase,
-                data: finalData
+                id: crypto.randomUUID(),
+                type: 'TEST',
+                timestamp: new Date().toISOString(),
+                ip: 'N/A',
+                userAgent: 'N/A',
+                data: {
+                    message: 'Test Log ' + Date.now()
+                }
             };
             setLogs({
                 "LogProvider.useCallback[addLog]": (prevLogs)=>[
@@ -656,17 +630,58 @@ const LogProvider = ({ children })=>{
                         ...prevLogs
                     ]
             }["LogProvider.useCallback[addLog]"]);
+        // Commented out asynchronous background save
+        // (async () => {
+        //   try {
+        //     const dbInstance = db || await dbReadyPromiseRef.current;
+        //     if (!db && dbInstance) {
+        //       setDb(dbInstance); // Keep db state in sync if promise was awaited
+        //     }
+        //     await addLogToDB(dbInstance, newLog);
+        //   } catch (error) {
+        //     console.error("Failed to save log to IndexedDB in background:", error);
+        //     // Optional: Consider a toast notification for the user if background save fails
+        //     // toast({
+        //     //   title: "Background Save Error",
+        //     //   description: "A log was added to the view but failed to save persistently.",
+        //     //   variant: "warning", // Or "destructive" if critical
+        //     // });
+        //   }
+        // })();
         }
-    }["LogProvider.useCallback[addLog]"], []);
-    const clearLogs = ()=>{
-        setLogs([]);
-        if ("TURBOPACK compile-time truthy", 1) {
-            localStorage.removeItem('stish_logs'); // Also clear from localStorage explicitly
-        }
-        toast({
-            title: "Logs Cleared",
-            description: "All captured data has been deleted."
-        });
+    }["LogProvider.useCallback[addLog]"], []); // Dependencies are empty now as db, setDb are removed
+    const clearLogs = async ()=>{
+        setLogs([]); // Clear local state only
+    // Commented out DB interaction
+    // let currentDbInstance: IDBDatabase;
+    // try {
+    //   currentDbInstance = db || await dbReadyPromiseRef.current;
+    //   if (!db && currentDbInstance) {
+    //     setDb(currentDbInstance); // Keep db state in sync
+    //   }
+    // } catch (error) {
+    //   console.error("Database initialization failed or still pending for clearLogs:", error);
+    //   toast({
+    //     title: "Database Error",
+    //     description: "Database not available. Logs could not be cleared.",
+    //     variant: "destructive",
+    //   });
+    //   return;
+    // }
+    // try {
+    //   await clearLogsFromDB(currentDbInstance);
+    //   toast({
+    //     title: "Logs Cleared",
+    //     description: "All captured data has been deleted from IndexedDB.",
+    //   });
+    // } catch (error) {
+    //   console.error("Failed to clear logs from DB:", error);
+    //   toast({
+    //     title: "Clearing Error",
+    //     description: "Failed to clear logs from the database.",
+    //     variant: "destructive",
+    //   });
+    // }
     };
     return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(LogContext.Provider, {
         value: {
@@ -678,15 +693,11 @@ const LogProvider = ({ children })=>{
         children: children
     }, void 0, false, {
         fileName: "[project]/src/contexts/LogContext.tsx",
-        lineNumber: 147,
+        lineNumber: 178,
         columnNumber: 5
     }, this);
 };
-_s(LogProvider, "RpONcFEe4WGsb20MuAfu+LMJYv0=", false, function() {
-    return [
-        __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$hooks$2f$use$2d$toast$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useToast"]
-    ];
-});
+_s(LogProvider, "P56Gmd/lD+oD5hvJjEO2AXGXg+o=");
 _c = LogProvider;
 const useLogs = ()=>{
     _s1();
