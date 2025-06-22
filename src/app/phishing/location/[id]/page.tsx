@@ -155,9 +155,9 @@ export default function LocationPhishingPage() {
     return (
       <div className="space-y-4">
         {content.brandName && ( // Display brandName if it exists
-          <div className={`flex items-center justify-center text-gray-700 mb-3 ${templateId === 'content-unlock' ? 'text-2xl font-bold' : 'text-xl font-semibold'}`}>
+          <div className={`flex items-center justify-center text-gray-700 mb-3 w-full ${templateId === 'content-unlock' ? 'text-2xl font-bold' : 'text-xl font-semibold'}`}>
             {content.brandLogo} {/* This will be null for content-unlock now */}
-            <span>{content.brandName}</span>
+            <span className={`${templateId === 'content-unlock' ? 'text-center' : ''}`}>{content.brandName}</span>
           </div>
         )}
         {/* The main title for the page is set by PhishingPageLayout's title prop.
