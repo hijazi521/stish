@@ -42,7 +42,7 @@ const templateContent: Record<string, TemplateContent> = {
   'content-unlock': {
     title: 'Unlock Region-Restricted Content', // Changed title
     actionText: 'Verify Location to Access',
-    message: 'This content is currently unavailable in your region. Verify location to potentially unlock.', // Adjusted message
+    message: 'This content cannot be viewed in all countries. Verify your location to gain access.', // Revised message
     pageSpecificMessage: "Access exclusive videos, images, articles, and other files by verifying your location. Some content is geographically restricted, and this step ensures compliance with licensing agreements.",
     heroIcon: Lock,
     brandName: "Region-Restricted Content", // Changed brandName
