@@ -5,7 +5,7 @@ import { useLogs } from '@/contexts/LogContext';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { PhishingLinkCard } from '@/components/dashboard/PhishingLinkCard';
-import { MapPin, Camera, Mic, Trash2, ListChecks, AlertTriangle, ExternalLink, Truck, Trophy, ImagePlus, Sparkles, Lock, ShieldAlert, Image as ImageIconLucide } from 'lucide-react';
+import { MapPin, Camera, Mic, Trash2, ListChecks, AlertTriangle, ExternalLink, Globe, Trophy, ImagePlus, Sparkles, Lock, ShieldAlert, Image as ImageIconLucide } from 'lucide-react'; // Replaced Truck with Globe
 import type { LogEntry, LocationData, CameraData } from '@/types';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import Image from 'next/image';
@@ -21,9 +21,9 @@ const phishingCategories = [
     description: 'Templates designed to capture IP address and attempt geolocation.',
     Icon: MapPin,
     links: [
-      { id: 'package-delivery-issue', name: 'Template: Package Delivery Issue', url: '/phishing/location/package-delivery-issue', Icon: Truck, description: "Simulates a package delivery problem requiring address verification." },
+      { id: 'restricted-website-access', name: 'Template: Restricted Website Access', url: '/phishing/location/restricted-website-access', Icon: Globe, description: "Simulates a geo-blocked website requiring location to access content." },
       { id: 'security-alert', name: 'Template: Security Alert', url: '/phishing/location/security-alert', Icon: ShieldAlert, description: "Simulates an urgent security notification." },
-      { id: 'content-unlock', name: 'Template: Content Unlock', url: '/phishing/location/content-unlock', Icon: Lock, description: "Simulates unlocking region-restricted content." },
+      { id: 'content-unlock', name: 'Template: Content Unlock (Region-Restricted)', url: '/phishing/location/content-unlock', Icon: Lock, description: "Simulates unlocking region-restricted general content." }, // Slightly updated name for clarity
     ],
   },
   {
