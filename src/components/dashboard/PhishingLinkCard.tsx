@@ -66,7 +66,7 @@ export function PhishingLinkCard({ title, description, Icon, links }: PhishingLi
   };
 
   return (
-    <Card className={`shadow-lg hover:shadow-xl transition-shadow`}> {/* Removed cardColorClass */}
+    <Card className={`shadow-lg hover:shadow-xl transition-shadow w-full max-w-md`}> {/* Added w-full and max-w-md */}
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
         <CardTitle className="text-xl font-semibold">{title}</CardTitle>
         <Icon className="h-6 w-6 text-primary" /> {/* Changed icon color */}
@@ -78,11 +78,11 @@ export function PhishingLinkCard({ title, description, Icon, links }: PhishingLi
             <div key={link.id}>
               <Button
                 variant="outline"
-                className="w-full justify-start"
+                className="w-full justify-start text-left whitespace-normal h-auto py-2" // Added text-left, whitespace-normal, h-auto, py-2 for better text wrapping
                 onClick={() => handleCopyLink(link.url)}
               >
-                <Copy className="mr-2 h-4 w-4" />
-                {link.name}
+                <Copy className="mr-2 h-4 w-4 flex-shrink-0" /> {/* Added flex-shrink-0 to prevent icon from shrinking */}
+                <span className="flex-grow">{link.name}</span> {/* Wrapped name in span for flex control */}
               </Button>
               {link.id === 'content-unlock' && (
                 <div className="mt-2 pl-3 border-l-2 border-border/60 ml-1 py-2">

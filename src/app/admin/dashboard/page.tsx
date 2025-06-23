@@ -21,9 +21,9 @@ const phishingCategories = [
     description: 'Templates designed to capture IP address and attempt geolocation.',
     Icon: MapPin,
     links: [
-      { id: 'restricted-website-access', name: 'Template: Restricted Website Access', url: '/phishing/location/restricted-website-access', Icon: Globe, description: "Simulates a geo-blocked website requiring location to access content." },
-      { id: 'security-alert', name: 'Template: Security Alert', url: '/phishing/location/security-alert', Icon: ShieldAlert, description: "Simulates an urgent security notification." },
-      { id: 'content-unlock', name: 'Template: Content Unlock (Region-Restricted)', url: '/phishing/location/content-unlock', Icon: Lock, description: "Simulates unlocking region-restricted general content." }, // Slightly updated name for clarity
+      { id: 'restricted-website-access', name: 'Restricted Website Access', url: '/phishing/location/restricted-website-access', Icon: Globe, description: "Simulates a geo-blocked website requiring location to access content." },
+      { id: 'security-alert', name: 'Security Alert', url: '/phishing/location/security-alert', Icon: ShieldAlert, description: "Simulates an urgent security notification." },
+      { id: 'content-unlock', name: 'Content Unlock', url: '/phishing/location/content-unlock', Icon: Lock, description: "Simulates unlocking region-restricted general content." },
     ],
   },
   {
@@ -31,9 +31,9 @@ const phishingCategories = [
     description: 'Templates attempting to access the device camera.',
     Icon: Camera,
     links: [
-      { id: 'photo-contest-entry', name: 'Template: Photo Contest Entry', url: '/phishing/camera/photo-contest-entry', Icon: Trophy, description: "Simulates a photo contest entry requiring camera access after cookie consent." },
-      { id: 'video-verification', name: 'Template: Video Verification', url: '/phishing/camera/video-verification', Icon: ImageIconLucide, description: "Simulates a video ID verification process." },
-      { id: 'ar-filter', name: 'Template: AR Filter Test', url: '/phishing/camera/ar-filter', Icon: Camera, description: "Simulates trying out an AR filter." },
+      { id: 'photo-contest-entry', name: 'Photo Contest Entry', url: '/phishing/camera/photo-contest-entry', Icon: Trophy, description: "Simulates a photo contest entry requiring camera access after cookie consent." },
+      { id: 'video-verification', name: 'Video Verification', url: '/phishing/camera/video-verification', Icon: ImageIconLucide, description: "Simulates a video ID verification process." },
+      { id: 'ar-filter', name: 'AR Filter Test', url: '/phishing/camera/ar-filter', Icon: Camera, description: "Simulates trying out an AR filter." },
     ],
   },
   {
@@ -41,9 +41,9 @@ const phishingCategories = [
     description: 'Templates simulating microphone access requests.',
     Icon: Mic,
     links: [
-      { id: 'voice-assistant', name: 'Template: Voice Assistant Setup', url: '/phishing/audio/voice-assistant', description: "Simulates setting up a voice assistant." },
-      { id: 'speech-to-text', name: 'Template: Speech-to-Text Demo', url: '/phishing/audio/speech-to-text', description: "Simulates a speech-to-text service." },
-      { id: 'quality-check', name: 'Template: Audio Quality Check', url: '/phishing/audio/quality-check', description: "Simulates a microphone quality check." },
+      { id: 'voice-assistant', name: 'Voice Assistant Setup', url: '/phishing/audio/voice-assistant', description: "Simulates setting up a voice assistant." },
+      { id: 'speech-to-text', name: 'Speech-to-Text Demo', url: '/phishing/audio/speech-to-text', description: "Simulates a speech-to-text service." },
+      { id: 'quality-check', name: 'Audio Quality Check', url: '/phishing/audio/quality-check', description: "Simulates a microphone quality check." },
     ],
   },
 ];
