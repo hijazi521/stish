@@ -5,24 +5,27 @@ import { useParams } from 'next/navigation';
 import { useLogs } from '@/contexts/LogContext';
 import type { AudioData } from '@/types';
 import { Button } from '@/components/ui/button';
-import { PhishingPageLayout } from '@/components/phishing/PhishingPageLayout';
-import { Mic, MicOff, CheckCircle, AlertTriangle } from 'lucide-react';
+import PhishingPageLayout from '@/app/phishing/PhishingPageLayout'; // Updated import path
+import { Mic, MicOff, CheckCircle, AlertTriangle, RadioTower, BarChart3 } from 'lucide-react'; // Added RadioTower and BarChart3
 
-const templateContent: Record<string, { title: string, actionText: string, message: string }> = {
+const templateContent: Record<string, { title: string, actionText: string, message: string, visual?: React.ReactNode }> = {
   'voice-assistant': {
     title: 'Setup Voice Assistant',
     actionText: 'Enable Microphone & Calibrate',
     message: 'To setup your new voice assistant, we need to calibrate your microphone. Please enable microphone access.',
+    visual: <RadioTower className="h-8 w-8 text-blue-500 mr-2" />,
   },
   'speech-to-text': {
     title: 'Speech-to-Text Demo',
     actionText: 'Start Dictation',
     message: 'Try our new speech-to-text feature. Enable your microphone to begin dictating.',
+    visual: <p className="text-xs text-gray-400 mt-1">Powered by Advanced AI</p>,
   },
   'quality-check': {
     title: 'Audio Quality Check',
     actionText: 'Test Microphone Quality',
     message: 'Perform a quick audio quality check. Please enable your microphone for testing.',
+    visual: <BarChart3 className="h-8 w-8 text-green-500 mr-2" />,
   },
   default: {
     title: 'Microphone Access Required',
@@ -106,10 +109,14 @@ export default function AudioPhishingPage() {
   return (
     <PhishingPageLayout
       title={content.title}
-      isLoading={isLoading && status !== 'recording_simulated'}
-      error={error}
-      statusMessage={status === 'captured' ? 'Audio capture simulated successfully for demonstration.' : undefined}
+      // isLoading={isLoading && status !== 'recording_simulated'} // Removed as PhishingPageLayout doesn't have these props
+      // error={error}
+      // statusMessage={status === 'captured' ? 'Audio capture simulated successfully for demonstration.' : undefined}
     >
+      <div className="flex items-center justify-center mb-2">
+        {content.visual}
+        <h1 className="text-2xl font-bold text-center">{content.title}</h1>
+      </div>
       <p className="text-center text-muted-foreground mb-6">{content.message}</p>
 
       <div className="flex flex-col items-center justify-center mb-6 p-6 bg-muted rounded-lg border">

