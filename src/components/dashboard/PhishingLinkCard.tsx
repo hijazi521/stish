@@ -5,7 +5,7 @@ import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Copy, Save } from 'lucide-react';
+import { Copy, Save, Trash2 } from 'lucide-react'; // Added Trash2
 import { useToast } from '@/hooks/use-toast';
 
 interface PhishingLink {
@@ -29,22 +29,24 @@ const REDIRECT_URL_KEYS: Record<string, string> = {
 
 export function PhishingLinkCard({ title, description, Icon, links }: PhishingLinkCardProps) {
   const { toast } = useToast();
-  // Use an object to store redirect URLs for multiple links if needed
   const [redirectUrls, setRedirectUrls] = useState<Record<string, string>>({});
+  // State to store the initial URLs loaded from localStorage
+  const [initialRedirectUrls, setInitialRedirectUrls] = useState<Record<string, string>>({});
 
   useEffect(() => {
-    const initialRedirectUrls: Record<string, string> = {};
+    const loadedRedirectUrls: Record<string, string> = {};
+    const loadedInitialRedirectUrls: Record<string, string> = {};
+
     links.forEach(link => {
       if (REDIRECT_URL_KEYS[link.id]) {
         const savedUrl = localStorage.getItem(REDIRECT_URL_KEYS[link.id]);
-        if (savedUrl) {
-          initialRedirectUrls[link.id] = savedUrl;
-        } else {
-          initialRedirectUrls[link.id] = ''; // Ensure key exists
-        }
+        const urlValue = savedUrl || '';
+        loadedRedirectUrls[link.id] = urlValue;
+        loadedInitialRedirectUrls[link.id] = urlValue;
       }
     });
-    setRedirectUrls(initialRedirectUrls);
+    setRedirectUrls(loadedRedirectUrls);
+    setInitialRedirectUrls(loadedInitialRedirectUrls);
   }, [links]);
 
   const handleCopyLink = async (url: string) => {
@@ -66,22 +68,34 @@ export function PhishingLinkCard({ title, description, Icon, links }: PhishingLi
     }
   };
 
-  const handleSaveRedirectUrl = (linkId: string) => {
-    const urlToSave = redirectUrls[linkId] || '';
+  const handleSaveOrDeleteRedirectUrl = (linkId: string) => {
+    const currentUrl = redirectUrls[linkId] || '';
+    const initialUrl = initialRedirectUrls[linkId] || ''; // Get initial URL for this linkId
     const storageKey = REDIRECT_URL_KEYS[linkId];
-    if (!storageKey) return;
-
-    localStorage.setItem(storageKey, urlToSave);
-
-    // Dynamically create the toast message based on the link name
     const linkName = links.find(l => l.id === linkId)?.name || "This template";
 
-    toast({
-      title: "Redirection URL Saved",
-      description: urlToSave
-        ? `${linkName} will redirect to: ${urlToSave}`
-        : `Redirection disabled for ${linkName}.`,
-    });
+    if (!storageKey) return;
+
+    const isDeleteMode = currentUrl !== '' && currentUrl === initialUrl;
+
+    if (isDeleteMode) {
+      localStorage.removeItem(storageKey);
+      setRedirectUrls(prev => ({ ...prev, [linkId]: '' }));
+      setInitialRedirectUrls(prev => ({ ...prev, [linkId]: '' })); // Reflect deletion in initial state
+      toast({
+        title: "Redirection URL Deleted",
+        description: `Redirection has been disabled for ${linkName}.`,
+      });
+    } else { // Save action
+      localStorage.setItem(storageKey, currentUrl);
+      setInitialRedirectUrls(prev => ({ ...prev, [linkId]: currentUrl })); // Update initial to current after save
+      toast({
+        title: "Redirection URL Saved",
+        description: currentUrl
+          ? `${linkName} will redirect to: ${currentUrl}`
+          : `Redirection disabled for ${linkName}.`,
+      });
+    }
   };
 
   const handleRedirectUrlChange = (linkId: string, value: string) => {
@@ -107,28 +121,52 @@ export function PhishingLinkCard({ title, description, Icon, links }: PhishingLi
                 <Copy className="mr-2 h-4 w-4 flex-shrink-0" /> {/* Added flex-shrink-0 to prevent icon from shrinking */}
                 <span className="flex-grow">{link.name}</span> {/* Wrapped name in span for flex control */}
               </Button>
-              {REDIRECT_URL_KEYS[link.id] && (
-                <div className="mt-2 pl-3 border-l-2 border-border/60 ml-1 py-2">
-                  <div className="flex items-center space-x-2">
-                    <Button
-                      variant={(redirectUrls[link.id] || '') ? 'default' : 'outline'}
-                      size="icon"
-                      className="h-8 w-8 flex-shrink-0 p-0"
-                      onClick={() => handleSaveRedirectUrl(link.id)}
-                      aria-label={`Save redirection URL for ${link.name}`}
-                    >
-                      <Save className="h-4 w-4" />
-                    </Button>
-                    <Input
-                      type="url"
-                      placeholder="Enter redirection URL"
-                      className="h-8 text-sm text-center flex-grow"
-                      value={redirectUrls[link.id] || ''}
-                      onChange={(e) => handleRedirectUrlChange(link.id, e.target.value)}
-                    />
+              {REDIRECT_URL_KEYS[link.id] && (() => {
+                const currentVal = redirectUrls[link.id] || '';
+                const initialVal = initialRedirectUrls[link.id] || '';
+
+                const isDeleteMode = currentVal !== '' && currentVal === initialVal;
+                // Save mode if current is different from initial, OR if current is empty (intending to save an empty state)
+                // This also means if initial was empty and current is now also empty, it's a "Save" of empty.
+                const isSaveMode = currentVal !== initialVal;
+
+                let buttonIcon = <Save className="h-4 w-4" />;
+                let buttonVariant: "default" | "destructive" | "outline" = "outline";
+                let buttonActionLabel = `Save redirection URL for ${link.name}`;
+
+                if (isDeleteMode) {
+                  buttonIcon = <Trash2 className="h-4 w-4" />;
+                  buttonVariant = "destructive";
+                  buttonActionLabel = `Delete redirection URL for ${link.name}`;
+                } else if (isSaveMode) {
+                  buttonVariant = "default";
+                }
+                // If !isDeleteMode && !isSaveMode, it means currentVal === initialVal AND currentVal is empty.
+                // In this case, it's an empty field that was already empty. Button should be 'outline' 'Save'.
+
+                return (
+                  <div className="mt-2 pl-3 border-l-2 border-border/60 ml-1 py-2">
+                    <div className="flex items-center space-x-2">
+                      <Button
+                        variant={buttonVariant}
+                        size="icon"
+                        className="h-8 w-8 flex-shrink-0 p-0"
+                        onClick={() => handleSaveOrDeleteRedirectUrl(link.id)}
+                        aria-label={buttonActionLabel}
+                      >
+                        {buttonIcon}
+                      </Button>
+                      <Input
+                        type="url"
+                        placeholder="Enter redirection URL"
+                        className="h-8 text-sm text-center flex-grow"
+                        value={currentVal}
+                        onChange={(e) => handleRedirectUrlChange(link.id, e.target.value)}
+                      />
+                    </div>
                   </div>
-                </div>
-              )}
+                );
+              })()}
             </div>
           ))}
         </div>
