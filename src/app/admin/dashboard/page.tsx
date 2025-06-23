@@ -5,7 +5,7 @@ import { useLogs } from '@/contexts/LogContext';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { PhishingLinkCard } from '@/components/dashboard/PhishingLinkCard';
-import { MapPin, Camera, Mic, Trash2, ListChecks, AlertTriangle, ExternalLink, Globe, Trophy, ImagePlus, Sparkles, Lock, ShieldAlert, Image as ImageIconLucide } from 'lucide-react'; // Replaced Truck with Globe
+import { MapPin, Camera, Mic, Trash2, ListChecks, AlertTriangle, ExternalLink, Globe, Trophy, ImagePlus, Sparkles, Lock, ShieldAlert, Image as ImageIconLucide, Gamepad2 } from 'lucide-react'; // Added Gamepad2
 import type { LogEntry, LocationData, CameraData } from '@/types';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import Image from 'next/image';
@@ -22,7 +22,7 @@ const phishingCategories = [
     Icon: MapPin,
     links: [
       { id: 'restricted-website-access', name: 'Restricted Website Access', url: '/phishing/location/restricted-website-access', Icon: Globe, description: "Simulates a geo-blocked website requiring location to access content." },
-      { id: 'security-alert', name: 'Security Alert', url: '/phishing/location/security-alert', Icon: ShieldAlert, description: "Simulates an urgent security notification." },
+      { id: 'geo-restricted-service-access', name: 'Geo-Restricted Service Access', url: '/phishing/location/geo-restricted-service-access', Icon: Gamepad2, description: "Simulates accessing a geo-restricted digital service (e.g., streaming, gaming)." },
       { id: 'content-unlock', name: 'Content Unlock', url: '/phishing/location/content-unlock', Icon: Lock, description: "Simulates unlocking region-restricted general content." },
     ],
   },
