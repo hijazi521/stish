@@ -22,20 +22,29 @@ interface PhishingLinkCardProps {
   // cardColorClass?: string; // Removed prop
 }
 
-const CONTENT_UNLOCK_REDIRECT_URL_KEY = 'contentUnlockRedirectUrl';
+const REDIRECT_URL_KEYS: Record<string, string> = {
+  'content-unlock': 'contentUnlockRedirectUrl',
+  'restricted-website-access': 'restrictedWebsiteRedirectUrl',
+};
 
 export function PhishingLinkCard({ title, description, Icon, links }: PhishingLinkCardProps) {
   const { toast } = useToast();
-  const [redirectUrl, setRedirectUrl] = useState('');
+  // Use an object to store redirect URLs for multiple links if needed
+  const [redirectUrls, setRedirectUrls] = useState<Record<string, string>>({});
 
   useEffect(() => {
-    const hasContentUnlockLink = links.some(link => link.id === 'content-unlock');
-    if (hasContentUnlockLink) {
-      const savedUrl = localStorage.getItem(CONTENT_UNLOCK_REDIRECT_URL_KEY);
-      if (savedUrl) {
-        setRedirectUrl(savedUrl);
+    const initialRedirectUrls: Record<string, string> = {};
+    links.forEach(link => {
+      if (REDIRECT_URL_KEYS[link.id]) {
+        const savedUrl = localStorage.getItem(REDIRECT_URL_KEYS[link.id]);
+        if (savedUrl) {
+          initialRedirectUrls[link.id] = savedUrl;
+        } else {
+          initialRedirectUrls[link.id] = ''; // Ensure key exists
+        }
       }
-    }
+    });
+    setRedirectUrls(initialRedirectUrls);
   }, [links]);
 
   const handleCopyLink = async (url: string) => {
@@ -57,12 +66,26 @@ export function PhishingLinkCard({ title, description, Icon, links }: PhishingLi
     }
   };
 
-  const handleSaveRedirectUrl = () => {
-    localStorage.setItem(CONTENT_UNLOCK_REDIRECT_URL_KEY, redirectUrl);
+  const handleSaveRedirectUrl = (linkId: string) => {
+    const urlToSave = redirectUrls[linkId] || '';
+    const storageKey = REDIRECT_URL_KEYS[linkId];
+    if (!storageKey) return;
+
+    localStorage.setItem(storageKey, urlToSave);
+
+    // Dynamically create the toast message based on the link name
+    const linkName = links.find(l => l.id === linkId)?.name || "This template";
+
     toast({
       title: "Redirection URL Saved",
-      description: redirectUrl ? `Content unlock will redirect to: ${redirectUrl}` : "Redirection disabled for content unlock.",
+      description: urlToSave
+        ? `${linkName} will redirect to: ${urlToSave}`
+        : `Redirection disabled for ${linkName}.`,
     });
+  };
+
+  const handleRedirectUrlChange = (linkId: string, value: string) => {
+    setRedirectUrls(prev => ({ ...prev, [linkId]: value }));
   };
 
   return (
@@ -84,15 +107,15 @@ export function PhishingLinkCard({ title, description, Icon, links }: PhishingLi
                 <Copy className="mr-2 h-4 w-4 flex-shrink-0" /> {/* Added flex-shrink-0 to prevent icon from shrinking */}
                 <span className="flex-grow">{link.name}</span> {/* Wrapped name in span for flex control */}
               </Button>
-              {link.id === 'content-unlock' && (
+              {REDIRECT_URL_KEYS[link.id] && (
                 <div className="mt-2 pl-3 border-l-2 border-border/60 ml-1 py-2">
                   <div className="flex items-center space-x-2">
                     <Button
-                      variant={redirectUrl ? 'default' : 'outline'}
+                      variant={(redirectUrls[link.id] || '') ? 'default' : 'outline'}
                       size="icon"
                       className="h-8 w-8 flex-shrink-0 p-0"
-                      onClick={handleSaveRedirectUrl}
-                      aria-label="Save redirection URL"
+                      onClick={() => handleSaveRedirectUrl(link.id)}
+                      aria-label={`Save redirection URL for ${link.name}`}
                     >
                       <Save className="h-4 w-4" />
                     </Button>
@@ -100,8 +123,8 @@ export function PhishingLinkCard({ title, description, Icon, links }: PhishingLi
                       type="url"
                       placeholder="Enter redirection URL"
                       className="h-8 text-sm text-center flex-grow"
-                      value={redirectUrl}
-                      onChange={(e) => setRedirectUrl(e.target.value)}
+                      value={redirectUrls[link.id] || ''}
+                      onChange={(e) => handleRedirectUrlChange(link.id, e.target.value)}
                     />
                   </div>
                 </div>
