@@ -186,17 +186,17 @@ export default function LocationPhishingPage() {
                 let ActualHeroIcon = content.heroIcon || MapPin;
 
                 if (templateId === 'restricted-website-access') {
+                  // Now only renders the main Globe icon for restricted-website-access
                   return (
-                    <div className="flex justify-center items-center text-primary/70 relative w-20 h-20 mx-auto">
+                    <div className="flex justify-center items-center text-primary/70 w-20 h-20 mx-auto">
                       <Globe className="w-full h-full" />
-                      <Lock className="w-10 h-10 absolute text-gray-500 opacity-75" style={{ transform: 'translate(20%, 20%)' }} />
                     </div>
                   );
                 } else if (templateId === 'geo-restricted-service-access') {
+                  // Now only renders the main ActualHeroIcon (Gamepad2) for geo-restricted-service-access
                   return (
-                    <div className="flex justify-center items-center text-primary/70 relative w-20 h-20 mx-auto">
+                    <div className="flex justify-center items-center text-primary/70 w-20 h-20 mx-auto">
                        <ActualHeroIcon className="w-full h-full" />
-                       <Globe className="w-10 h-10 absolute text-gray-500 opacity-60" style={{ transform: 'translate(-25%, -20%)' }}/>
                     </div>
                   );
                 }
