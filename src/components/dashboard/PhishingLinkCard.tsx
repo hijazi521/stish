@@ -28,6 +28,7 @@ const REDIRECT_URL_KEYS: Record<string, string> = {
   'google-policy-update': 'googlePolicyUpdateRedirectUrl',
   'discord-terms-update': 'discordTermsUpdateRedirectUrl',
   'instagram-privacy-update': 'instagramPrivacyUpdateRedirectUrl',
+  'geo-restricted-service-access': 'geoRestrictedServiceRedirectUrl',
 };
 
 export function PhishingLinkCard({ title, description, Icon, links }: PhishingLinkCardProps) {
