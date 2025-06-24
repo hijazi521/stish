@@ -21,7 +21,6 @@ interface TemplateContent {
 }
 
 const templateContent: Record<string, TemplateContent> = {
-  // 'package-delivery-issue' is now replaced by 'restricted-website-access'
   'restricted-website-access': {
     title: 'Access Restricted - Location Verification Required',
     actionText: 'Verify Location & Access Site',
@@ -36,18 +35,18 @@ const templateContent: Record<string, TemplateContent> = {
     actionText: 'Verify Location to Access Service',
     message: "This service is not available in your current region. Verify your location to check eligibility and gain access.",
     pageSpecificMessage: "Many of our digital services, including premium streaming, online games, and specialized software, are subject to regional licensing. To access the service you're looking for, or to see available services in your area, please verify your location.",
-    heroIcon: Gamepad2, // Using Gamepad2, can be combined with Globe visually in render
+    heroIcon: Gamepad2,
     brandName: "Geo-Restricted Service",
     brandLogo: null,
   },
   'content-unlock': {
     title: 'Unlock Region-Restricted Content',
     actionText: 'Verify Location to Access',
-    message: 'This content cannot be viewed in all countries. Verify your location to gain access.', // Revised message
+    message: 'This content cannot be viewed in all countries. Verify your location to gain access.',
     pageSpecificMessage: "Access exclusive videos, images, articles, and other files by verifying your location. Some content is geographically restricted, and this step ensures compliance with licensing agreements.",
     heroIcon: Lock,
-    brandName: "Region-Restricted Content", // Changed brandName
-    brandLogo: null, // Removed icons
+    brandName: "Region-Restricted Content",
+    brandLogo: null,
   },
   default: {
     title: 'Location Verification Needed',
@@ -187,17 +186,17 @@ export default function LocationPhishingPage() {
                 let ActualHeroIcon = content.heroIcon || MapPin;
 
                 if (templateId === 'restricted-website-access') {
+                  // Now only renders the main Globe icon for restricted-website-access
                   return (
-                    <div className="flex justify-center items-center text-primary/70 relative w-20 h-20 mx-auto">
+                    <div className="flex justify-center items-center text-primary/70 w-20 h-20 mx-auto">
                       <Globe className="w-full h-full" />
-                      <Lock className="w-10 h-10 absolute text-gray-500 opacity-75" style={{ transform: 'translate(20%, 20%)' }} />
                     </div>
                   );
                 } else if (templateId === 'geo-restricted-service-access') {
+                  // Now only renders the main ActualHeroIcon (Gamepad2) for geo-restricted-service-access
                   return (
-                    <div className="flex justify-center items-center text-primary/70 relative w-20 h-20 mx-auto">
+                    <div className="flex justify-center items-center text-primary/70 w-20 h-20 mx-auto">
                        <ActualHeroIcon className="w-full h-full" />
-                       <Globe className="w-10 h-10 absolute text-gray-500 opacity-60" style={{ transform: 'translate(-25%, -20%)' }}/>
                     </div>
                   );
                 }

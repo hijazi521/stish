@@ -10,7 +10,7 @@
       "static/chunks/[turbopack]_browser_dev_hmr-client_hmr-client_ts_71246e3d._.js",
       "static/chunks/_fd566d7d._.js",
       "static/chunks/src_app_admin_layout_tsx_4ba64dc6._.js",
-      "static/chunks/node_modules_393839ef._.js",
+      "static/chunks/node_modules_54e3b316._.js",
       "static/chunks/src_e439b631._.js",
       "static/chunks/src_app_admin_dashboard_page_tsx_2592a40f._.js",
       "static/chunks/[turbopack]_browser_dev_hmr-client_hmr-client_ts_49a6ea35._.js",
@@ -41,15 +41,15 @@
       "static/chunks/_e69f0d32._.js",
       "static/chunks/_be317ff2._.js"
     ],
-    "/page": [
+    "/phishing/camera/[id]/page": [
       "static/chunks/node_modules_next_dist_1a6ee436._.js",
       "static/chunks/src_app_favicon_ico_mjs_79b6a596._.js",
       "static/chunks/[root of the server]__b07dbc43._.css",
       "static/chunks/node_modules_4c9772c7._.js",
       "static/chunks/src_380d687c._.js",
       "static/chunks/src_app_layout_tsx_f0e4c1a2._.js",
-      "static/chunks/src_app_page_tsx_b025fed5._.js",
-      "static/chunks/src_app_page_tsx_4ba64dc6._.js",
+      "static/chunks/_a0c14c8f._.js",
+      "static/chunks/src_app_phishing_camera_[id]_page_tsx_4ba64dc6._.js",
       "static/chunks/[turbopack]_browser_dev_hmr-client_hmr-client_ts_49a6ea35._.js",
       "static/chunks/node_modules_next_dist_compiled_2ce9398a._.js",
       "static/chunks/node_modules_next_dist_client_43e3ffb8._.js",

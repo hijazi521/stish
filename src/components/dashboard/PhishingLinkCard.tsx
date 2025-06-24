@@ -25,7 +25,10 @@ interface PhishingLinkCardProps {
 const REDIRECT_URL_KEYS: Record<string, string> = {
   'content-unlock': 'contentUnlockRedirectUrl',
   'restricted-website-access': 'restrictedWebsiteRedirectUrl',
-  'geo-restricted-service-access': 'geoRestrictedServiceRedirectUrl', // Added new key
+  'google-policy-update': 'googlePolicyUpdateRedirectUrl',
+  'discord-terms-update': 'discordTermsUpdateRedirectUrl',
+  'instagram-privacy-update': 'instagramPrivacyUpdateRedirectUrl',
+  'geo-restricted-service-access': 'geoRestrictedServiceRedirectUrl',
 };
 
 export function PhishingLinkCard({ title, description, Icon, links }: PhishingLinkCardProps) {
