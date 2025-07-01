@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
-import { LogIn, LogOut, ShieldCheck } from 'lucide-react'; 
+import { LogIn, LogOut, ShieldCheck, Settings2 } from 'lucide-react';
 
 export function AppHeader() {
   const { isAuthenticated, logout, isLoading } = useAuth();
@@ -12,24 +12,33 @@ export function AppHeader() {
     <header className="bg-primary text-primary-foreground shadow-md">
       <div className="container mx-auto flex h-16 items-center justify-between px-4 sm:px-6 lg:px-8">
         <Link href={isAuthenticated ? "/admin/dashboard" : "/admin/login"} className="flex items-center gap-2 text-xl font-semibold">
-          {/* Changed text-accent to text-primary-foreground for better contrast */}
           <ShieldCheck className="h-7 w-7 text-primary-foreground" /> 
           <span>Stish</span>
         </Link>
-        {isAuthenticated && !isLoading && (
-          <Button variant="ghost" onClick={logout} className="text-primary-foreground hover:bg-primary/80">
-            <LogOut className="mr-2 h-4 w-4" />
-            Logout
-          </Button>
-        )}
-        {!isAuthenticated && !isLoading && (
-           <Link href="/admin/login">
-            <Button variant="ghost" className="text-primary-foreground hover:bg-primary/80">
-              <LogIn className="mr-2 h-4 w-4" />
-              Admin Login
-            </Button>
-          </Link>
-        )}
+        <div className="flex items-center gap-2">
+          {isAuthenticated && !isLoading && (
+            <>
+              <Link href="/admin/advanced-dashboard">
+                <Button variant="ghost" className="text-primary-foreground hover:bg-primary/80">
+                  <Settings2 className="mr-2 h-4 w-4" />
+                  Advanced
+                </Button>
+              </Link>
+              <Button variant="ghost" onClick={logout} className="text-primary-foreground hover:bg-primary/80">
+                <LogOut className="mr-2 h-4 w-4" />
+                Logout
+              </Button>
+            </>
+          )}
+          {!isAuthenticated && !isLoading && (
+             <Link href="/admin/login">
+              <Button variant="ghost" className="text-primary-foreground hover:bg-primary/80">
+                <LogIn className="mr-2 h-4 w-4" />
+                Admin Login
+              </Button>
+            </Link>
+          )}
+        </div>
       </div>
     </header>
   );
