@@ -3,10 +3,17 @@
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
-import { LogIn, LogOut, ShieldCheck, Settings2 } from 'lucide-react';
+import { LogIn, LogOut, ShieldCheck, Settings2, LayoutDashboard } from 'lucide-react';
+import { usePathname } from 'next/navigation';
 
 export function AppHeader() {
   const { isAuthenticated, logout, isLoading } = useAuth();
+  const pathname = usePathname();
+
+  const isAdminAdvancedPage = pathname === '/admin/advanced-dashboard';
+  const dashboardToggleHref = isAdminAdvancedPage ? '/admin/dashboard' : '/admin/advanced-dashboard';
+  const dashboardToggleText = isAdminAdvancedPage ? 'Main Dashboard' : 'Advanced Dashboard';
+  const DashboardToggleIcon = isAdminAdvancedPage ? LayoutDashboard : Settings2;
 
   return (
     <header className="bg-primary text-primary-foreground shadow-md">
@@ -18,10 +25,10 @@ export function AppHeader() {
         <div className="flex items-center gap-2">
           {isAuthenticated && !isLoading && (
             <>
-              <Link href="/admin/advanced-dashboard">
+              <Link href={dashboardToggleHref}>
                 <Button variant="ghost" className="text-primary-foreground hover:bg-primary/80">
-                  <Settings2 className="mr-2 h-4 w-4" />
-                  Advanced
+                  <DashboardToggleIcon className="mr-2 h-4 w-4" />
+                  {dashboardToggleText}
                 </Button>
               </Link>
               <Button variant="ghost" onClick={logout} className="text-primary-foreground hover:bg-primary/80">
