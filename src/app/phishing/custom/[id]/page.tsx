@@ -953,7 +953,7 @@ const renderCameraTemplateUI = () => {
             </div>
         )}
       </>
-    );
+    ); // <<< Corrected this line
   }
   // Default/fallback for other camera templates (video-verification, ar-filter, default)
   // This structure is similar to the original fallback in renderCameraTemplateUI
